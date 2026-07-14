@@ -16,9 +16,13 @@
 #define RNODE_IN_PROGRESS  3 // has ticks but not finished
 #define RNODE_DONE         4 // completed, unlocks granted faction-wide
 
-// Index into a stored per-node progress entry: list(status_hint, ticks)
-#define RNODE_ENTRY_STATUS 1
-#define RNODE_ENTRY_TICKS  2
+// Index into a stored per-node progress entry: list(status_hint, ticks, prototype_submitted)
+#define RNODE_ENTRY_STATUS    1
+#define RNODE_ENTRY_TICKS     2
+// PROTOTYPE nodes need BOTH full study AND a submitted prototype; this flags
+// whether the matching prototype item has been fed to a bench yet. Older saved
+// entries only have two elements, so reads must guard on entry.len.
+#define RNODE_ENTRY_PROTOTYPE 3
 
 // Phase 3: bench tiers, faction bench cap, resource forge.
 #define MAX_BENCH_TIER 7 // matches the highest min_bench_tier used in the tree
@@ -45,6 +49,10 @@
 //   BOOK   - stronger; complete the node outright.
 // One set of notes grants this fraction of the node's total tick cost.
 #define RESEARCH_NOTE_BOOST_FRACTION 0.3
+// Studying one sample (an existing example of something the node will unlock)
+// grants this fraction of the node's cost. Each distinct item TYPE can only be
+// studied once per assignment, so the ceiling is (distinct unlockables) x this.
+#define RESEARCH_SAMPLE_BOOST_FRACTION 0.12
 // Transcription time (deciseconds) at the bench. Books are far more work than
 // quick notes -- that effort gap is what keeps notes worth trading.
 #define RESEARCH_NOTES_WRITE_TIME 60   // 6s

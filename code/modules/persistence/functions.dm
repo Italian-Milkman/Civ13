@@ -103,6 +103,15 @@ map_storage
 			src.ignore_types = ignore
 		return
 
+// Drops the save/load bookkeeping references so qdel'd atoms can be garbage
+// collected - these lists otherwise pin every atom they touched until the next
+// save/load runs. Called after a save or load finishes, successfully or not.
+/map_storage/proc/clear_bookkeeping()
+	saving_references = list()
+	existing_references = list()
+	found_types = list()
+	all_loaded = list()
+
 // Returns true if the value is purely numeric, return false if there are non-numeric
 // characters contained within the text string.
 /map_storage/proc/IsNumeric(text)
@@ -158,22 +167,33 @@ map_storage
 //////////////////GAMETICKER/////////////
 //////////////////////////////////////////
 
+var/global/persistence_save_in_progress = FALSE
+
 /datum/controller/gameticker/proc/savemap()
+	if (persistence_save_in_progress)
+		return 0
+	persistence_save_in_progress = TRUE
 	var/watch = start_watch()
 	to_chat(world, "<FONT color='yellow'><B>SAVING THE MAP! THIS USUALLY TAKES UNDER A MINUTE</B></FONT>")
 	sleep(5)
-	map_storage.Save_World()
+	try
+		map_storage.Save_World()
+	catch(var/exception/e)
+		map_storage.clear_bookkeeping()
+		persistence_save_in_progress = FALSE
+		message_admins("EXCEPTION IN MAP SAVING!! [e] on [e.file]:[e.line]")
+		return 0
+	persistence_save_in_progress = FALSE
 	log_startup_progress("	Saved the map in [stop_watch(watch)]s.")
 	return 1
 
 /datum/controller/gameticker/proc/loadmap()
 	var/watch = start_watch()
-	var/started = 0
 	log_startup_progress("Starting map load...")
 	sleep(1)
 	map_storage.ClearMap()
 	sleep(1)
 	map_storage.Load_World()
-	if(started)
-		log_startup_progress("	Loaded the map in [stop_watch(watch)]s.")
+	map_storage.load_map_metadata()
+	log_startup_progress("	Loaded the map in [stop_watch(watch)]s.")
 	return 1

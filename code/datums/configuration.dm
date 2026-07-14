@@ -141,6 +141,7 @@ var/list/gamemode_cache = list()
 	var/daynight_on = TRUE
 	var/seasons_on = TRUE
 	var/skip_persistence_saving = FALSE
+	var/persistence_reboot_hour = -1 // server-clock hour (0-23) at which a persistent world saves and reboots to reclaim memory. -1 disables.
 
 	// webhook stuff
 	var/webhook_can_fire = TRUE
@@ -441,6 +442,14 @@ var/list/gamemode_cache = list()
 
 				if ("skip_persistence_saving")
 					config.skip_persistence_saving = TRUE
+
+				if ("persistence_reboot_hour")
+					var/reboot_hour = text2num(value)
+					if (isnum(reboot_hour) && reboot_hour >= 0 && reboot_hour <= 23)
+						config.persistence_reboot_hour = reboot_hour
+					else
+						config.persistence_reboot_hour = -1
+						log_misc("Configuration: PERSISTENCE_REBOOT_HOUR '[value]' is not an hour (0-23); daily maintenance reboot disabled.")
 
 				if ("webhook_can_fire")
 					config.webhook_can_fire = TRUE

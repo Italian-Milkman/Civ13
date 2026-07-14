@@ -94,13 +94,31 @@
 		faction_research[faction] = fac
 	var/list/entry = fac[node_id]
 	if (!entry)
-		entry = list(RNODE_AVAILABLE, 0)
+		entry = list(RNODE_AVAILABLE, 0, 0) // status, ticks, prototype-submitted
 		fac[node_id] = entry
 	return entry
 
+// Whether the prototype for a PROTOTYPE-mode node has been fed to a bench yet.
+/obj/map_metadata/proc/node_prototype_submitted(faction, node_id)
+	var/list/entry = get_node_entry(faction, node_id)
+	return entry && entry.len >= RNODE_ENTRY_PROTOTYPE && entry[RNODE_ENTRY_PROTOTYPE]
+
+// Records that the prototype has been submitted (older 2-element entries are
+// grown to fit the flag first).
+/obj/map_metadata/proc/set_prototype_submitted(faction, node_id)
+	var/list/entry = ensure_node_entry(faction, node_id)
+	while (entry.len < RNODE_ENTRY_PROTOTYPE)
+		entry += 0
+	entry[RNODE_ENTRY_PROTOTYPE] = 1
+
 /obj/map_metadata/proc/is_node_done(faction, node_id)
 	var/datum/research_node/N = get_research_node(node_id)
-	if (N)
+	// The era-baseline free grant is a MAIN-TREE-ONLY mechanic. Specialist
+	// trees (Agriculture, Tailoring, ...) must never auto-complete by era --
+	// a faction's edge there is meant to be durable and actually earned, and
+	// new factions/factionless start at genuine zero in them, with no
+	// era-based catch-up at all (locked design decision).
+	if (N && N.tree == "Main")
 		if (!faction || faction == "none")
 			// Factionless: no persistent identity to freeze a snapshot
 			// against, and no "someone else's achievement" unfairness to
@@ -109,14 +127,15 @@
 				return TRUE
 		else
 			// A real faction's baseline is frozen at whatever era existed
-			// when they were founded (set in create_faction_pr()). It must
+			// when they were founded (set in found_faction(), see
+			// faction_creation.dm). It must
 			// NOT keep growing later just because the era advances due to
 			// OTHER factions' achievements or the legacy age-up system --
 			// past that snapshot, they have to actually research it.
 			var/snapshot_era = faction_baseline_era[faction]
 			if (isnull(snapshot_era))
 				// Faction predates snapshot tracking (or was created outside
-				// create_faction_pr(), e.g. a map's fixed civs) -- grandfather
+				// the creation UI, e.g. a map's fixed civs) -- grandfather
 				// it in at whatever era it is right now, freezing from here on.
 				snapshot_era = ordinal_age
 				faction_baseline_era[faction] = snapshot_era
@@ -160,7 +179,35 @@
 	entry[RNODE_ENTRY_TICKS] += amount
 	entry[RNODE_ENTRY_STATUS] = RNODE_IN_PROGRESS
 	if (entry[RNODE_ENTRY_TICKS] >= N.cost_ticks)
+		// A PROTOTYPE node needs BOTH the full study AND the prototype submitted.
+		// If study is done but the prototype hasn't been fed in yet, hold the
+		// ticks at the cap and wait -- completion happens when the prototype is
+		// submitted (see the bench's attackby).
+		if (N.mode == RESEARCH_MODE_PROTOTYPE && !node_prototype_submitted(faction, node_id))
+			entry[RNODE_ENTRY_TICKS] = N.cost_ticks
+			return FALSE
 		return complete_node(faction, node_id)
+	return FALSE
+
+// Human-readable name of an ordinal age (0-8), for era-change announcements.
+/proc/ordinal_age_name(age)
+	var/static/list/age_names = list("Stone Age", "Classical Age", "Medieval Age", "Imperial Age", "Industrial Age", "WW1", "WW2", "Cold War", "Modern Age")
+	var/i = age + 1
+	if (i >= 1 && i <= age_names.len)
+		return age_names[i]
+	return "new age"
+
+// TRUE if at least one research-authorised member of faction (Leader, Research
+// Director or Researcher) is currently connected. Benches only tick while this
+// holds, so a faction can't research while nobody who could direct it is around.
+/obj/map_metadata/proc/faction_has_active_researcher(faction)
+	if (!faction || faction == "none")
+		return FALSE
+	for (var/mob/living/human/H in human_mob_list)
+		if (!H.client || H.civilization != faction)
+			continue
+		if (is_faction_leader(H, faction) || is_research_director(H, faction) || H.research_role == "researcher")
+			return TRUE
 	return FALSE
 
 // Marks a node DONE faction-wide. Returns TRUE.
@@ -171,11 +218,17 @@
 	var/list/entry = ensure_node_entry(faction, node_id)
 	entry[RNODE_ENTRY_STATUS] = RNODE_DONE
 	entry[RNODE_ENTRY_TICKS] = N.cost_ticks
-	// Announce to the researching faction only: world-wide shouts for every
-	// node x every faction would be hundreds of lines of noise per round.
-	for (var/mob/living/human/M in human_mob_list)
-		if (M.client && M.civilization == faction)
-			to_chat(M, "<big>Your faction has researched <b>[N.name]</b>!</big>")
+	// Era-changing nodes (the PROTOTYPE-mode capstones) advance the WHOLE WORLD
+	// into their era the first time anyone completes one -- a global event,
+	// announced server-wide. Every other completion is a quiet faction notice
+	// (world-wide shouts for every node x faction would be pure noise).
+	if (N.mode == RESEARCH_MODE_PROTOTYPE && N.era_tier > ordinal_age)
+		ordinal_age = N.era_tier
+		to_chat(world, "<big><font color='#c98a1d'>The discovery of <b>[N.name]</b> by the [faction] sends the world into the <b>[ordinal_age_name(N.era_tier)]</b>!</font></big>")
+	else
+		for (var/mob/living/human/M in human_mob_list)
+			if (M.client && M.civilization == faction)
+				to_chat(M, "<big>Your faction has researched <b>[N.name]</b>!</big>")
 	return TRUE
 
 // ------------------------------------------------------------
@@ -192,6 +245,8 @@
 /obj/map_metadata/proc/count_faction_benches(faction)
 	var/count = 0
 	for (var/obj/structure/research_bench/B in research_benches)
+		if (istype(B, /obj/structure/research_bench/adminbench))
+			continue // debug-only bench; must not eat into a real faction's cap
 		if (B.faction == faction)
 			count++
 	return count
