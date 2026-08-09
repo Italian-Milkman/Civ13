@@ -11,6 +11,10 @@
 
 	var/resistance = 150
 	var/obj/structure/vehicleparts/axis/axis = null
+
+	/// New wall system
+	var/datum/vehicle_walls/walls = null
+
 	//format: type of wall, opacity, density, armor, current health, can open/close, is open, is ambrasure
 	var/list/w_front = list("",FALSE,FALSE,0,0,FALSE,FALSE,FALSE)
 	var/list/w_back = list("",FALSE,FALSE,0,0,FALSE,FALSE,FALSE)
@@ -36,17 +40,31 @@
 
 	New()
 		..()
+		walls = new()
 		roof = image(icon=icon, loc=src, icon_state="roof_steel[rand(1,4)]", layer=8)
 		roof_turret = image(icon=icon, loc=src, icon_state="", layer=1)
 		roof.override = TRUE
-		spawn(1)
-			update_icon()
+		update_icon()
+
 	relaymove(var/mob/mob, direction)
 		..()
 		update_icon()
 	Move(newloc, direct)
 		..()
 		update_icon()
+
+/obj/structure/vehicleparts/frame/proc/initialize_walls(f_type="", b_type="", l_type="", r_type="")
+	walls.set_wall(NORTH, f_type)
+	walls.set_wall(SOUTH, b_type)
+	walls.set_wall(WEST, l_type)
+	walls.set_wall(EAST, r_type)
+
+	// Sync legacy lists for combat/icon logic
+	if (walls.front) w_front = list(walls.front.wall_type, walls.front.opacity, walls.front.density, walls.front.armor, walls.front.max_health, walls.front.can_open, walls.front.is_open, FALSE)
+	if (walls.back) w_back = list(walls.back.wall_type, walls.back.opacity, walls.back.density, walls.back.armor, walls.back.max_health, walls.back.can_open, walls.back.is_open, FALSE)
+	if (walls.left) w_left = list(walls.left.wall_type, walls.left.opacity, walls.left.density, walls.left.armor, walls.left.max_health, walls.left.can_open, walls.left.is_open, FALSE)
+	if (walls.right) w_right = list(walls.right.wall_type, walls.right.opacity, walls.right.density, walls.right.armor, walls.right.max_health, walls.right.can_open, walls.right.is_open, FALSE)
+
 
 /obj/structure/vehicleparts/frame/proc/total_weight()
 	var/tmpsum = 10
@@ -61,20 +79,20 @@
 	..()
 	if (axis)
 		if (user in range(1,src))
-			user << "<span class='notice'>Current Weight: <b>[axis.get_weight()]</b>.</span>"
+			to_chat(user, "<span class='notice'>Current Weight: <b>[axis.get_weight()]</b>.</span>")
 
 /obj/structure/vehicleparts/frame/MouseDrop(var/obj/structure/vehicleparts/frame/VP)
 	if (istype(VP, /obj/structure/vehicleparts/frame) && VP.axis && !axis)
-		if (abs(VP.y-y) > 5 || abs(VP.x-x) > 5)
-			usr << "<span class='notice'>Vehicles can't be more than 5 tiles long or wide!</span>"
+		if (abs(VP.y-y) > VEHICLE_CONSTANTS.MAX_VEHICLE_SIZE || abs(VP.x-x) > VEHICLE_CONSTANTS.MAX_VEHICLE_SIZE)
+			to_chat(usr, "<span class='notice'>Vehicles can't be more than [VEHICLE_CONSTANTS.MAX_VEHICLE_SIZE] tiles long or wide!</span>")
 			return
-			if (VP.axis.components.len > 25)
-				usr << "<span class='notice'>The vehicle is too big already!</span>"
-				return
+		if (VP.axis.components.len > VEHICLE_CONSTANTS.MAX_COMPONENTS)
+			to_chat(usr, "<span class='notice'>The vehicle is too big already!</span>")
+			return
 		for(var/obj/structure/vehicleparts/frame/FR in range(1,src))
 			if (FR != src && FR.axis == VP.axis)
 				playsound(loc, 'sound/effects/lever.ogg',100, TRUE)
-				usr << "You connect \the [src] to \the [VP.axis]."
+				to_chat(usr, "You connect \the [src] to \the [VP.axis].")
 				axis = VP.axis
 				name = VP.axis.name
 				var/found = FALSE
@@ -90,7 +108,7 @@
 	if (istype(VP, /obj/structure/engine/internal) && axis && !axis.engine && !VP.anchored)
 		var/obj/structure/engine/internal/E = VP
 		playsound(loc, 'sound/effects/lever.ogg',100, TRUE)
-		usr << "You connect \the [VP] to \the [axis]."
+		to_chat(usr, "You connect \the [VP] to \the [axis].")
 		axis.engine = VP
 		VP.forceMove(loc)
 		VP.anchored = TRUE
@@ -100,7 +118,7 @@
 		return
 	else if (istype(VP, /obj/structure/bed/chair/drivers) && axis && !VP.anchored && !axis.wheel)
 		playsound(loc, 'sound/effects/lever.ogg',100, TRUE)
-		usr << "You place \the [VP] in \the [axis]."
+		to_chat(usr, "You place \the [VP] in \the [axis].")
 		VP.forceMove(loc)
 		VP.anchored = TRUE
 		var/obj/structure/bed/chair/drivers/VPP = VP
@@ -110,7 +128,7 @@
 	else if (istype(VP, /obj/structure/lamp/lamp_small/tank) && !VP.anchored)
 		var/obj/structure/lamp/lamp_small/tank/TL = VP
 		TL.connection = src
-		usr << "You place \the [VP] in \the [axis]."
+		to_chat(usr, "You place \the [VP] in \the [axis].")
 
 /obj/structure/vehicleparts/frame/CheckExit(atom/movable/O as mob|obj, target as turf)
 	var/chdir = get_dir(O.loc, target)
@@ -234,7 +252,6 @@
 							return TRUE
 	return FALSE
 /obj/structure/vehicleparts/frame/attackby(var/obj/item/I, var/mob/living/human/H)
-
 	if (mwheel && mwheel.broken && istype(I, /obj/item/weapon/weldingtool))
 		var/cantdo = FALSE
 		for (var/obj/structure/vehicleparts/frame/FM in H.loc)
@@ -242,7 +259,7 @@
 		if (!cantdo)
 			visible_message("[H] starts repairing \the [mwheel.ntype]...")
 			if (do_after(H, 200, src))
-				visible_message("[H] sucessfully repairs \the [mwheel.ntype].")
+				visible_message("[H] successfully repairs \the [mwheel.ntype].")
 				mwheel.broken = FALSE
 				mwheel.update_icon()
 				update_icon()
@@ -250,11 +267,10 @@
 	else if (istype(I,/obj/item/weapon/wrench) && !axis)
 		anchored = !anchored
 		if (anchored)
-			H << "You fix the frame in place."
-			return
+			to_chat(H, "You fix the frame in place.")
 		else
-			H << "You release the frame."
-			return
+			to_chat(H, "You release the frame.")
+		return
 	else if (istype(I,/obj/item/weapon/key))
 		var/obj/item/weapon/key/K = I
 		if (doorcode)
@@ -357,7 +373,7 @@
 					H.setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
 				update_icon()
 			else
-				H << "This key does not match this lock!"
+				to_chat(H, "This key does not match this lock!")
 				return
 		else
 			if(istype(src, /obj/structure/vehicleparts/frame/ship )) //adds routines to lock the boat
@@ -370,15 +386,15 @@
 				else if(src.w_front[1] == "boat_port2")
 					src.w_front[6] = TRUE
 				else
-					H << "This is not a door."
+					to_chat(H, "This is not a door.")
 					return
 				doorcode = K.code
-				H << "You assign this key to the lock."
+				to_chat(H, "You assign this key to the lock.")
 				return
 			else
 				if (src.w_front[6] || src.w_back[6] || src.w_left[6] || src.w_right[6])
 					doorcode = K.code		//Leave it as before if its not a boat
-					H << "You assign this key to the lock."
+					to_chat(H, "You assign this key to the lock.")
 				return
 	else
 		..()
@@ -468,7 +484,7 @@
 
 	else if (istype(proj, /obj/item/weapon/grenade))
 		startingturf = get_turf(proj)
-	
+
 	else if (istype(proj, /obj/structure/drone))
 		startingturf = get_turf(proj)
 
@@ -640,7 +656,7 @@
 		visible_message("<span class='danger'>The frame gets wrecked!</span>")
 		update_icon()
 		broken = TRUE
-	else if (!axis in contents)
+	else if (!(axis in contents))
 		axis = null
 		mwheel = null
 		..()

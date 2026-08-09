@@ -1,6 +1,6 @@
 
 /hook/roundstart/proc/mainstuff()
-	to_chat(world, "<b><big>The round has started!</big></b>")
+	to_world("<big><b>The round has started!</b></big>")
 
 	for (var/C in clients)
 		winset(C, null, "mainwindow.flash=1")
@@ -10,7 +10,7 @@
 
 		// this may have already happened, do it again w/o announce
 		setup_autobalance(0)
-		if (map && map.ID == MAP_FOOTBALL)
+		if (map && istype(map, /obj/map_metadata/football))
 			var/obj/map_metadata/football/FM = map
 			for (var/datum/job/job in job_master.faction_organized_occupations)
 				if (istype(job, /datum/job/civilian/football_red/goalkeeper))
@@ -26,28 +26,6 @@
 					job.selection_color = FM.teams[FM.team2]["main uniform"]["shirt_color"]
 
 				else if (istype(job, /datum/job/civilian/football_blue))
-					job.title = FM.teams[FM.team2][1]
-					job.selection_color = FM.teams[FM.team2]["main uniform"]["shirt_color"]
-			for (var/obj/effect/step_trigger/goal/red/GR in world)
-				GR.assign()
-			for (var/obj/effect/step_trigger/goal/blue/GB in world)
-				GB.assign()	
-		if (map && map.ID == MAP_FOOTBALL_CMP)
-			var/obj/map_metadata/football_cmp/FM = map
-			for (var/datum/job/job in job_master.faction_organized_occupations)
-				if (istype(job, /datum/job/civilian/football_red_campaign/goalkeeper))
-					job.title = "[FM.teams[FM.team1][1]] goalkeeper"
-					job.selection_color = FM.teams[FM.team1]["main uniform"]["shirt_color"]
-
-				else if (istype(job, /datum/job/civilian/football_red_campaign))
-					job.title = FM.teams[FM.team1][1]
-					job.selection_color = FM.teams[FM.team1]["main uniform"]["shirt_color"]
-
-				else if (istype(job, /datum/job/civilian/football_blue_campaign/goalkeeper))
-					job.title = "[FM.teams[FM.team2][1]] goalkeeper"
-					job.selection_color = FM.teams[FM.team2]["main uniform"]["shirt_color"]
-
-				else if (istype(job, /datum/job/civilian/football_blue_campaign))
 					job.title = FM.teams[FM.team2][1]
 					job.selection_color = FM.teams[FM.team2]["main uniform"]["shirt_color"]
 			for (var/obj/effect/step_trigger/goal/red/GR in world)

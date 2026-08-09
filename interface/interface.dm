@@ -1,5 +1,5 @@
 
-	#define HOTKEY_MODE_OPTIONS {"<font color='purple'> \
+	#define HOTKEY_MODE_OPTIONS {"<font color='#7FFFD4'> \
 Hotkey-Mode: (hotkey-mode must be on)\n \
 \tTAB = toggle hotkey-mode\n \
 \tA = Left\n \
@@ -22,6 +22,8 @@ Hotkey-Mode: (hotkey-mode must be on)\n \
 \t2 = Disarm-intent\n \
 \t3 = Grab-intent\n \
 \t4 = Harm-intent\n \
+\t5-9 = Quick-cast wand spells\n \
+\t. = Cycle movement mode\n \
 \tPgUp = Go up\n \
 \tPgDwn = Do down\n \
 \tCtrl click= drag\n \
@@ -47,6 +49,7 @@ Any-Mode: (hotkey doesn't need to be on)\n  \
 \tCtrl+2 = Disarm-intent\n \
 \tCtrl+3 = Grab-intent\n \
 \tCtrl+4 = Harm-intent\n \
+\t5-9 = Quick-cast wand spells\n \
 \tDEL = Pull\n \
 \tINS = Cycle-intents-right\n \
 \tHOME = Drop\n \
@@ -66,7 +69,7 @@ Any-Mode: (hotkey doesn't need to be on)\n  \
 			return
 		src << link(config.websiteurl)
 	else
-		src << "<span class='warning'>The website URL is not set in the server configuration.</span>"
+		to_chat(src, "<span class='warning'>The website URL is not set in the server configuration.</span>")
 	return
 
 /client/verb/wiki()
@@ -78,7 +81,7 @@ Any-Mode: (hotkey doesn't need to be on)\n  \
 			return
 		src << link(config.wikiurl)
 	else
-		src << "<span class='warning'>The wiki URL is not set in the server configuration.</span>"
+		to_chat(src, "<span class='warning'>The wiki URL is not set in the server configuration.</span>")
 	return
 
 /client/verb/donate()
@@ -90,7 +93,7 @@ Any-Mode: (hotkey doesn't need to be on)\n  \
 			return
 		src << link(config.donationurl)
 	else
-		src << "<span class='warning'>The donation URL is not set in the server configuration.</span>"
+		to_chat(src, "<span class='warning'>The donation URL is not set in the server configuration.</span>")
 	return
 
 /client/verb/github()
@@ -102,7 +105,7 @@ Any-Mode: (hotkey doesn't need to be on)\n  \
 			return
 		src << link(config.githuburl)
 	else
-		src << "<span class='warning'>The Github URL is not set in the server configuration.</span>"
+		to_chat(src, "<span class='warning'>The Github URL is not set in the server configuration.</span>")
 	return
 
 /client/verb/discord()
@@ -114,7 +117,7 @@ Any-Mode: (hotkey doesn't need to be on)\n  \
 			return
 		src << link(config.discordurl)
 	else
-		src << "<span class='warning'>The Discord URL is not set in the server configuration.</span>"
+		to_chat(src, "<span class='warning'>The Discord URL is not set in the server configuration.</span>")
 	return
 
 #define RULES_FILE "config/rules.html"
@@ -127,7 +130,7 @@ Any-Mode: (hotkey doesn't need to be on)\n  \
 			return
 		src << link(config.rulesurl)
 	else
-		src << "<span class='warning'>The rules URL is not set in the server configuration.</span>"
+		to_chat(src, "<span class='warning'>The rules URL is not set in the server configuration.</span>")
 	return
 #undef RULES_FILE
 
@@ -135,7 +138,7 @@ Any-Mode: (hotkey doesn't need to be on)\n  \
 	set name = "Hotkeys Help"
 	set category = "OOC"
 
-	src << HOTKEY_MODE_OPTIONS
+	to_chat(src, HOTKEY_MODE_OPTIONS)
 
 /mob/verb/a_intent_change(input as text)
 	set name = "a-intent"

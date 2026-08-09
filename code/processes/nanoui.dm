@@ -1,7 +1,7 @@
 /process/nanoUI/setup()
 	name = "nanoui"
 	fires_at_gamestates = list(GAME_STATE_PREGAME, GAME_STATE_SETTING_UP, GAME_STATE_PLAYING, GAME_STATE_FINISHED)
-	schedule_interval = 0.5 SECONDS // every half second (more responsive) - Kachnov
+	schedule_interval = 1 SECOND
 	priority = PROCESS_PRIORITY_MEDIUM
 	processes.nanoUI = src
 
@@ -25,9 +25,9 @@
 /process/nanoUI/reset_current_list()
 	PROCESS_USE_FASTEST_LIST(GLOB.nanomanager.processing_uis)
 
-/process/nanoUI/statProcess()
-	..()
-	stat(null, "[GLOB.nanomanager.processing_uis.len] UIs")
+/process/nanoUI/statProcess(client/C)
+	..(C)
+	C.add_stat("[GLOB.nanomanager.processing_uis.len] UIs")
 
 /process/nanoUI/htmlProcess()
 	return ..() + "[GLOB.nanomanager.processing_uis.len] UIs"

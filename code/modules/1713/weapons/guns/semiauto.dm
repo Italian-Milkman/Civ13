@@ -3,17 +3,12 @@
 	fire_sound = 'sound/weapons/guns/fire/rifle.ogg'
 	icon = 'icons/obj/guns/rifles.dmi'
 	// pistol accuracy, rifle skill & decent KD chance
-	accuracy_increase_mod = 2.00
-	accuracy_decrease_mod = 6.00
 	KD_chance = KD_CHANCE_MEDIUM
 	stat = "rifle"
 	load_delay = 5
-	aim_miss_chance_divider = 2.50
 	recoil = 60
 	accuracy = 2
 
-	headshot_kill_chance = 35
-	KO_chance = 30
 
 	gtype = "rifle"
 
@@ -28,13 +23,13 @@
 
 /obj/item/weapon/gun/projectile/semiautomatic/special_check(mob/user)
 	if (gun_safety && safetyon)
-		user << "<span class='warning'>You can't fire \the [src] while the safety is on!</span>"
+		to_chat(user, "<span class='warning'>You can't fire \the [src] while the safety is on!</span>")
 		return FALSE
 	if (!user.has_empty_hand(both = FALSE))
-		user << "<span class='warning'>You need both hands to fire \the [src]!</span>"
+		to_chat(user, "<span class='warning'>You need both hands to fire \the [src]!</span>")
 		return FALSE
 	if (jammed_until > world.time)
-		user << "<span class = 'danger'>\The [src] has jammed! You can't fire it until it has unjammed.</span>"
+		to_chat(user, "<span class = 'danger'>\The [src] has jammed! You can't fire it until it has unjammed.</span>")
 		return FALSE
 	return TRUE
 
@@ -517,7 +512,6 @@
 		)
 	gun_type = GUN_TYPE_RIFLE
 	equiptimer = 15
-	accuracy_increase_mod = 2.0
 	shake_strength = 2
 	accuracy = 1
 	scope_mounts = list ("picatinny")
@@ -553,7 +547,6 @@
 	reload_sound = 'sound/weapons/guns/interact/barrett_magin.ogg'
 	unload_sound = 'sound/weapons/guns/interact/barrett_magout.ogg'
 	fire_sound = 'sound/weapons/guns/fire/ptrd.ogg'
-	accuracy_increase_mod = 2.00
 	fire_delay = 5
 	equiptimer = 12
 	gun_safety = FALSE

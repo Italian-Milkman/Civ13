@@ -1,7 +1,8 @@
 /obj/map_metadata/wake_island
 	ID = MAP_WAKE_ISLAND
 	title = "Wake Island"
-	lobby_icon = 'icons/lobby/pacific.png'
+	description = "Points are added to each team for each minute they control the Coastal Artillery Batteries, and the Village.First team to reach 40 points wins!"
+	lobby_icon = "icons/lobby/pacific.png"
 	no_winner ="The battle for the city is still going on."
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/one,/area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 0
@@ -24,7 +25,7 @@
 	faction2 = JAPANESE
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET)
 	songs = list(
-		"Tokkutai Bushi (Koji Tsuruta):1" = 'sound/music/tokkutai_bushi.ogg',)
+		"Tokkutai Bushi (Koji Tsuruta):1" = "sound/music/tokkutai_bushi.ogg",)
 	gamemode = "Area Control"
 	var/jap_points = 0
 	var/usa_points = 0
@@ -36,23 +37,6 @@
 	..()
 	spawn(3000)
 		points_check()
-
-/obj/map_metadata/wake_island/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (istype(J, /datum/job/american))
-		if (J.is_navy == TRUE || (istype(J, /datum/job/american/sailor_ww2)) || (istype(J, /datum/job/american/mp_ww2)) || (istype(J, /datum/job/american/chef_ww2)) || J.is_tanker == TRUE || (istype(J, /datum/job/american/soldier_ww2_filipino)))
-			. = FALSE
-		else if (J.is_ww2 == TRUE)
-			. = TRUE
-		else
-			. = FALSE
-	else if (istype(J, /datum/job/japanese))
-		if (J.is_ww2 == TRUE && J.is_navy == TRUE || (istype(J, /datum/job/japanese/ija_ww2_tanker)))
-			. = TRUE
-		else
-			. = FALSE
-	else
-		. = FALSE
 
 /obj/map_metadata/wake_island/roundend_condition_def2name(define)
 	..()
@@ -116,9 +100,9 @@
 			jap_points++
 		if (a1_control != prev_control)
 			if (prev_control != "none")
-				world << "<font size=3>The [prev_control] have lost the <b>West Artillery Battery!</b><font>"
+				to_chat(world, "<font size=3>The [prev_control] have lost the <b>West Artillery Battery!</b><font>")
 			else
-				world << "<font size=3>The [a1_control] have captured the <b>West Artillery Battery!</b><font>"
+				to_chat(world, "<font size=3>The [a1_control] have captured the <b>West Artillery Battery!</b><font>")
 		c1 = 0
 		c2 = 0
 		prev_control = a2_control
@@ -139,9 +123,9 @@
 			jap_points++
 		if (a2_control != prev_control)
 			if (prev_control != "none")
-				world << "<font size=3>The [prev_control] have lost the <b>East Artillery Battery!</b><font>"
+				to_chat(world, "<font size=3>The [prev_control] have lost the <b>East Artillery Battery!</b><font>")
 			else
-				world << "<font size=3>The [a2_control] have captured the <b>East Artillery Battery!</b><font>"
+				to_chat(world, "<font size=3>The [a2_control] have captured the <b>East Artillery Battery!</b><font>")
 		c1 = 0
 		c2 = 0
 		prev_control = a3_control
@@ -162,12 +146,12 @@
 			jap_points++
 		if (a3_control != prev_control)
 			if (prev_control != "none")
-				world << "<font size=3>The [prev_control] have lost the <b>Village!</b><font>"
+				to_chat(world, "<font size=3>The [prev_control] have lost the <b>Village!</b><font>")
 			else
-				world << "<font size=3>The [a3_control] have captured the <b>Village!</b><font>"
-	world << "<big><b>Current Points:</big></b>"
-	world << "<big>Americans: [usa_points]</big>"
-	world << "<big>Japanese: [jap_points]</big>"
+				to_chat(world, "<font size=3>The [a3_control] have captured the <b>Village!</b><font>")
+	to_chat(world, "<big><b>Current Points:</b></big>")
+	to_chat(world, "<big>Americans: [usa_points]</big>")
+	to_chat(world, "<big>Japanese: [jap_points]</big>")
 	spawn(300)
 		points_check()
 
@@ -180,7 +164,7 @@
 				return FALSE
 			ticker.finished = TRUE
 			var/message = "The <b>Japanese</b> have reached [jap_points] points and won!"
-			world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+			to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 			show_global_battle_report(null)
 			win_condition_spam_check = TRUE
 			return FALSE
@@ -189,7 +173,7 @@
 				return FALSE
 			ticker.finished = TRUE
 			var/message = "The <b>Americans</b> have reached [usa_points] points and won!"
-			world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+			to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 			show_global_battle_report(null)
 			win_condition_spam_check = TRUE
 			return FALSE

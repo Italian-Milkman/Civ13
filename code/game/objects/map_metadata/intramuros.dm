@@ -1,7 +1,8 @@
 /obj/map_metadata/intramuros
 	ID = MAP_INTRAMUROS
 	title = "Intramuros"
-	lobby_icon = 'icons/lobby/pacific.png'
+	description = "The Japanese Army will win if they hold out for 35 minutes. The Americans will win if they manage to capture Japanese Command within Fort Santiago!"
+	lobby_icon = "icons/lobby/pacific.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/one,/area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 1200
 	no_hardcore = TRUE
@@ -24,24 +25,9 @@
 	grace_wall_timer = 4800
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET)
 	songs = list(
-		"Tokkutai Bushi (Koji Tsuruta):1" = 'sound/music/tokkutai_bushi.ogg',
-		"I Hate These Classes:2" = 'sound/music/i_hate_these_classes.ogg',)
+		"Tokkutai Bushi (Koji Tsuruta):1" = "sound/music/tokkutai_bushi.ogg",
+		"I Hate These Classes:2" = "sound/music/i_hate_these_classes.ogg",)
 	gamemode = "Siege"
-/obj/map_metadata/intramuros/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (istype(J, /datum/job/american))
-		if (J.is_navy == TRUE || (istype(J, /datum/job/american/sailor_ww2)) || (istype(J, /datum/job/american/mp_ww2)) || (istype(J, /datum/job/american/chef_ww2)))
-			. = FALSE
-		else if (J.is_ww2 == TRUE || J.is_tanker == TRUE || (istype(J, /datum/job/american/soldier_ww2_filipino)))
-			. = TRUE
-		else
-			. = FALSE
-	if (istype(J, /datum/job/japanese))
-		if (J.is_ww2 == TRUE && !J.is_navy && !J.is_prison && !J.is_tanker)
-			. = TRUE
-		else
-			. = FALSE
-
 /obj/map_metadata/intramuros/roundend_condition_def2name(define)
 	..()
 	switch (define)
@@ -92,14 +78,14 @@ var/no_loop_intra = FALSE
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The <b>Japanese</b> have successfuly defended Fort Santiago! The Americans have halted the attack!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_intra == FALSE)
 		ticker.finished = TRUE
 		var/message = "The <b>Americans</b> have captured the Japanese Command! The battle for The Walled City is over!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_intra = TRUE
@@ -142,7 +128,7 @@ var/no_loop_intra = FALSE
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The <b>Japanese</b> have recaptured Fort Santiago!</font>"
+			to_chat(world, "<font size = 3>The <b>Japanese</b> have recaptured Fort Santiago!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1

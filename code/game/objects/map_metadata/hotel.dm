@@ -1,7 +1,8 @@
 /obj/map_metadata/hotel
 	ID = MAP_HOTEL
 	title = "Hotel"
-	lobby_icon = 'icons/lobby/ww2.png'
+	description = "The Wehrmacht and the Red Army are battling for the control of the Grand Hotel! Capture the Upstairs Lounge in order to control the Hotel!"
+	lobby_icon = "icons/lobby/ww2.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/one,/area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 0
 	can_spawn_on_base_capture = TRUE
@@ -21,27 +22,13 @@
 	faction1 = GERMAN
 	faction2 = RUSSIAN
 	ordinal_age = 6
+	valid_weather_types = list(WEATHER_NONE, WEATHER_WET, WEATHER_EXTREME)
 	songs = list(
-		"Red Army Choir - Katyusha:1" = 'sound/music/katyusha.ogg')
+		"Red Army Choir - Katyusha:1" = "sound/music/katyusha.ogg")
+	ambience = list("sound/ambience/battle1.ogg")
 	gamemode = "King of the Hill"
 	grace_wall_timer = 1800
 
-/obj/map_metadata/hotel/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (istype(J, /datum/job/german/tank_crew) || istype(J, /datum/job/russian/tank_crew) || istype(J, /datum/job/russian/antitank_soldier_soviet) || istype(J, /datum/job/russian/antitank_assistant_soldier_soviet))
-		. = FALSE
-	else if (J.is_ss_panzer == TRUE)
-		. = FALSE
-	else if (J.is_occupation == TRUE)
-		. = FALSE
-	else if (J.is_tanker == TRUE)
-		. = FALSE
-	else if (J.is_ww2 == TRUE && J.is_reichstag == FALSE)
-		. = TRUE
-	else if (J.is_reichstag == TRUE)
-		. = FALSE
-	else
-		. = FALSE
 /obj/map_metadata/hotel/short_win_time(faction)
 	if (!(alive_n_of_side(faction1)) || !(alive_n_of_side(faction2)))
 		return 600

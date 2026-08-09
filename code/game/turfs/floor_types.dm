@@ -37,6 +37,21 @@
 /turf/floor/wood/alt/eleven
 	icon_state = "woodalt11"
 
+/turf/floor/gravel
+	name = "gravel"
+	icon_state = "gravel"
+
+/turf/floor/gravel/New()
+	dir = pick(SOUTH, NORTH, EAST, WEST)
+
+/turf/floor/gravel/alt
+	icon_state = "gravel_alt"
+/turf/floor/gravel/dust
+	icon_state = "gravel_dust"
+
+/turf/floor/rocky
+	name = "rocky floor"
+	icon_state = "rockyfloor"
 
 /turf/floor/blackslateroof
 	name = "roof"
@@ -59,7 +74,6 @@
 	name = "plating"
 	icon_state = "plating"
 	floor_type = null
-	intact = FALSE
 
 /turf/floor/plating/ex_act(severity)
 		//set src in oview(1)
@@ -95,9 +109,8 @@
 	icon_state = "carpet"
 	icon = 'icons/turf/flooring/carpet.dmi'
 	flooring = null
+	initial_flooring = /decl/flooring/carpet
 	New()
-		if (!icon_state)
-			icon_state = "carpet"
 		..()
 		spawn(4)
 			if (src)
@@ -112,38 +125,48 @@
 /turf/floor/carpet/pinkcarpet
 	name = "Pink Carpet"
 	icon_state = "gaycarpet"
+	initial_flooring = /decl/flooring/carpet/pink
 
 /turf/floor/carpet/redcarpet
 	name = "Red Carpet"
 	icon_state = "carpet"
+	initial_flooring = /decl/flooring/carpet
 
 /turf/floor/carpet/orangecarpet
 	name = "Orange Carpet"
 	icon_state = "oracarpet"
+	initial_flooring = /decl/flooring/carpet/orange
 
 /turf/floor/carpet/purplecarpet
 	name = "Purple Carpet"
 	icon_state = "purcarpet"
+	initial_flooring = /decl/flooring/carpet/purple
 
 /turf/floor/carpet/bluecarpet
 	name = "Blue Carpet"
 	icon_state = "blucarpet"
+	initial_flooring = /decl/flooring/carpet/blue
 
 /turf/floor/carpet/tealcarpet
 	name = "Teal Carpet"
 	icon_state = "sblucarpet"
+	initial_flooring = /decl/flooring/carpet/bluelight
 
 /turf/floor/carpet/greencarpet
 	name = "Green Carpet"
 	icon_state = "turcarpet"
+	initial_flooring = /decl/flooring/carpet/green
 
 /turf/floor/carpet/blackcarpet
 	name = "Black Carpet"
 	icon_state = "bcarpet"
+	initial_flooring = /decl/flooring/carpet/black
 
 /turf/floor/carpet/whitecarpet
 	name = "White Carpet"
 	icon_state = "wcarpet"
+	initial_flooring = /decl/flooring/carpet/white
+
 //Continue
 
 /turf/floor/plating/ironsand/New()
@@ -154,10 +177,9 @@
 
 /turf/floor/grass/jungle
 	name = "jungle grass patch"
-	overlay_priority = 0
 	is_diggable = TRUE
 	may_become_muddy = TRUE
-	initial_flooring = null
+	initial_flooring = /decl/flooring/grass
 
 /turf/floor/grass/edge
 	name = "grass edge"
@@ -174,7 +196,7 @@
 /turf/floor/grass/jungle/savanna
 	name = "dry grass patch"
 	icon_state = "dry_grass"
-	initial_flooring = null
+	initial_flooring = /decl/flooring/grass/savanna
 
 /turf/floor/grass/jungle/savanna/New()
 	..()
@@ -206,11 +228,10 @@
 	..()
 	icon = 'icons/turf/snow.dmi'
 	icon_state = "grass[rand(0,6)]"
-	initial_flooring = null
 
 /turf/floor/beach
 	name = "beach"
-	icon = 'icons/misc/beach.dmi'
+	icon = 'icons/turf/beach.dmi'
 	initial_flooring = null
 
 /turf/floor/beach/drywater
@@ -218,14 +239,14 @@
 	icon = 'icons/turf/floors.dmi'
 	icon_state = "sand1"
 	is_diggable = FALSE
-	initial_flooring = null
+	initial_flooring = /decl/flooring/sand/drywater
 
 /turf/floor/beach/drywater2
 	name = "dry riverbed"
 	icon = 'icons/turf/floors.dmi'
 	icon_state = "sand1"
 	is_diggable = FALSE
-	initial_flooring = null
+	initial_flooring = /decl/flooring/sand/drywater
 
 /turf/floor/beach/sand
 	name = "sand"
@@ -247,13 +268,8 @@
 	icon_state = "darksand"
 	is_diggable = TRUE
 	available_sand = 4
-	initial_flooring = null
+	initial_flooring = /decl/flooring/sand/dark
 
-/turf/floor/beach/coastline
-	name = "coastline"
-	icon = 'icons/misc/beach2.dmi'
-	icon_state = "sandwater"
-	watertile = TRUE
 //water level is measured in centimeters. the maximum is 200 (2 meters). up to 1.5 will make movement progressively slower, up from that you will drown if you stay for too long.
 
 /turf/floor/beach/water
@@ -266,15 +282,10 @@
 	var/sickness = 1 //amount of toxins, from 0 to 3
 	initial_flooring = /decl/flooring/water
 	watertile = TRUE
-	var/image/water_overlay = null
 
 /turf/floor/beach/water/New()
 	..()
 	water_turf_list += src
-	spawn(1)
-		water_overlay = image(icon='icons/misc/beach.dmi')
-		water_overlay.icon_state= "[icon_state]_ov"
-		water_overlay.layer= 10
 
 /turf/floor/beach/water/coastwater
 	name = "coast water"
@@ -364,8 +375,9 @@
 
 /turf/floor/beach/water/deep/saltwater/underwater
 	name = "deep saltwater"
+	icon_state = "underwater"
 	salty = TRUE
-	initial_flooring = /decl/flooring/water_deep_salt
+	initial_flooring = /decl/flooring/water_deep_underwater
 
 
 /turf/floor/beach/water/deep/CanPass(atom/movable/mover)
@@ -374,6 +386,10 @@
 	else if (istype(mover, /obj/item/projectile))
 		return TRUE
 	else if (istype(mover, /mob) && !iscovered())
+		if (istype(mover, /mob/living/simple_animal))
+			var/mob/living/simple_animal/SA = mover
+			if (SA.flying)
+				return TRUE
 		if (ishuman(mover))
 			var/mob/living/human/H = mover
 			if(istype(H.wear_suit, /obj/item/clothing/suit/lifejacket))
@@ -387,18 +403,6 @@
 		return TRUE
 	for (var/obj/structure/vehicleparts/frame/ship/S in src.contents)
 		return TRUE
-	for(var/obj/structure/STR in src.contents)
-		var/obj/structure/vehicleparts/frame/ship/S
-		if (S in src.contents)
-			return TRUE
-		else
-			return FALSE
-	for(var/obj/item/OB in src.contents)
-		var/obj/structure/vehicleparts/frame/ship/S
-		if (S in src.contents)
-			return TRUE
-		else
-			return FALSE
 	for(var/obj/structure/multiz/ladder/ST in src.contents)
 		return TRUE
 	for (var/obj/structure/vehicleparts/axis/ship/SA in src.contents)
@@ -445,14 +449,15 @@
 	name = "ice"
 	icon_state = "seashallow_frozen"
 	move_delay = 0
-	initial_flooring = null
+	initial_flooring = /decl/flooring/water/ice
 
 /turf/floor/beach/water/ice/salty
 	name = "saltwater ice"
+	initial_flooring = /decl/flooring/water/ice
 
 /turf/floor/beach/sand/desert
 	name = "desert sand"
-	icon = 'icons/misc/beach.dmi'
+	icon = 'icons/turf/beach.dmi'
 	icon_state = "desert1"
 	interior = FALSE
 	stepsound = "dirt"

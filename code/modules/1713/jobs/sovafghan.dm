@@ -2,6 +2,7 @@
 /datum/job/russian/sovafghan/captain
 	title = "Soviet Army Captain"
 	rank_abbreviation = "Kapt."
+	allowed_maps = list(MAP_KANDAHAR, MAP_MAGISTRAL)
 
 	spawn_location = "JoinLateRUCap"
 
@@ -62,6 +63,7 @@
 /datum/job/russian/sovafghan/lieutenant
 	title = "Soviet Army Lieutenant"
 	rank_abbreviation = "Leyt."
+	allowed_maps = list(MAP_HILL_3234, MAP_KANDAHAR, MAP_MAGISTRAL)
 
 	spawn_location = "JoinLateRULt"
 
@@ -133,6 +135,7 @@
 /datum/job/russian/sovafghan/sergeant
 	title = "Soviet Army Sergeant"
 	rank_abbreviation = "Srj."
+	allowed_maps = list(MAP_HILL_3234, MAP_KANDAHAR, MAP_MAGISTRAL)
 
 	spawn_location = "JoinLateRUSL"
 
@@ -202,6 +205,7 @@
 /datum/job/russian/sovafghan/medic
 	title = "Soviet Army Field Medic"
 	rank_abbreviation = "Efr."
+	allowed_maps = list(MAP_HILL_3234, MAP_KANDAHAR, MAP_MAGISTRAL)
 
 	spawn_location = "JoinLateRU"
 
@@ -259,6 +263,7 @@
 /datum/job/russian/sovafghan/radop
 	title = "Soviet Army Radio Operator"
 	rank_abbreviation = "Efr."
+	allowed_maps = list(MAP_HILL_3234, MAP_KANDAHAR, MAP_MAGISTRAL)
 
 	spawn_location = "JoinLateRU"
 	is_afghan = TRUE
@@ -327,6 +332,7 @@
 /datum/job/russian/sovafghan/soldier
 	title = "Soviet Army Private"
 	rank_abbreviation = "Ryad."
+	allowed_maps = list(MAP_HILL_3234, MAP_KANDAHAR, MAP_MAGISTRAL)
 
 	spawn_location = "JoinLateRU"
 	is_afghan = TRUE
@@ -423,6 +429,7 @@
 /datum/job/russian/sovafghan/sapper
 	title = "Soviet Army Sapper"
 	rank_abbreviation = "Efr."
+	allowed_maps = list(MAP_HILL_3234, MAP_KANDAHAR, MAP_MAGISTRAL)
 
 	spawn_location = "JoinLateRUSap"
 	is_afghan = TRUE
@@ -502,6 +509,7 @@
 /datum/job/russian/sovafghan/tank_com
 	title = "Soviet Army Tank Commander"
 	rank_abbreviation = "Jr. Sgt."
+	allowed_maps = list(MAP_KANDAHAR, MAP_MAGISTRAL)
 
 	spawn_location = "JoinLateRUTank"
 
@@ -576,6 +584,7 @@
 /datum/job/russian/sovafghan/tanker
 	title = "Soviet Army Tanker"
 	rank_abbreviation = "Efr."
+	allowed_maps = list(MAP_KANDAHAR, MAP_MAGISTRAL)
 
 	spawn_location = "JoinLateRUTank"
 	uses_squads = TRUE
@@ -642,6 +651,7 @@
 /datum/job/russian/sovafghan/spez
 	title = "Spetznaz GRU"
 	rank_abbreviation = "Jr. Sgt."
+	allowed_maps = list(MAP_HILL_3234, MAP_KANDAHAR, MAP_MAGISTRAL)
 
 	spawn_location = "JoinLateRU"
 	whitelisted = TRUE
@@ -712,6 +722,7 @@
 	title = "DRA Governor"
 	rank_abbreviation = "Gov."
 	spawn_location = "JoinLateDRAGov"
+	allowed_maps = list(MAP_HILL_3234, MAP_KANDAHAR)
 
 	is_commander = TRUE
 	whitelisted = TRUE
@@ -777,6 +788,7 @@
 /datum/job/civilian/afghan/dra/lieutenant
 	title = "DRA Lieutenant"
 	rank_abbreviation = "DRA Lt."
+	allowed_maps = list(MAP_HILL_3234, MAP_KANDAHAR, MAP_MAGISTRAL)
 
 	spawn_location = "JoinLateDRALt"
 
@@ -854,6 +866,7 @@
 /datum/job/civilian/afghan/dra/sergeant
 	title = "DRA Sergeant"
 	rank_abbreviation = "DRA Sgt."
+	allowed_maps = list(MAP_HILL_3234, MAP_KANDAHAR, MAP_MAGISTRAL)
 
 	spawn_location = "JoinLateDRACap"
 
@@ -930,6 +943,7 @@
 /datum/job/civilian/afghan/dra/soldier
 	title = "DRA Soldier"
 	rank_abbreviation = "DRA Pvt."
+	allowed_maps = list(MAP_HILL_3234, MAP_KANDAHAR, MAP_MAGISTRAL)
 
 	spawn_location = "JoinLateDRA"
 	is_afghan = TRUE
@@ -1005,6 +1019,7 @@
 /datum/job/civilian/afghan/doctor
 	title = "Hospital Doctor"
 	rank_abbreviation = "Dr."
+	allowed_maps = list(MAP_HILL_3234, MAP_KANDAHAR)
 
 	spawn_location = "JoinLateDoc"
 	is_afghan = TRUE
@@ -1130,188 +1145,12 @@
 
 	return TRUE */
 
-/*/datum/job/civilian/afghan/facworker
-	title = "Industrial Worker"
 
-	spawn_location = "JoinLateCivFW"
-	is_afghan = TRUE
-	is_coldwar = TRUE
-	default_language = "Arabic"
-	additional_languages = list("Russian" = 20)
-
-	min_positions = 1
-	max_positions = 6
-
-/datum/job/civilian/afghan/facworker/equip(var/mob/living/human/H)
-	if (!H)	return FALSE
-//shoes
-	var/randshoes = rand (1,5)
-	switch(randshoes)
-		if (1)
-			H.equip_to_slot_or_del(new /obj/item/clothing/shoes/medieval/arab(H), slot_shoes)
-		if (2)
-			H.equip_to_slot_or_del(new /obj/item/clothing/shoes/black(H), slot_shoes)
-		if (3)
-			H.equip_to_slot_or_del(new /obj/item/clothing/shoes/sandal(H), slot_shoes)
-		if (4)
-			H.equip_to_slot_or_del(new /obj/item/clothing/shoes/laceup(H), slot_shoes)
-		if (5)
-			H.equip_to_slot_or_del(new /obj/item/clothing/shoes/leather(H), slot_shoes)
-//clothes
-	H.equip_to_slot_or_del(new /obj/item/clothing/under/mechanic_outfit(H), slot_w_uniform)
-	H.equip_to_slot_or_del(new /obj/item/clothing/under/industrial4(H), slot_w_uniform)
-//jacket
-	if (prob(70))
-		H.equip_to_slot_or_del(new /obj/item/clothing/suit/storage/jacket/coveralls(H), slot_wear_suit)
-//gloves
-	if (prob(70))
-		H.equip_to_slot_or_del(new /obj/item/clothing/gloves/thick(H), slot_gloves)
-//head
-	if (prob(10))
-		H.equip_to_slot_or_del(new /obj/item/clothing/head/turban(H), slot_head)
-	else if (prob(30))
-		var/obj/item/clothing/head/custom/taqiyah/taq = new /obj/item/clothing/head/custom/taqiyah(null)
-		taq.color = pick("#f0f0f0","#bababa","#787878","#303030")
-		taq.uncolored1 = FALSE
-		H.equip_to_slot_or_del(taq, slot_head)
-	else if (prob(40))
-		H.equip_to_slot_or_del(new /obj/item/clothing/head/pakol(H), slot_head)
-	else if (prob(65))
-		H.equip_to_slot_or_del(new /obj/item/clothing/head/helmet/modern/hardhat/yellow(H), slot_head)
-//back
-	H.equip_to_slot_or_del(new /obj/item/weapon/key/civ/mechanic(H), slot_l_store)
-	if (prob(50))
-		H.equip_to_slot_or_del(new /obj/item/weapon/storage/belt/utility/sapper, slot_belt)
-	else
-		H.equip_to_slot_or_del(new /obj/item/weapon/storage/belt/utility/full, slot_belt)
-
-	H.name = H.species.get_random_arab_name(H.gender)
-	H.real_name = H.name
-	if (H.gender != FEMALE)
-		if (H.f_style != "Shaved" && H.f_style != "Full Beard" && H.f_style != "Selleck Mustache" && H.f_style != "Hulk Hogan Mustache" && H.f_style != "Van Dyke Mustache" && H.f_style != "Waston Mustache" )
-			H.f_style = pick("Shaved","Full Beard","Selleck Mustache","Watson Mustache","Hulk Hogan Mustache","Van Dyke Mustache")
-		if (H.h_style != "Bald" && H.f_style != "Crewcut" && H.f_style != "Undercut" && H.f_style != "Short Hair" && H.f_style != "Cut Hair" && H.f_style != "Skinhead" && H.f_style != "Average Joe" && H.f_style != "Fade" && H.f_style != "Combover" && H.f_style != "Gelled Back" && H.f_style != "Slick" && H.f_style != "Balding Hair" && H.f_style != "Joestar")
-			H.h_style = pick("Bald","Crewcut","Undercut","Short Hair","Cut Hair","Skinhead","Average Joe","Fade","Combover","Gelled Back","Slick","Balding Hair","Joestar")
-	var/new_hair = pick("Dark Brown","Black","Grey")
-	var/hex_hair = hair_colors[new_hair]
-	H.r_hair = hex2num(copytext(hex_hair, 2, 4))
-	H.g_hair = hex2num(copytext(hex_hair, 4, 6))
-	H.b_hair = hex2num(copytext(hex_hair, 6, 8))
-	H.r_facial = hex2num(copytext(hex_hair, 2, 4))
-	H.g_facial = hex2num(copytext(hex_hair, 4, 6))
-	H.b_facial = hex2num(copytext(hex_hair, 6, 8))
-
-	H.civilization = "Civilian"
-	H.add_note("Role", "You are a <b>[title]</b>, produce various goods and supplies in the factory.")
-	H.setStat("strength", STAT_NORMAL)
-	H.setStat("crafting", STAT_HIGH)
-	H.setStat("rifle", STAT_LOW)
-	H.setStat("dexterity", STAT_NORMAL)
-	H.setStat("swords", STAT_LOW)
-	H.setStat("pistol", STAT_LOW)
-	H.setStat("bows", STAT_LOW)
-	H.setStat("medical", STAT_LOW)
-	return TRUE
-
-/datum/job/civilian/afghan/miner
-	title = "Mine Worker"
-
-	spawn_location = "JoinLateCivMW"
-	is_afghan = TRUE
-	is_coldwar = TRUE
-	default_language = "Arabic"
-	additional_languages = list("Russian" = 10)
-
-	min_positions = 1
-	max_positions = 6
-
-/datum/job/civilian/afghan/miner/equip(var/mob/living/human/H)
-	if (!H)	return FALSE
-//shoes
-	var/randshoes = rand (1,4)
-	switch(randshoes)
-		if (1)
-			H.equip_to_slot_or_del(new /obj/item/clothing/shoes/medieval/arab(H), slot_shoes)
-		if (2)
-			H.equip_to_slot_or_del(new /obj/item/clothing/shoes/black(H), slot_shoes)
-		if (3)
-			H.equip_to_slot_or_del(new /obj/item/clothing/shoes/sandal(H), slot_shoes)
-		if (4)
-			H.equip_to_slot_or_del(new /obj/item/clothing/shoes/leather(H), slot_shoes)
-//clothes
-	if (H.gender != FEMALE)
-		var/randclothes = rand(1,10)
-		switch(randclothes)
-			if (1)
-				H.equip_to_slot_or_del(new /obj/item/clothing/under/artisan(H), slot_w_uniform)
-			if (2)
-				H.equip_to_slot_or_del(new /obj/item/clothing/under/artisan/dark(H), slot_w_uniform)
-			if (3)
-				H.equip_to_slot_or_del(new /obj/item/clothing/under/artisan/light(H), slot_w_uniform)
-			if (4)
-				H.equip_to_slot_or_del(new /obj/item/clothing/under/medieval/arab2(H), slot_w_uniform)
-			if (5)
-				H.equip_to_slot_or_del(new /obj/item/clothing/under/medieval/arab3(H), slot_w_uniform)
-			if (6)
-				H.equip_to_slot_or_del(new /obj/item/clothing/under/industrial5(H), slot_w_uniform)
-			if (7)
-				H.equip_to_slot_or_del(new /obj/item/clothing/under/industrial4(H), slot_w_uniform)
-			if (8)
-				H.equip_to_slot_or_del(new /obj/item/clothing/under/ww2/civ1(H), slot_w_uniform)
-			if (9)
-				H.equip_to_slot_or_del(new /obj/item/clothing/under/ww2/civ2(H), slot_w_uniform)
-			if (10)
-				H.equip_to_slot_or_del(new /obj/item/clothing/under/medieval/steppe_tunic(H), slot_w_uniform)
-//head
-	if (prob(10))
-		H.equip_to_slot_or_del(new /obj/item/clothing/head/turban(H), slot_head)
-	else if (prob(30))
-		var/obj/item/clothing/head/custom/taqiyah/taq = new /obj/item/clothing/head/custom/taqiyah(null)
-		taq.color = pick("#f0f0f0","#bababa","#787878","#303030")
-		taq.uncolored1 = FALSE
-		H.equip_to_slot_or_del(taq, slot_head)
-	else if (prob(30))
-		H.equip_to_slot_or_del(new /obj/item/clothing/head/pakol(H), slot_head)
-	else if (prob(65))
-		H.equip_to_slot_or_del(new /obj/item/clothing/head/helmet/modern/hardhat/orange(H), slot_head)
-//back
-	/obj/item/clothing/suit/storage/hazard
-	H.equip_to_slot_or_del(new/obj/item/weapon/material/pickaxe(H), slot_belt)
-	H.equip_to_slot_or_del(new/obj/item/weapon/material/shovel(H), slot_back)
-	H.equip_to_slot_or_del(new /obj/item/weapon/key/civ/mechanic(H), slot_l_store)
-
-	H.civilization = "Civilian"
-	H.name = H.species.get_random_arab_name(H.gender)
-	H.real_name = H.name
-	if (H.gender != FEMALE)
-		if (H.f_style != "Shaved" && H.f_style != "Full Beard" && H.f_style != "Selleck Mustache" && H.f_style != "Hulk Hogan Mustache" && H.f_style != "Van Dyke Mustache" && H.f_style != "Waston Mustache" )
-			H.f_style = pick("Shaved","Full Beard","Selleck Mustache","Watson Mustache","Hulk Hogan Mustache","Van Dyke Mustache")
-		if (H.h_style != "Bald" && H.f_style != "Crewcut" && H.f_style != "Undercut" && H.f_style != "Short Hair" && H.f_style != "Cut Hair" && H.f_style != "Skinhead" && H.f_style != "Average Joe" && H.f_style != "Fade" && H.f_style != "Combover" && H.f_style != "Gelled Back" && H.f_style != "Slick" && H.f_style != "Balding Hair" && H.f_style != "Joestar")
-			H.h_style = pick("Bald","Crewcut","Undercut","Short Hair","Cut Hair","Skinhead","Average Joe","Fade","Combover","Gelled Back","Slick","Balding Hair","Joestar")
-
-	var/new_hair = pick("Dark Brown","Black","Grey")
-	var/hex_hair = hair_colors[new_hair]
-	H.r_hair = hex2num(copytext(hex_hair, 2, 4))
-	H.g_hair = hex2num(copytext(hex_hair, 4, 6))
-	H.b_hair = hex2num(copytext(hex_hair, 6, 8))
-	H.r_facial = hex2num(copytext(hex_hair, 2, 4))
-	H.g_facial = hex2num(copytext(hex_hair, 4, 6))
-	H.b_facial = hex2num(copytext(hex_hair, 6, 8))
-
-	H.add_note("Role", "You are a <b>[title]</b>, working in a local mine. Prospect for ores in the region and sell them.")
-	H.setStat("strength", STAT_HIGH)
-	H.setStat("crafting", STAT_MEDIUM_LOW)
-	H.setStat("rifle", STAT_LOW)
-	H.setStat("dexterity", STAT_NORMAL)
-	H.setStat("swords", STAT_LOW)
-	H.setStat("pistol", STAT_LOW)
-	H.setStat("bows", STAT_LOW)
-	H.setStat("medical", STAT_LOW)
-	return TRUE*/
 
 /datum/job/civilian/afghan/waiter
 	title = "Waiter"
 	rank_abbreviation = ""
+	allowed_maps = list(MAP_HILL_3234, MAP_KANDAHAR)
 
 	spawn_location = "JoinLateCivWaiter"
 	is_afghan = TRUE
@@ -1381,6 +1220,7 @@
 /datum/job/civilian/afghan/cook
 	title = "Cook"
 	rank_abbreviation = ""
+	allowed_maps = list(MAP_HILL_3234, MAP_KANDAHAR)
 
 	spawn_location = "JoinLateCivCook"
 	is_afghan = TRUE
@@ -1445,6 +1285,7 @@
 /datum/job/civilian/afghan/urbanciv
 	title = "Civilian"
 	rank_abbreviation = ""
+	allowed_maps = list(MAP_HILL_3234, MAP_KANDAHAR)
 
 	spawn_location = "JoinLateCiv"
 	is_afghan = TRUE
@@ -1554,6 +1395,7 @@
 /datum/job/civilian/afghan/villager
 	title = "Villager"
 	rank_abbreviation = ""
+	allowed_maps = list(MAP_HILL_3234, MAP_KANDAHAR)
 
 	spawn_location = "JoinLateVil"
 	is_afghan = TRUE
@@ -1655,6 +1497,7 @@
 /datum/job/arab/mujahideen/warchief
 	title = "Mujahideen Warchief"
 	rank_abbreviation = "Malik"
+	allowed_maps = list(MAP_HILL_3234, MAP_KANDAHAR, MAP_MAGISTRAL)
 
 	spawn_location = "JoinLateAR"
 	is_officer = TRUE
@@ -1743,6 +1586,7 @@
 /datum/job/arab/mujahideen/group_leader
 	title = "Mujahideen Group Leader"
 	rank_abbreviation = "Jameedar"
+	allowed_maps = list(MAP_HILL_3234, MAP_KANDAHAR, MAP_MAGISTRAL)
 
 	spawn_location = "JoinLateAR"
 	is_squad_leader = TRUE
@@ -1829,6 +1673,7 @@
 	title = "Mujahideen Imam"
 	rank_abbreviation = ""
 	en_meaning = "Chaplain/Medic"
+	allowed_maps = list(MAP_HILL_3234, MAP_KANDAHAR, MAP_MAGISTRAL)
 
 	spawn_location = "JoinLateAR"
 	is_afghan = TRUE
@@ -1887,6 +1732,7 @@
 /datum/job/arab/mujahideen/insurgent
 	title = "Mujahideen Insurgent"
 	rank_abbreviation = ""
+	allowed_maps = list(MAP_HILL_3234, MAP_KANDAHAR, MAP_MAGISTRAL)
 
 	spawn_location = "JoinLateAR"
 	is_afghan = TRUE

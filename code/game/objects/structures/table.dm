@@ -249,22 +249,22 @@
 								dir_sum += 128
 
 			var/table_type = 0 //stand_alone table
-			if (dir_sum%16 in cardinal)
+			if ((dir_sum%16) in cardinal)
 				table_type = 1 //endtable
 				dir_sum %= 16
-			if (dir_sum%16 in list(3,12))
+			if ((dir_sum%16) in list(3,12))
 				table_type = 2 //1 tile thick, streight table
 				if (dir_sum%16 == 3) //3 doesn't exist as a dir
 					dir_sum = 2
 				if (dir_sum%16 == 12) //12 doesn't exist as a dir.
 					dir_sum = 4
-			if (dir_sum%16 in list(5,6,9,10))
+			if ((dir_sum%16) in list(5,6,9,10))
 				if (locate(/obj/structure/table,get_step(loc,dir_sum%16)))
 					table_type = 3 //full table (not the TRUE tile thick one, but one of the 'tabledir' tables)
 				else
 					table_type = 2 //1 tile thick, corner table (treated the same as streight tables in code later on)
 				dir_sum %= 16
-			if (dir_sum%16 in list(13,14,7,11)) //Three-way intersection
+			if ((dir_sum%16) in list(13,14,7,11)) //Three-way intersection
 				table_type = 5 //full table as three-way intersections are not sprited, would require 64 sprites to handle all combinations.  TOO BAD -- SkyMarshal
 				switch(dir_sum%16)	//Begin computation of the special type tables.  --SkyMarshal
 					if (7)
@@ -425,7 +425,10 @@
 	var/list/shards = list()
 	var/obj/item/weapon/material/shard/S = null
 	if (buildstack)
-		new buildstack (loc)
+		if (map && map.ID == MAP_WIZARD_BOY && (buildstack == /obj/item/stack/material/wood || buildstack == /obj/item/stack/material/woodplank))
+			new /obj/item/wand_part/mdf_board(loc)
+		else
+			new buildstack (loc)
 /*	if (carpeted && (full_return || prob(50))) // Higher chance to get the carpet back intact, since there's no non-intact option
 		new /obj/item/stack/tile/carpet(loc)*/
 	else if (full_return || prob(20))
@@ -441,10 +444,10 @@
 	if (get_dist(src, user) < 2)
 		var/obj/item/weapon/grab/G = I
 		if (G.affecting.buckled)
-			user << "<span class='warning'>[G.affecting] is buckled to [G.affecting.buckled]!</span>"
+			to_chat(user, "<span class='warning'>[G.affecting] is buckled to [G.affecting.buckled]!</span>")
 			return FALSE
 		if (G.state < GRAB_AGGRESSIVE)
-			user << "<span class='warning'>You need a better grip to do that!</span>"
+			to_chat(user, "<span class='warning'>You need a better grip to do that!</span>")
 			return FALSE
 		if (!G.confirm())
 			return FALSE
@@ -503,7 +506,7 @@
 		return
 
 	if (destroy_type == TBL_DISASSEMBLE)
-		user << "<span class='notice'>You start disassembling [src]...</span>"
+		to_chat(user, "<span class='notice'>You start disassembling [src]...</span>")
 		playsound(loc, 'sound/items/Screwdriver.ogg', 50, TRUE)
 		if (do_after(user, 20, target = src))
 			new frame(loc)
@@ -513,7 +516,7 @@
 			return
 
 	if (destroy_type == TBL_DECONSTRUCT)
-		user << "<span class='notice'>You start deconstructing [src]...</span>"
+		to_chat(user, "<span class='notice'>You start deconstructing [src]...</span>")
 		playsound(loc, 'sound/items/Ratchet.ogg', 50, TRUE)
 		if (do_after(user, 40, target = src))
 			for (var/i = TRUE, i <= framestackamount, i++)

@@ -22,9 +22,12 @@ var/round_progressing = TRUE
 var/datum/configuration/config	  = null
 
 var/Debug2 = FALSE
-var/datum/debug/debugobj
 
 var/join_motd = null
+
+
+var/datum/nanomanager/nanomanager		= new() // NanoManager, the manager for Nano UIs.
+
 
 var/season = "SPRING"
 var/game_hour = 0
@@ -51,35 +54,83 @@ var/custom_event_msg = null
 // Bomb cap!
 var/max_explosion_range = 14
 
+var/global/datum/titlecard/lobby_titlecard
+
 // Announcer intercom, because too much stuff creates an intercom for one message then hard del()s it.
 //var/global/obj/item/radio/intercom/global_announcer = new(null)
 
 // "convenient" (shitcode) way to make normal windows look like nanoUI, since BYOND won't load stylesheets normally - Kachnov
 var/common_browser_style = {"
-<meta charset='utf-8'>
 <style>
+@font-face {
+	font-family: 'Civ13Custom';
+	src: url('Alegreya-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'Civ13Custom';
+	src: url('Alegreya-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'Civ13Custom';
+	src: url('Alegreya-Italic.ttf') format('truetype');
+	font-weight: normal;
+	font-style: italic;
+}
+
+@font-face {
+	font-family: 'Civ13Custom';
+	src: url('Alegreya-BoldItalic.ttf') format('truetype');
+	font-weight: bold;
+	font-style: italic;
+}
+
+@font-face {
+	font-family: 'Civ13Custom';
+	src: url('Alegreya-Black.ttf') format('truetype');
+	font-weight: 900;
+	font-style: normal;
+}
+@font-face {
+	font-family: 'Wizard';
+	src: url('Wizard.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+}
+@font-face {
+	font-family: 'Pixelated';
+	src: url('Grand9K_Pixel.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+}
 body
 {
 	padding: 0;
 	margin: 0;
-	background-color: #271a0c;
-	font-size: 16px;
-	color: #ffffff;
+	background-color: #392611;
+	font-family: "Civ13Custom", "Book Antiqua", "Bookman Old Style", serif;
+	font-size: 14px;
+	color: #e1e1d7;
 	line-height: 170%;
 }
 
 hr
 {
-	background-color: #271a0c;
+	background-color: #1a1108;
 	height: 1px;
 }
 
 a, a:link, a:visited, a:active, .linkOn, .linkOff
 {
-	color: #ffffff;
+	color: #e1e1d7;
 	text-decoration: none;
-	background: #404040;
-	border: 1px solid #3d3d29;
+	background: #271a0c;
+	border: 1px solid #1a1108;
 	padding: 1px 4px 1px 4px;
 	margin: 0 2px 0 0;
 	cursor:default;
@@ -87,8 +138,8 @@ a, a:link, a:visited, a:active, .linkOn, .linkOff
 
 a:hover
 {
-	color: #ebebe0;
-	background: #7a7a52;
+	color: #ff8040;
+	background: #3f2a13;
 }
 
 a.white, a.white:link, a.white:visited, a.white:active
@@ -96,7 +147,7 @@ a.white, a.white:link, a.white:visited, a.white:active
 	color: #ebebe0;
 	text-decoration: none;
 	background: #ffffff;
-	border: 1px solid #3d3d29;
+	border: 1px solid #1a1108;
 	padding: 1px 4px 1px 4px;
 	margin: 0 2px 0 0;
 	cursor:default;
@@ -110,16 +161,16 @@ a.white:hover
 
 .linkOn, a.linkOn:link, a.linkOn:visited, a.linkOn:active, a.linkOn:hover
 {
-	color: #ffffff;
-	background: #595959;
-	border-color: #888888;
+	color: #e1e1d7;
+	background: #3f2a13;
+	border-color: #ff8040;
 }
 
 .linkOff, a.linkOff:link, a.linkOff:visited, a.linkOff:active, a.linkOff:hover
 {
-	color: #ffffff;
-	background: #999999;
-	border-color: #888888;
+	color: #a68b7d;
+	background: #271a0c;
+	border-color: #1a1108;
 }
 
 a.icon, .linkOn.icon, .linkOff.icon
@@ -193,9 +244,9 @@ h4
 {
 	clear: both;
 	padding: 6px 8px 6px 8px;
-	border-bottom: 2px solid #3d3d29;
-	background: #383838;
-	color: #98B0C3;
+	border-bottom: 2px solid #1a1108;
+	background: #271a0c;
+	color: #ff8040;
 	font-size: 22px;
 }
 
@@ -228,7 +279,7 @@ h4
 {
 	clear: both;
 	padding: 8px;
-	font-family: Verdana, Geneva, sans-serif;
+	font-family: "Civ13Custom", "Book Antiqua", "Bookman Old Style", serif;
 }
 
 .good
@@ -260,7 +311,7 @@ h4
 {
 	position: relative;
 	background: #E9C183;
-	color: #15345A;
+	color: #89a2d8;
 	font-size: 14px;
 	font-style: italic;
 	padding: 2px 4px 0 4px;
@@ -299,8 +350,8 @@ div.notice
 {
 	padding: 8px;
 	margin: 10px 4px 4px 4px;
-	border: 1px solid #ebebe0;
-	background-color: #3e2a14;
+	border: 1px solid #1a1108;
+	background-color: #271a0c;
 }
 
 .block h3
@@ -370,6 +421,34 @@ div.notice
 	width: 100%;
 	clear: both;
 }
+
+/* Late choices job tiers */
+a.job-commander
+{
+	font-size: 1.35em;
+	border-left: 4px solid #ffd700;
+	font-weight: bold;
+	letter-spacing: 0.04em;
+}
+
+a.job-officer
+{
+	font-size: 1.15em;
+	border-left: 4px solid #c0c0c0;
+	font-weight: bold;
+}
+
+a.job-squad-leader
+{
+	font-size: 1.1em;
+	border-left: 4px solid #cd7f32;
+	font-weight: bold;
+}
+
+a.job-normal
+{
+	font-size: 1.0em;
+}
 </style>
 "}
 //green on black
@@ -385,13 +464,25 @@ body
 	font-size: 16px;
 	color: #009933;
 	line-height: 170%;
+	text-shadow: 0px 0px 4px rgba(51, 255, 51, 0.6); /* CRT Phosphor Glow */
+}
+/* The Scanline Effect */
+body::after {
+	content: " ";
+	display: block;
+	position: absolute;
+	top: 0; left: 0; bottom: 0; right: 0;
+	background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+	z-index: 2;
+	background-size: 100% 2px, 3px 100%;
+	pointer-events: none; /* Let clicks pass through */
+}
+hr {
+	border: 1px dashed #33FF33;
 }
 
-hr
-{
-	background-color: #161616;
-	height: 1px;
-}
+.warning { color: #FF3333; text-shadow: 0px 0px 4px #FF0000; }
+.notice { color: #FFFF33; }
 
 a, a:link, a:visited, a:active, .linkOn, .linkOff
 {
@@ -579,7 +670,7 @@ h4
 {
 	position: relative;
 	background: #E9C183;
-	color: #15345A;
+	color: #89a2d8;
 	font-size: 14px;
 	font-style: italic;
 	padding: 2px 4px 0 4px;

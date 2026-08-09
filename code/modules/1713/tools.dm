@@ -341,7 +341,7 @@
 //Needs two hands to use.
 /obj/item/weapon/material/pickaxe/jackhammer/proc/special_check(mob/user)
 	if (!(user.has_empty_hand(both = FALSE)))
-		user << "<span class='warning'>You need both hands to use the [src]!</span>"
+		to_chat(user, "<span class='warning'>You need both hands to use the [src]!</span>")
 		return FALSE
 
 /obj/item/weapon/wirecutters/boltcutters
@@ -429,7 +429,7 @@
 		return
 	else if (input == "Tunnel")
 		/*if (!(locate(/obj/roof/, (user.x,user.y,user.z-1)))
-			user << "<span class='notice'>You try to dig, but something hard is underneath!</span>"
+			to_chat(user, "<span class='notice'>You try to dig, but something hard is underneath!</span>")
 			return*/ //TO DO TO STOP PEOPLE FROM DIGGING ITNO BUNKERS LATER, TAISLIN PLZ FIX K THX!
 		if (!(locate(/obj/structure/multiz/) in user.loc) && user.z == 1)
 			TB = locate(user.x,user.y,user.z+1)
@@ -489,6 +489,10 @@
 			to_chat(user, SPAN_WARNING("You cannot dig a hole here!"))
 			return
 	else if (input == "Irrigation Channel")
+		var/mob/living/human/HU = user
+		if (map && !map.is_node_done(istype(HU) ? HU.civilization : null, "irrigation"))
+			to_chat(user, SPAN_WARNING("Your people haven't researched Irrigation yet."))
+			return
 		user.visible_message("<span class='notice'>[user] starts to dig an irrigation channel.</span>", "<span class='notice'>You start to dig an irrigation channel.</span>", "<span class='notice'>You hear the ground being dug nearby.</span>")
 		if (do_after(user, 25, src))
 			user.visible_message("<span class='notice'>[user] makes an irrigation channel.</span>", "<span class='notice'>You make an irrigation channel.</span>", "<span class='notice'>You finish and the sounds cease.</span>")
@@ -500,7 +504,7 @@
 			return
 		else
 			if (locate(/obj/structure/multiz) in user.loc)
-				user << "<span class='notice'>There is a tunnel entrance here!</span>"
+				to_chat(user, "<span class='notice'>There is a tunnel entrance here!</span>")
 				return
 			user.visible_message("[user] starts digging up a grave...", "<span class='notice'>You start digging up a grave...</span>", "<span class='notice'>You hear the ground being dug nearby.</span>")
 			playsound(src,'sound/effects/shovelling.ogg',100,1)

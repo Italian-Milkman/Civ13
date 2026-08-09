@@ -2,7 +2,8 @@
 /obj/map_metadata/karak
 	ID = MAP_KARAK
 	title = "Karak"
-	lobby_icon = 'icons/lobby/medieval.png'
+	description = "A medieval siege scenario where the Arabic Caliphate besieges the Crusader fortress of Karak."
+	lobby_icon = "icons/lobby/medieval.png"
 	no_winner ="The fighting is still going on."
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/one,/area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 300
@@ -22,21 +23,11 @@
 	mission_start_message = "<font size=4>The <b>Caliphate</b> troops are besieging the <b>Crusader</b> fortress of Karak! The Crusaders will win if they manage to hold the fortress for 35 minutes. <br> The siege will start in <b>6 minutes</b>.</font>"
 	faction1 = FRENCH
 	faction2 = ARAB
-	ambience = list('sound/ambience/desert.ogg')
+	ambience = list("sound/ambience/desert.ogg")
 	songs = list(
-		"Crusaders:1" = 'sound/music/crusaders.ogg')
+		"Crusaders:1" = "sound/music/crusaders.ogg")
 	gamemode = "Siege"
 	grace_wall_timer = 3600
-
-obj/map_metadata/karak/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_crusader && J.is_medieval)
-		. = TRUE
-	else if (J.is_arabcaliph && J.is_medieval)
-		. = TRUE
-	else
-		. = FALSE
-
 
 
 /obj/map_metadata/karak/roundend_condition_def2name(define)
@@ -85,14 +76,14 @@ var/no_loop_sm = FALSE
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The Crusaders have managed to defend the fortress!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_sm == FALSE)
 		ticker.finished = TRUE
 		var/message = "The Arabic Caliphate has captured the fortress! The remaining Crusaders have surrendered!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_sm = TRUE
@@ -135,7 +126,7 @@ var/no_loop_sm = FALSE
 				current_loser = "Crusaders"
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The Crusaders have recaptured the fortress!</font>"
+			to_chat(world, "<font size = 3>The Crusaders have recaptured the fortress!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1

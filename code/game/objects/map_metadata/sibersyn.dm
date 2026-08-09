@@ -2,7 +2,8 @@
 /obj/map_metadata/sibersyn
 	ID = MAP_SIBERSYN
 	title = "Battle of the Bridges"
-	lobby_icon = 'icons/lobby/rcw.png'
+	description = "The Soviets will win if they capture the White Army's command post in 40 minutes. The White Army will win if they capture the Soviets' command post in 40 minutes."
+	lobby_icon = "icons/lobby/rcw.png"
 	no_winner ="The battle ends in stalemate."
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall/tundra)
 	respawn_delay = 600
@@ -23,24 +24,9 @@
 	faction2 = CIVILIAN
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET, WEATHER_EXTREME)
 	songs = list(
-		"Korobushka:1" = 'sound/music/korobushka.ogg')
+		"Korobushka:1" = "sound/music/korobushka.ogg")
 	gamemode = "Siege"
 	grace_wall_timer = 4200
-
-obj/map_metadata/sibersyn/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (istype(J, /datum/job/russian))
-		if (J.is_rcw == TRUE)
-			. = TRUE
-		else
-			. = FALSE
-	else if (istype(J, /datum/job/civilian))
-		if (J.is_rcw == TRUE)
-			. = TRUE
-		else
-			. = FALSE
-	else
-		. = FALSE
 
 /obj/map_metadata/sibersyn/roundend_condition_def2name(define)
 	..()

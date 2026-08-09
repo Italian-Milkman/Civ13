@@ -1,7 +1,8 @@
 /obj/map_metadata/clash
 	ID = MAP_CLASH
 	title = "Clash"
-	lobby_icon = 'icons/lobby/clash.png'
+	description = "The Bear clan is sieging the Raven clan's settlement hidden away in the snowy fjords! The Bear clan will win if they manage to capture the Raven King's Cabin."
+	lobby_icon = "icons/lobby/clash.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall/)
 	victory_time = 21600
 	no_winner = "The settlement is still held by the Raven Clan."
@@ -25,15 +26,8 @@
 	faction2 = NORWEGIAN
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET)
 	songs = list(
-		"Danheim - Ivar's Revenge:1" = 'sound/music/ivars_revenge.ogg',)
+		"Danheim - Ivar's Revenge:1" = "sound/music/ivars_revenge.ogg",)
 	gamemode = "Siege"
-
-/obj/map_metadata/clash/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_clash == TRUE)
-		. = TRUE
-	else
-		. = FALSE
 
 /obj/map_metadata/clash/faction1_can_cross_blocks()
 	return (processes.ticker.playtime_elapsed >= 21600 || admin_ended_all_grace_periods)
@@ -68,14 +62,14 @@ var/no_loop_clash = FALSE
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The Raven clan has managed to defend their settlement!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_clash == FALSE)
 		ticker.finished = TRUE
 		var/message = "The Bear clan has captured the King's cabin! The remaining Raven clansmen have surrendered!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_clash = TRUE
@@ -118,7 +112,7 @@ var/no_loop_clash = FALSE
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The Raven clan has recaptured the King's cabin!</font>"
+			to_chat(world, "<font size = 3>The Raven clan has recaptured the King's cabin!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1
@@ -144,7 +138,7 @@ var/no_loop_clash = FALSE
 			return
 		if (!head_nationality || head_nationality == "none")
 			return
-		user << "You offer the head as a tribute to Odin."
+		to_chat(user, "You offer the head as a tribute to Odin.")
 
 		if	(prob(20))
 			var/randmed = rand(1,3)

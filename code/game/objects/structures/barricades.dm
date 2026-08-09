@@ -16,29 +16,11 @@
 	var/protection_chance = 85 //prob of the projectile hitting the barricade
 	var/applies_material_colour = TRUE
 
-/*
-/obj/structure/barricade/attackby(obj/item/W as obj, mob/user as mob)
-	switch(material)
-		if ("wood")
-			//Do nothing, anything can cut through wood.
-		else if ("stone")
-			//Swords no work on stone, unga dunga no knify wifey the wall.
-			if(!istype(W, /obj/item/weapon/sledgehammer) && !istype(W, /obj/item/projectile))
-				user << "Your [W.name] glances off the [src.name]!"
-				return
-			else
-				//Damage the wall.
-		else if ("metal" || "steel")
-			if(!istype(W, /obj/item/weapon/sledgehammer) && !istype(W, /obj/item/projectile))
-				user << "Your [W.name] glances off the [src.name]!"
-				returns
-			else
-				//Damage the wall.
-		..()*/
+
 
 /obj/structure/barricade/New(var/newloc)
 	..(newloc)
-	if(!istype(src, /obj/structure/barricade/ship))
+	if(!istype(src, /obj/structure/barricade/ship) && !istype(src, /obj/structure/barricade/magic))
 		if (!material_name)
 			material_name = "wood"
 		material = get_material_by_name("[material_name]")
@@ -68,7 +50,7 @@
 			return //hitting things with the wrong type of stack usually doesn't produce messages, and probably doesn't need to.
 		if (health < maxhealth)
 			if (D.amount < 1)
-				user << SPAN_WARNING("You need one sheet of [material.display_name] to repair \the [src].")
+				to_chat(user, SPAN_WARNING("You need one sheet of [material.display_name] to repair \the [src]."))
 				return
 			visible_message(SPAN_NOTICE("[user] begins to repair \the [src]."))
 			if (do_after(user,8 SECONDS,src) && health < maxhealth)
@@ -99,7 +81,7 @@
 				SPAN_DANGER("You stop deploying \the [W.name]."))
 		return
 	if (istype(W, /obj/item/weapon/poster/religious))
-		user << SPAN_NOTICE("You start placing the [W] on \the [src]...")
+		to_chat(user, SPAN_NOTICE("You start placing the [W] on \the [src]..."))
 		if (do_after(user, 7 SECONDS, src))
 			visible_message("[user] places the [W] on \the [src].")
 			var/obj/structure/poster/religious/RP = new/obj/structure/poster/religious(get_turf(src))
@@ -112,7 +94,7 @@
 			qdel(W)
 		return
 	if (istype(W, /obj/item/weapon/poster/faction))
-		user << SPAN_NOTICE("You start placing the [W] on \the [src]...")
+		to_chat(user, SPAN_NOTICE("You start placing the [W] on \the [src]..."))
 		if (do_after(user, 7 SECONDS, src))
 			visible_message("[user] places \the [W] on the [src].")
 			var/obj/structure/poster/faction/RP = new/obj/structure/poster/faction(get_turf(src))
@@ -136,7 +118,7 @@
 		try_destroy()
 	else
 		if (istype(W,/obj/item/weapon) || !istype(W,/obj/item/weapon/wrench) || !istype(W,/obj/item/weapon/hammer)) //No weapons can harm me! If not weapon and not a wrench.
-			user << "You uselessly hit the wall!"
+			to_chat(user, "You uselessly hit the wall!")
 		return
 	..()
 
@@ -193,7 +175,7 @@
 
 /obj/structure/barricade/bullet_act(var/obj/item/projectile/proj)
 	health -= proj.damage * 0.05
-	visible_message(SPAN_DANGER("\The [src] is hit by \the [proj.name]!"))
+	visible_message(SPAN_WARNING("\The [src] is hit by \the [proj.name]!"))
 	try_destroy()
 
 /obj/structure/barricade/horizontal
@@ -203,6 +185,19 @@
 	flammable = TRUE
 	protection_chance = 85
 	layer = 2.98
+
+/obj/structure/barricade/magic
+	name = "magical barrier"
+	desc = "A spell-spawned magical barricade. It shimmers with arcane energy."
+	icon_state = "magic_barricade"
+	flammable = TRUE
+	protection_chance = 90
+	layer = 2.98
+	alpha = 110
+	health = 80
+	maxhealth = 80
+	applies_material_colour = FALSE
+
 
 /obj/structure/barricade/vertical
 	name = "wood barrier"
@@ -560,6 +555,20 @@
 	else
 		return
 
+/obj/structure/barricade/stone_h/cliffside
+	name = "cliffside"
+	desc = "A cliffside. It seems like you can put a ladder on this."
+	icon = 'icons/obj/structures.dmi'
+	icon_state = "cliffside"
+	health = 30000
+	maxhealth = 30000
+	pixel_y = -4
+
+/obj/structure/barricade/stone_h/cliffside/New()
+	return
+
+/obj/structure/barricade/stone_h/cliffside/corner
+	icon_state = "cliffside_corner"
 
 /obj/structure/barricade/jap_h
 	name = "shingled stone wall"
@@ -887,7 +896,7 @@
 	if (user.a_intent == I_HELP)
 		user.drop_from_inventory(W)
 		W.forceMove(loc)
-		user << "You put \the [W] on the [src]."
+		to_chat(user, "You put \the [W] on the [src].")
 	else
 		..()
 

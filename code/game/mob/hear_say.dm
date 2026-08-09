@@ -9,6 +9,16 @@
 			//Or someone snoring.  So we make it where they won't hear it.
 		return
 
+	if (language && !istype(language, /datum/language))
+		if (ismob(language))
+			var/mob/living/M = language
+			language = M.get_default_language()
+		else
+			language = null
+
+	if (!alt_message)
+		alt_message = message
+
 	//make sure the air can transmit speech - hearer's side
 	original_message = message
 
@@ -64,6 +74,13 @@
 	if (animal)
 		language = null
 	var/track = null
+	if (language && !istype(language, /datum/language))
+		if (ismob(language))
+			var/mob/living/M = language
+			language = M.get_default_language()
+		else
+			language = null
+
 	if (isghost(src))
 		if (italics && is_preference_enabled(/datum/client_preference/ghost_radio))
 			return
@@ -76,9 +93,9 @@
 	if ((sdisabilities & DEAF) || ear_deaf || find_trait("Deaf"))
 		if (!language || !(language.flags & INNATE)) // INNATE is the flag for audible-emote-language, so we don't want to show an "x talks but you cannot hear them" message if it's set
 			if (speaker == src)
-				src << "<span class='warning'>You cannot hear yourself speak!</span>"
+				to_chat(src, "<span class='warning'>You cannot hear yourself speak!</span>")
 			else
-				src << "<span class='name'>[alt_name]</span> talks but you cannot hear."
+				to_chat(src, "<span class='name'>[alt_name]</span> talks but you cannot hear.")
 	else
 		if (language)
 			on_hear_say("<span class='name'>[alt_name] <span class = 'small_message'>([language.name])</span> </span> [track][language.format_message(message, verb)]",speaker, alt_message)
@@ -97,21 +114,18 @@
 			if (H.partial_languages[lname] >= language.difficulty)
 				H.add_language("[lname]", FALSE)
 				H.add_note("Known Languages", "[language.name]")
-				H << "<span class = 'notice'>You've learned how to speak <b>[language.name]</b> from hearing it so much.</span>"
+				to_chat(H, "<span class = 'notice'>You've learned how to speak <b>[language.name]</b> from hearing it so much.</span>")
+
 
 /mob/proc/on_hear_say(var/message, var/mob/speaker = null, var/message2 = "")
 	to_chat(src, message)
 	if (speaker && message2 != "")
-		if (client && speaker.client && (speaker in view(7,src) || speaker == src))
+		if (client && ((speaker in view(7,src)) || speaker == src))
+			show_chat_overlay(speaker, message2)
 
-			if (client.is_preference_enabled(/datum/client_preference/show_chat_overlays))
-				var/obj/chat_text/CT = new/obj/chat_text(speaker,message2,src)
-				client.seen_chat_text += CT
-				if(speaker.client)
-					speaker.client.stored_chat_text += CT
-
-			if (config.tts_on && ishuman(src) && client.is_preference_enabled(/datum/client_preference/play_chat_tts))
+			if (config.tts_on && ishuman(src) && ishuman(speaker) && client.is_preference_enabled(/datum/client_preference/play_chat_tts))
 				play_tts(message2, speaker)
+
 
 /mob/proc/hear_radio(var/message, var/verb="says", var/datum/language/language=null, var/mob/speaker = null, var/obj/destination=null, var/obj/origin=null)
 
@@ -173,10 +187,11 @@
 
 	if ((sdisabilities & DEAF) || ear_deaf || find_trait("Deaf"))
 		if (prob(20))
-			src << "<span class='warning'>You feel the radio vibrate but can hear nothing from it!</span>"
+			to_chat(src, "<span class='warning'>You feel the radio vibrate but can hear nothing from it!</span>")
 	else
 		var/fontsize = 2
 		var/full_message = ""
+		var/lang_name = language ? "<span class = 'small_message'>([language.name])</span> " : ""
 		if (destination)
 			if (istype(destination, /obj/structure/radio))
 				var/obj/structure/radio/RD = destination
@@ -185,9 +200,9 @@
 					if(!isnum(RD.freq))
 						khz = "([RD.freq])"
 				if (RD)
-					full_message = "<font size = [fontsize] color=#FFAE19><b>[destination.name], <i>[khz]</i>:</font></b><font size = [fontsize]> <b>[speaker.real_name]</b> <span class = 'small_message'>([language.name])</span> \"[message]\"</font>"
+					full_message = "<font size = [fontsize] color=#FFAE19><b>[destination.name], <i>[khz]</i>:</font></b><font size = [fontsize]> <b>[speaker.real_name]</b> [lang_name]\"[message]\"</font>"
 					if (track)
-						full_message = "<font size = [fontsize] color=#FFAE19><b>[destination.name], <i>[khz]</i>:</font></b><font size = [fontsize]> <b>[speaker.real_name]</b> [track] <span class = 'small_message'>([language.name])</span> \"[message]\"</font>"
+						full_message = "<font size = [fontsize] color=#FFAE19><b>[destination.name], <i>[khz]</i>:</font></b><font size = [fontsize]> <b>[speaker.real_name]</b> [track] [lang_name]\"[message]\"</font>"
 			else
 				var/obj/item/weapon/radio/RD = destination
 				var/khz = "([RD.freq] kHz)"
@@ -195,13 +210,13 @@
 					if(!isnum(RD.freq))
 						khz = "([RD.freq])"
 				if (RD)
-					full_message = "<font size = [fontsize] color=#FFAE19><b>[destination.name], <i>[khz]</i>:</font></b><font size = [fontsize]> <b>[speaker.real_name]</b> <span class = 'small_message'>([language.name])</span> \"[message]\"</font>"
+					full_message = "<font size = [fontsize] color=#FFAE19><b>[destination.name], <i>[khz]</i>:</font></b><font size = [fontsize]> <b>[speaker.real_name]</b> [lang_name]\"[message]\"</font>"
 					if (track)
-						full_message = "<font size = [fontsize] color=#FFAE19><b>[destination.name], <i>[khz]</i>:</font></b><font size = [fontsize]> <b>[speaker.real_name]</b> [track] <span class = 'small_message'>([language.name])</span> \"[message]\"</font>"
+						full_message = "<font size = [fontsize] color=#FFAE19><b>[destination.name], <i>[khz]</i>:</font></b><font size = [fontsize]> <b>[speaker.real_name]</b> [track] [lang_name]\"[message]\"</font>"
 		else
-			full_message = "<font size = [fontsize] color=#FFAE19><b>Radio:</font></b><font size = [fontsize]> <b>[speaker.real_name]</b> <span class = 'small_message'>([language.name])</span> \"[message]\"</font>"
+			full_message = "<font size = [fontsize] color=#FFAE19><b>Radio:</font></b><font size = [fontsize]> <b>[speaker.real_name]</b> [lang_name]\"[message]\"</font>"
 			if (track)
-				full_message = "<font size = [fontsize] color=#FFAE19><b>Radio:</font></b><font size = [fontsize]> <b>[speaker.real_name]</b> [track] <span class = 'small_message'>([language.name])</span> \"[message]\"</font>"
+				full_message = "<font size = [fontsize] color=#FFAE19><b>Radio:</font></b><font size = [fontsize]> <b>[speaker.real_name]</b> [track] [lang_name]\"[message]\"</font>"
 
 
 		on_hear_radio(destination, full_message)
@@ -254,17 +269,18 @@
 
 	if ((sdisabilities & DEAF) || ear_deaf || find_trait("Deaf"))
 		if (prob(20))
-			src << "<span class='warning'>You feel the telephone vibrate but can hear nothing from it!</span>"
+			to_chat(src, "<span class='warning'>You feel the telephone vibrate but can hear nothing from it!</span>")
 	else
 		var/fontsize = 2
 		var/contactname = " "
+		var/lang_name = language ? "<span class = 'small_message'>([language.name])</span> " : ""
 		for (var/list/L in origin.contacts)
 			if (L[2] == origin.phonenumber)
 				contactname = "[L[1]] "
 				break
-		var/full_message = "<font size = [fontsize] color=#FFAE19><b>[contactname]([destination.phonenumber]):</font></b><font size = [fontsize]> <span class = 'small_message'>([language.name])</span> \"[message]\"</font>"
+		var/full_message = "<font size = [fontsize] color=#FFAE19><b>[contactname]([destination.phonenumber]):</font></b><font size = [fontsize]> [lang_name]\"[message]\"</font>"
 		if (track)
-			full_message = "<font size = [fontsize] color=#FFAE19><b>[contactname]([destination.phonenumber]):</font></b><font size = [fontsize]> [track] <span class = 'small_message'>([language.name])</span> \"[message]\"</font>"
+			full_message = "<font size = [fontsize] color=#FFAE19><b>[contactname]([destination.phonenumber]):</font></b><font size = [fontsize]> [track] [lang_name]\"[message]\"</font>"
 		on_hear_radio(destination, full_message)
 
 /mob/proc/hear_voicepipe(var/message, var/verb="says", var/datum/language/language=null, var/mob/speaker = null, var/obj/structure/voyage/voicepipe/destination=null, var/obj/structure/voyage/voicepipe/origin=null)
@@ -316,32 +332,30 @@
 	message = replacetext(message,";","")
 	if ((sdisabilities & DEAF) || ear_deaf || find_trait("Deaf"))
 		if (prob(20))
-			src << "<span class='warning'>You feel the voicepipe vibrate but can hear nothing from it!</span>"
+			to_chat(src, "<span class='warning'>You feel the voicepipe vibrate but can hear nothing from it!</span>")
 	else
 		var/fontsize = 2
 		var/full_message = ""
+		var/lang_name = language ? "<span class = 'small_message'>([language.name])</span> " : ""
 		if (destination)
 			var/obj/structure/voyage/voicepipe/RD = destination
 			if (RD)
-				full_message = "<font size = [fontsize] color=#FFAE19><b>[destination.vp_reference]:</font></b><font size = [fontsize]> <b>[speaker.real_name]</b> <span class = 'small_message'>([language.name])</span> \"[message]\"</font>"
+				full_message = "<font size = [fontsize] color=#FFAE19><b>[destination.vp_reference]:</font></b><font size = [fontsize]> <b>[speaker.real_name]</b> [lang_name]\"[message]\"</font>"
 				if (track)
-					full_message = "<font size = [fontsize] color=#FFAE19><b>[destination.vp_reference]:</font></b><font size = [fontsize]> <b>[speaker.real_name]</b> [track] <span class = 'small_message'>([language.name])</span> \"[message]\"</font>"
+					full_message = "<font size = [fontsize] color=#FFAE19><b>[destination.vp_reference]:</font></b><font size = [fontsize]> <b>[speaker.real_name]</b> [track] [lang_name]\"[message]\"</font>"
 		else
-			full_message = "<font size = [fontsize] color=#FFAE19><b>Voicepipe:</font></b><font size = [fontsize]> <b>[speaker.real_name]</b> <span class = 'small_message'>([language.name])</span> \"[message]\"</font>"
+			full_message = "<font size = [fontsize] color=#FFAE19><b>Voicepipe:</font></b><font size = [fontsize]> <b>[speaker.real_name]</b> [lang_name]\"[message]\"</font>"
 			if (track)
-				full_message = "<font size = [fontsize] color=#FFAE19><b>Voicepipe:</font></b><font size = [fontsize]> <b>[speaker.real_name]</b> [track] <span class = 'small_message'>([language.name])</span> \"[message]\"</font>"
+				full_message = "<font size = [fontsize] color=#FFAE19><b>Voicepipe:</font></b><font size = [fontsize]> <b>[speaker.real_name]</b> [track] [lang_name]\"[message]\"</font>"
 
 
 		on_hear_radio(destination, full_message)
 
-/proc/say_timestamp()
-	return "<span class='say_quote'>\[[stationtime2text()]\]</span>"
-
 /mob/proc/on_hear_radio(var/obj/destination = null, var/fullmessage)
 	if (destination)
-		src << "\icon[getFlatIcon(destination)] [fullmessage]"
+		to_chat(src, "\icon[getFlatIcon(destination)] [fullmessage]")
 	else
-		src << fullmessage
+		to_chat(src, fullmessage)
 
 /mob/proc/hear_signlang(var/message, var/verb = "gestures", var/datum/language/language, var/mob/speaker = null)
 	if (!client)

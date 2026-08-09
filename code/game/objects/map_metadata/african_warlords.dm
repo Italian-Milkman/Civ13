@@ -2,7 +2,8 @@
 /obj/map_metadata/african_warlords
 	ID = MAP_AFRICAN_WARLORDS
 	title = "African Warlords"
-	lobby_icon = 'icons/lobby/africanwarlords.png'
+	description = "Two African warlords are fighting to humiliate the other's tribe. They will need to collect Enemy Skulls and bring them to their camp shaman's altar to score."
+	lobby_icon = "icons/lobby/africanwarlords.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall/jungle,/area/caribbean/no_mans_land/invisible_wall/jungle/one,/area/caribbean/no_mans_land/invisible_wall/jungle/two,/area/caribbean/no_mans_land/invisible_wall/jungle/three)
 	respawn_delay = 300
 	no_winner ="No warband has won yet."
@@ -23,7 +24,7 @@
 	faction2 = CIVILIAN
 	valid_weather_types = list(WEATHER_WET, WEATHER_NONE, WEATHER_EXTREME)
 	songs = list(
-		"Barrington Levy - Murderer:1" = 'sound/music/murderer.ogg',)
+		"Barrington Levy - Murderer:1" = "sound/music/murderer.ogg",)
 	scores = list(
 		"Blugisi" = 0,
 		"Yellowagwana" = 0,
@@ -32,17 +33,6 @@
 		..()
 		spawn(600) // 1 minute 
 			points_check()
-
-/obj/map_metadata/african_warlords/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_blugi)
-		if (J.title != "warlord (do not use)")
-			. = TRUE
-	else if (J.is_yellowag)
-		if (J.title != "warlord (do not use)")
-			. = TRUE
-	else
-		. = FALSE
 
 /obj/map_metadata/african_warlords/cross_message(faction)
 	return "<font size = 4>All factions may cross the grace wall now!</font>"
@@ -62,9 +52,9 @@
 	return FALSE
 
 /obj/map_metadata/african_warlords/proc/points_check()
-	world << "<big><b>Current Points:</big></b>"
-	world << "<big>Yellowagwana: [scores["Yellowagwana"]]</big>"
-	world << "<big>Blugisi: [scores["Blugisi"]]</big>"
+	to_chat(world, "<big><b>Current Points:</b></big>")
+	to_chat(world, "<big>Yellowagwana: [scores["Yellowagwana"]]</big>")
+	to_chat(world, "<big>Blugisi: [scores["Blugisi"]]</big>")
 	spawn(300)
 		points_check()
 
@@ -73,27 +63,27 @@
 		if (win_condition_spam_check)
 			return FALSE
 		if (!(scores["Yellowagwana"] >= 30 || scores["Blugisi"] >= 30))
+			last_win_condition = win_condition.hash
 			return TRUE
 		ticker.finished = TRUE
 		var/message = ""
 		message = "The round has ended!"
 		if (scores["Yellowagwana"] > scores["Blugisi"])
 			message = "The battle is over! The <font color='yellow'><b>Yellowagwana</b></font> were victorious over the <b>Blugisi</b> tribe!"
-			world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+			to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 			win_condition_spam_check = TRUE
 			return FALSE
 		else if (scores["Blugisi"] > scores["Yellowagwana"])
 			message = "The battle is over! The <font color='blue'><b>Blugisi</b></font> were victorious over the <b>Yellowagwana</b> tribe!"
-			world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+			to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 			win_condition_spam_check = TRUE
 			return FALSE
 		else
 			message = "The battle has ended in a <b>stalemate</b>!"
-			world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+			to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 			win_condition_spam_check = TRUE
 			return FALSE
-		last_win_condition = win_condition.hash
-		return TRUE
+	last_win_condition = win_condition.hash
 	return TRUE
 ///////////map specific objs/////////
 /obj/structure/altar/darkstone/sacrifice
@@ -150,7 +140,7 @@
 				AW.scores["Yellowagwana"] -= 1*/
 	//		if("Redkantu")
 	//			AW.scores["Redkantu"] -= 1
-		user << "You place the head on the shaman's altar."
+		to_chat(user, "You place the head on the shaman's altar.")
 		if	(prob(20))
 			var/randmed = rand(1,6)
 			switch (randmed)

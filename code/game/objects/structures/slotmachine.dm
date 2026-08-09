@@ -9,7 +9,6 @@
 	density = TRUE
 	anchored = TRUE
 	not_disassemblable = FALSE
-	not_disassemblable = FALSE
 
 /obj/machinery/slotmachine
 	name = "slot machine"
@@ -156,6 +155,16 @@
 	if (spinning)
 		return
 
+	if (map && map.ID == MAP_WIZARD_BOY && (istype(W, /obj/item/stack/money/goldcoin) || istype(W, /obj/item/stack/money/silvercoin)))
+		var/obj/item/stack/money/silvercoin/D = W
+		var/worth = D.value * D.amount
+		if ((worth > 0) && (bet + worth <= 1000))
+			to_chat(user, SPAN_NOTICE("You insert [worth] silver coins into the [src]."))
+			bet += worth
+			user.drop_from_inventory(D)
+			qdel(D)
+		else
+			to_chat(user, SPAN_WARNING("You must bet 1 to [1000 - bet] silver coins! Can't insert [worth], that's too much."))
 	if (istype(W, /obj/item/stack/money/dollar/))
 		var/obj/item/stack/money/dollar/D = W
 		var/worth = D.value * D.amount

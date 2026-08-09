@@ -1,11 +1,11 @@
 /obj/map_metadata/siberiad
 	ID = MAP_SIBERIAD
 	title = "Operation Siberiad"
-	lobby_icon = 'icons/lobby/siberiad.png'
+	lobby_icon = "icons/lobby/siberiad.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/one,/area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 600
 	no_hardcore = FALSE
-	ambience = list('sound/ambience/winter.ogg')
+	ambience = list("sound/ambience/winter.ogg")
 	can_spawn_on_base_capture = TRUE
 
 	faction_organization = list(
@@ -24,7 +24,7 @@
 	faction2 = RUSSIAN
 	ordinal_age = 7
 	songs = list(
-		"Audio - Emissions:1" = 'sound/music/emissions.ogg')
+		"Audio - Emissions:1" = "sound/music/emissions.ogg")
 	gamemode = "Extraction"
 	var/activation_code = 0
 
@@ -37,21 +37,6 @@
 
 /obj/map_metadata/siberiad/faction1_can_cross_blocks()
 	return (processes.ticker.playtime_elapsed >= 3600 || admin_ended_all_grace_periods)
-
-/obj/map_metadata/siberiad/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (istype(J, /datum/job/american))
-		if (J.is_siberiad)
-			. = TRUE
-		else
-			. = FALSE
-	else if (istype(J, /datum/job/russian))
-		if (J.is_siberiad)
-			. = TRUE
-		else
-			. = FALSE
-	else
-		. = FALSE
 
 /obj/map_metadata/siberiad/short_win_time(faction)
 	if (!(alive_n_of_side(faction1)) || !(alive_n_of_side(faction2)))
@@ -158,11 +143,11 @@
 		if (!src.unlocked)
 			var/code = input(H, "Enter the activation code:", "Access Termninal") as num
 			if (code != SD.activation_code)
-				to_chat(H, SPAN_WARNING("\icon[src] Wrong password."))
+				to_chat(H, SPAN_WARNING("\icon[getFlatIcon(src)] Wrong password."))
 				return
-		src.visible_message(SPAN_NOTICE("\icon[src] Initiliazing protocols... Please wait."))
+		src.visible_message(SPAN_NOTICE("\icon[getFlatIcon(src)] Initiliazing protocols... Please wait."))
 		spawn(100)
-			src.visible_message(SPAN_WARNING("\icon[src] Security protocol terminated. Please insert the trajectory path disk."))
+			src.visible_message(SPAN_WARNING("\icon[getFlatIcon(src)] Security protocol terminated. Please insert the trajectory path disk."))
 			src.unlocked = TRUE
 
 /obj/structure/props/computerprops/tracking/siberiad/attackby(obj/item/O as obj, mob/living/human/user as mob)
@@ -179,15 +164,15 @@
 			destination = 1
 		else if (istype(O, /obj/item/weapon/disk/siberiad/nato))
 			destination = 2
-		src.visible_message(SPAN_NOTICE("\icon[src] Calibrating trajectory... Please wait."))
+		src.visible_message(SPAN_NOTICE("\icon[getFlatIcon(src)] Calibrating trajectory... Please wait."))
 		spawn(100)
 			src.active = TRUE
-			src.visible_message(SPAN_WARNING("\icon[src] Nuclear missile activated."))
+			src.visible_message(SPAN_WARNING("\icon[getFlatIcon(src)] Nuclear missile activated."))
 			switch(destination)
 				if (1)
-					src.visible_message(SPAN_WARNING("\icon[src] Target destination: SEATTLE <br>(LAT: 47.608013, LONG: -122.335167)."))
+					src.visible_message(SPAN_WARNING("\icon[getFlatIcon(src)] Target destination: SEATTLE <br>(LAT: 47.608013, LONG: -122.335167)."))
 				if (2)
-					src.visible_message(SPAN_WARNING("\icon[src] Target destination: NOVOSIBIRSK <br>(LAT: 55.018803, LONG: 82.933952)."))
+					src.visible_message(SPAN_WARNING("\icon[getFlatIcon(src)] Target destination: NOVOSIBIRSK <br>(LAT: 55.018803, LONG: 82.933952)."))
 
 /obj/item/weapon/disk/siberiad
 	name = "ballistic trajectory diskette"

@@ -77,7 +77,8 @@
 	spawn(10)
 		for (var/ix=1,ix<=5,ix++)
 			for(var/iy=1, iy<=5, iy++)
-				if (tocreate["[ix],[iy]"] && islist(tocreate["[ix],[iy]"]) && tocreate["[ix],[iy]"].len)
+				var/list/creation_list = tocreate["[ix],[iy]"]
+				if (istype(creation_list) && creation_list.len)
 					var/turf/T = get_turf(locate(src.x+ix,src.y+iy,src.z))
 					if (T)
 						for(var/pt in tocreate["[ix],[iy]"])
@@ -338,7 +339,7 @@
 	custom_color = "#45453b"
 	axis = /obj/structure/vehicleparts/axis/car/mercedes
 	tocreate = list(
-	"1,1" = list(/obj/structure/vehicleparts/frame/car/rf/armored, /obj/item/weapon/reagent_containers/glass/barrel/fueltank/tank/fueleddiesel{density = 0}, /obj/structure/vehicleparts/movement/armored),
+	"1,1" = list(/obj/structure/vehicleparts/frame/car/rf/armored, /obj/item/weapon/reagent_containers/glass/barrel/fueltank/tank/fueleddiesel, /obj/structure/vehicleparts/movement/armored),
 	"2,1" = list(/obj/structure/vehicleparts/frame/car/lf/armored, /obj/structure/engine/internal/diesel/premade/v6, /obj/structure/vehicleparts/movement/armored/reversed, /obj/structure/vehicleparts/license_plate/nl/centered/front),
 
 	"1,2" = list(/obj/structure/vehicleparts/frame/car/mercedes/rf, /obj/structure/bed/chair/office/dark),
@@ -349,7 +350,7 @@
 	)
 /obj/effects/premadevehicles/car/mercedes/mg
 	tocreate = list(
-	"1,1" = list(/obj/structure/vehicleparts/frame/car/rf/armored, /obj/item/weapon/reagent_containers/glass/barrel/fueltank/tank/fueleddiesel{density = 0}, /obj/structure/vehicleparts/movement/armored),
+	"1,1" = list(/obj/structure/vehicleparts/frame/car/rf/armored, /obj/item/weapon/reagent_containers/glass/barrel/fueltank/tank/fueleddiesel, /obj/structure/vehicleparts/movement/armored),
 	"2,1" = list(/obj/structure/vehicleparts/frame/car/lf/armored, /obj/structure/engine/internal/diesel/premade/v6, /obj/structure/vehicleparts/movement/armored/reversed, /obj/structure/vehicleparts/license_plate/nl/centered/front),
 
 	"1,2" = list(/obj/structure/vehicleparts/frame/car/mercedes/rf, /obj/structure/bed/chair/office/dark, /obj/item/weapon/gun/projectile/automatic/stationary/m2browning),
@@ -366,7 +367,7 @@
 	custom_color = "#45453b"
 	axis = /obj/structure/vehicleparts/axis/car/tigr
 	tocreate = list(
-	"1,1" = list(/obj/structure/vehicleparts/frame/car/rf/armored, /obj/item/weapon/reagent_containers/glass/barrel/fueltank/tank/fueleddiesel{density = 0}, /obj/structure/vehicleparts/movement/armored),
+	"1,1" = list(/obj/structure/vehicleparts/frame/car/rf/armored, /obj/item/weapon/reagent_containers/glass/barrel/fueltank/tank/fueleddiesel, /obj/structure/vehicleparts/movement/armored),
 	"2,1" = list(/obj/structure/vehicleparts/frame/car/lf/armored, /obj/structure/engine/internal/diesel/premade/v6, /obj/structure/vehicleparts/movement/armored/reversed, /obj/structure/vehicleparts/license_plate/ru_mil/centered/front),
 
 	"1,2" = list(/obj/structure/vehicleparts/frame/car/tigr/rf, /obj/structure/bed/chair/office/dark),
@@ -377,7 +378,7 @@
 	)
 /obj/effects/premadevehicles/car/tigr/mg
 	tocreate = list(
-	"1,1" = list(/obj/structure/vehicleparts/frame/car/rf/armored, /obj/item/weapon/reagent_containers/glass/barrel/fueltank/tank/fueleddiesel{density = 0}, /obj/structure/vehicleparts/movement/armored),
+	"1,1" = list(/obj/structure/vehicleparts/frame/car/rf/armored, /obj/item/weapon/reagent_containers/glass/barrel/fueltank/tank/fueleddiesel, /obj/structure/vehicleparts/movement/armored),
 	"2,1" = list(/obj/structure/vehicleparts/frame/car/lf/armored, /obj/structure/engine/internal/diesel/premade/v6, /obj/structure/vehicleparts/movement/armored/reversed, /obj/structure/vehicleparts/license_plate/ru_mil/centered/front),
 
 	"1,2" = list(/obj/structure/vehicleparts/frame/car/tigr/rf, /obj/structure/bed/chair/office/dark, /obj/item/weapon/gun/projectile/automatic/stationary/pkm),
@@ -664,11 +665,11 @@
 	"1,1" = list(/obj/structure/vehicleparts/frame/l3/rf, /obj/structure/vehicleparts/movement/tracks/right),
 	"2,1" = list(/obj/structure/vehicleparts/frame/l3/lf, /obj/structure/vehicleparts/movement/tracks/left),
 
-	"1,2" = list(/obj/structure/vehicleparts/frame/l3/rc, /obj/structure/bed/chair/drivers/tank{anchored = 1}),
-	"2,2" = list(/obj/structure/vehicleparts/frame/l3/lc, /obj/structure/bed/chair/office/dark{anchored = 1}, /obj/item/weapon/gun/projectile/automatic/stationary/breda30/hull, /obj/item/ammo_magazine/breda30, /obj/item/ammo_magazine/breda30, /obj/item/ammo_magazine/breda30, /obj/item/ammo_magazine/breda30, /obj/item/ammo_magazine/breda30),
+	"1,2" = list(/obj/structure/vehicleparts/frame/l3/rc, /obj/structure/bed/chair/drivers/tank/anchored),
+	"2,2" = list(/obj/structure/vehicleparts/frame/l3/lc, /obj/structure/bed/chair/office/dark/anchored, /obj/item/weapon/gun/projectile/automatic/stationary/breda30/hull, /obj/item/ammo_magazine/breda30, /obj/item/ammo_magazine/breda30, /obj/item/ammo_magazine/breda30, /obj/item/ammo_magazine/breda30, /obj/item/ammo_magazine/breda30),
 
 	"1,3" = list(/obj/structure/vehicleparts/frame/l3/rb, /obj/structure/vehicleparts/movement/tracks/left/reversed, /obj/structure/engine/internal/gasoline/premade/l3),
-	"2,3" = list(/obj/structure/vehicleparts/frame/l3/lb, /obj/structure/vehicleparts/movement/tracks/right/reversed, /obj/item/weapon/reagent_containers/glass/barrel/fueltank/smalltank/fueledgasoline{density = 0}),
+	"2,3" = list(/obj/structure/vehicleparts/frame/l3/lb, /obj/structure/vehicleparts/movement/tracks/right/reversed, /obj/item/weapon/reagent_containers/glass/barrel/fueltank/smalltank/fueledgasoline),
 	)
 
 /obj/effects/premadevehicles/tank/l3/antitank
@@ -680,11 +681,11 @@
 	"1,1" = list(/obj/structure/vehicleparts/frame/l3/rf, /obj/structure/vehicleparts/movement/tracks/right),
 	"2,1" = list(/obj/structure/vehicleparts/frame/l3/lf/cc, /obj/structure/vehicleparts/movement/tracks/left),
 
-	"1,2" = list(/obj/structure/vehicleparts/frame/l3/rc, /obj/structure/bed/chair/drivers/tank{anchored = 1}),
-	"2,2" = list(/obj/structure/vehicleparts/frame/l3/lc, /obj/structure/bed/chair/office/dark{anchored = 1}, /obj/item/weapon/gun/projectile/automatic/stationary/solothurn/italian/stationary, /obj/item/ammo_magazine/a20mm_aphe, /obj/item/ammo_magazine/a20mm_aphe, /obj/item/ammo_magazine/a20mm_aphe, /obj/item/ammo_magazine/a20mm_aphe, /obj/item/ammo_magazine/a20mm_aphe),
+	"1,2" = list(/obj/structure/vehicleparts/frame/l3/rc, /obj/structure/bed/chair/drivers/tank/anchored),
+	"2,2" = list(/obj/structure/vehicleparts/frame/l3/lc, /obj/structure/bed/chair/office/dark/anchored, /obj/item/weapon/gun/projectile/automatic/stationary/solothurn/italian/stationary, /obj/item/ammo_magazine/a20mm_aphe, /obj/item/ammo_magazine/a20mm_aphe, /obj/item/ammo_magazine/a20mm_aphe, /obj/item/ammo_magazine/a20mm_aphe, /obj/item/ammo_magazine/a20mm_aphe),
 
 	"1,3" = list(/obj/structure/vehicleparts/frame/l3/rb, /obj/structure/vehicleparts/movement/tracks/left/reversed, /obj/structure/engine/internal/gasoline/premade/l3),
-	"2,3" = list(/obj/structure/vehicleparts/frame/l3/lb, /obj/structure/vehicleparts/movement/tracks/right/reversed, /obj/item/weapon/reagent_containers/glass/barrel/fueltank/smalltank/fueledgasoline{density = 0}),
+	"2,3" = list(/obj/structure/vehicleparts/frame/l3/lb, /obj/structure/vehicleparts/movement/tracks/right/reversed, /obj/item/weapon/reagent_containers/glass/barrel/fueltank/smalltank/fueledgasoline),
 	)
 
 /obj/effects/premadevehicles/tank/m13
@@ -880,7 +881,7 @@
 	"2,2" = list(/obj/structure/vehicleparts/frame/t72, /obj/structure/shellrack/autoloader/full125/, /obj/structure/turret/t64bm),
 	"3,2" = list(/obj/structure/vehicleparts/frame/t72/left),
 
-	"1,3" = list(/obj/structure/vehicleparts/frame/t72/right/door{doorcode = 4975}),
+	"1,3" = list(/obj/structure/vehicleparts/frame/t72/right/door/coded),
 	"2,3" = list(/obj/structure/vehicleparts/frame/t72),
 	"3,3" = list(/obj/structure/vehicleparts/frame/t72/left),
 
@@ -903,7 +904,7 @@
 	"2,2" = list(/obj/structure/vehicleparts/frame/t72, /obj/structure/shellrack/autoloader/full125, /obj/structure/turret/t72),
 	"3,2" = list(/obj/structure/vehicleparts/frame/t72/left),
 
-	"1,3" = list(/obj/structure/vehicleparts/frame/t72/right/door{doorcode = 4975}),
+	"1,3" = list(/obj/structure/vehicleparts/frame/t72/right/door/coded),
 	"2,3" = list(/obj/structure/vehicleparts/frame/t72),
 	"3,3" = list(/obj/structure/vehicleparts/frame/t72/left),
 
@@ -926,7 +927,7 @@
 	"2,2" = list(/obj/structure/vehicleparts/frame/t90a, /obj/structure/shellrack/autoloader/full125, /obj/structure/turret/t72/t72b3),
 	"3,2" = list(/obj/structure/vehicleparts/frame/t90a/left),
 
-	"1,3" = list(/obj/structure/vehicleparts/frame/t90a/right/door{doorcode = 4975}),
+	"1,3" = list(/obj/structure/vehicleparts/frame/t90a/right/door/coded),
 	"2,3" = list(/obj/structure/vehicleparts/frame/t90a),
 	"3,3" = list(/obj/structure/vehicleparts/frame/t90a/left),
 
@@ -948,7 +949,7 @@
 	"2,2" = list(/obj/structure/vehicleparts/frame/t72, /obj/structure/shellrack/autoloader/full125, /obj/structure/turret/t72/t72m1),
 	"3,2" = list(/obj/structure/vehicleparts/frame/t72/left),
 
-	"1,3" = list(/obj/structure/vehicleparts/frame/t72/right/door{doorcode = 4975}),
+	"1,3" = list(/obj/structure/vehicleparts/frame/t72/right/door/coded),
 	"2,3" = list(/obj/structure/vehicleparts/frame/t72),
 	"3,3" = list(/obj/structure/vehicleparts/frame/t72/left),
 
@@ -971,7 +972,7 @@
 	"2,2" = list(/obj/structure/vehicleparts/frame/t90a, /obj/structure/turret/t80u/t80uk, /obj/structure/shellrack/autoloader/full125),
 	"3,2" = list(/obj/structure/vehicleparts/frame/t90a/left, /obj/structure/bed/chair/gunner),
 
-	"1,3" = list(/obj/structure/vehicleparts/frame/t90a/right/door{doorcode = 4975}),
+	"1,3" = list(/obj/structure/vehicleparts/frame/t90a/right/door/coded),
 	"2,3" = list(/obj/structure/vehicleparts/frame/t90a),
 	"3,3" = list(/obj/structure/vehicleparts/frame/t90a/left),
 
@@ -994,7 +995,7 @@
 	"2,2" = list(/obj/structure/vehicleparts/frame/t90a, /obj/structure/shellrack/autoloader/full125/, /obj/structure/turret/t90a),
 	"3,2" = list(/obj/structure/vehicleparts/frame/t90a/left),
 
-	"1,3" = list(/obj/structure/vehicleparts/frame/t90a/right/door{doorcode = 4975}),
+	"1,3" = list(/obj/structure/vehicleparts/frame/t90a/right/door/coded),
 	"2,3" = list(/obj/structure/vehicleparts/frame/t90a),
 	"3,3" = list(/obj/structure/vehicleparts/frame/t90a/left),
 
@@ -1017,7 +1018,7 @@
 	"2,2" = list(/obj/structure/vehicleparts/frame/baf1_a, /obj/structure/turret/m1abrams),
 	"3,2" = list(/obj/structure/vehicleparts/frame/baf1_a/left, /obj/structure/shellrack/full120),
 
-	"1,3" = list(/obj/structure/vehicleparts/frame/baf1_a/right/door{doorcode = 9950}),
+	"1,3" = list(/obj/structure/vehicleparts/frame/baf1_a/right/door/coded),
 	"2,3" = list(/obj/structure/vehicleparts/frame/baf1_a),
 	"3,3" = list(/obj/structure/vehicleparts/frame/baf1_a/left),
 
@@ -1040,7 +1041,7 @@
 	"2,2" = list(/obj/structure/vehicleparts/frame/omw22_2, /obj/structure/turret/challenger2),
 	"3,2" = list(/obj/structure/vehicleparts/frame/omw22_2/left),
 
-	"1,3" = list(/obj/structure/vehicleparts/frame/omw22_2/right/door{doorcode = 5970}),
+	"1,3" = list(/obj/structure/vehicleparts/frame/omw22_2/right/door/coded),
 	"2,3" = list(/obj/structure/vehicleparts/frame/omw22_2),
 	"3,3" = list(/obj/structure/vehicleparts/frame/omw22_2/left),
 
@@ -1063,7 +1064,7 @@
 	"2,2" = list(/obj/structure/vehicleparts/frame/leopard, /obj/structure/turret/leo2a6),
 	"3,2" = list(/obj/structure/vehicleparts/frame/leopard/left),
 
-	"1,3" = list(/obj/structure/vehicleparts/frame/leopard/right/door{doorcode = 5970}),
+	"1,3" = list(/obj/structure/vehicleparts/frame/leopard/right/door/coded),
 	"2,3" = list(/obj/structure/vehicleparts/frame/leopard),
 	"3,3" = list(/obj/structure/vehicleparts/frame/leopard/left),
 
@@ -1129,7 +1130,7 @@
 	"1,2" = list(/obj/structure/vehicleparts/frame/bmd2/rc, /obj/structure/turret/bmd2, /obj/item/ammo_magazine/a30mm_ap, /obj/item/ammo_magazine/a30mm_ap, /obj/item/ammo_magazine/a30mm_he, /obj/item/ammo_magazine/a30mm_he, /obj/structure/lamp/lamp_small/tank/red),
 	"2,2" = list(/obj/structure/vehicleparts/frame/bmd2/lc),
 
-	"1,3" = list(/obj/structure/vehicleparts/movement/tracks/bmd2new/right_back, /obj/structure/vehicleparts/frame/bmd2/rb, /obj/structure/engine/internal/diesel/premade/bmd2, /obj/item/weapon/reagent_containers/glass/barrel/fueltank/tank/fueleddiesel{density = 0}),
+	"1,3" = list(/obj/structure/vehicleparts/movement/tracks/bmd2new/right_back, /obj/structure/vehicleparts/frame/bmd2/rb, /obj/structure/engine/internal/diesel/premade/bmd2, /obj/item/weapon/reagent_containers/glass/barrel/fueltank/tank/fueleddiesel),
 	"2,3" = list(/obj/structure/vehicleparts/movement/tracks/bmd2new/left_back, /obj/structure/vehicleparts/frame/bmd2/lb),
 	)
 
@@ -1145,7 +1146,7 @@
 	"1,2" = list(/obj/structure/vehicleparts/frame/su85/right/door),
 	"2,2" = list(/obj/structure/vehicleparts/frame/car/left/metalreinforced, /obj/item/weapon/storage/toolbox/emergency),
 
-	"1,3" = list(/obj/structure/vehicleparts/movement/armored, /obj/structure/vehicleparts/frame/defaultarmored/rb, /obj/item/weapon/reagent_containers/glass/barrel/fueltank/tank/fueleddiesel{density = 0}),
+	"1,3" = list(/obj/structure/vehicleparts/movement/armored, /obj/structure/vehicleparts/frame/defaultarmored/rb, /obj/item/weapon/reagent_containers/glass/barrel/fueltank/tank/fueleddiesel),
 	"2,3" = list(/obj/structure/vehicleparts/movement/armored/reversed, /obj/structure/vehicleparts/frame/defaultarmored/lb, /obj/structure/engine/internal/diesel/premade/chiha),
 	)
 
@@ -1164,7 +1165,7 @@
 	"1,3" = list(/obj/structure/vehicleparts/frame/btr80/rbc, /obj/structure/lamp/lamp_small/tank/red),
 	"2,3" = list(/obj/structure/vehicleparts/frame/btr80/lbc, /obj/item/ammo_magazine/a30mm_ap/btr80, /obj/item/ammo_magazine/a30mm_ap/btr80, /obj/item/ammo_magazine/a30mm_he/btr80),
 
-	"1,4" = list(/obj/structure/vehicleparts/movement/armored/btr/right/reversed, /obj/structure/vehicleparts/frame/btr80/rb, /obj/structure/engine/internal/diesel/premade/btr80, /obj/item/weapon/reagent_containers/glass/barrel/fueltank/tank/fueleddiesel{density = 0}),
+	"1,4" = list(/obj/structure/vehicleparts/movement/armored/btr/right/reversed, /obj/structure/vehicleparts/frame/btr80/rb, /obj/structure/engine/internal/diesel/premade/btr80, /obj/item/weapon/reagent_containers/glass/barrel/fueltank/tank/fueleddiesel),
 	"2,4" = list(/obj/structure/vehicleparts/movement/armored/btr/left/reversed, /obj/structure/vehicleparts/frame/btr80/lb),
 	)
 
@@ -1186,7 +1187,7 @@
 	"2,3" = list(/obj/structure/vehicleparts/frame/cv90),
 	"3,3" = list(/obj/structure/vehicleparts/frame/cv90/left),
 
-	"1,4" = list(/obj/structure/vehicleparts/movement/tracks/left/reversed, /obj/structure/vehicleparts/frame/cv90/rb, /obj/structure/engine/internal/diesel/premade/btr80, /obj/item/weapon/reagent_containers/glass/barrel/fueltank/tank/fueleddiesel{density = 0}),
+	"1,4" = list(/obj/structure/vehicleparts/movement/tracks/left/reversed, /obj/structure/vehicleparts/frame/cv90/rb, /obj/structure/engine/internal/diesel/premade/btr80, /obj/item/weapon/reagent_containers/glass/barrel/fueltank/tank/fueleddiesel),
 	"2,4" = list(/obj/structure/vehicleparts/frame/cv90/back),
 	"3,4" = list(/obj/structure/vehicleparts/movement/tracks/right/reversed, /obj/structure/vehicleparts/frame/cv90/lb),
 	)
@@ -1197,7 +1198,7 @@
 	custom_color = "#CCC0A6"
 	axis = /obj/structure/vehicleparts/axis/heavy/bradley
 	tocreate = list(
-	"1,1" = list(/obj/structure/vehicleparts/movement/tracks/bradley/right_front, /obj/structure/vehicleparts/frame/bradley/rf, /obj/structure/engine/internal/diesel/premade/m113, /obj/item/weapon/reagent_containers/glass/barrel/fueltank/tank/fueleddiesel{density = 0}),
+	"1,1" = list(/obj/structure/vehicleparts/movement/tracks/bradley/right_front, /obj/structure/vehicleparts/frame/bradley/rf, /obj/structure/engine/internal/diesel/premade/m113, /obj/item/weapon/reagent_containers/glass/barrel/fueltank/tank/fueleddiesel),
 	"2,1" = list(/obj/structure/vehicleparts/movement/tracks/bradley/left_front, /obj/structure/vehicleparts/frame/bradley/lf, /obj/structure/bed/chair/drivers/tank),
 
 	"1,2" = list(/obj/structure/vehicleparts/frame/bradley/rfc),

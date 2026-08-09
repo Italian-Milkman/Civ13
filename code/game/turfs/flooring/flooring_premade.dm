@@ -18,7 +18,6 @@
 	is_diggable = TRUE
 	uses_winter_overlay = TRUE
 	may_become_muddy = TRUE
-	var/obj/structure/wild/wild = null
 
 /turf/floor/grass/ex_act(severity)
 	return
@@ -242,7 +241,7 @@
 	return ..()
 
 /turf/floor/dirt/proc/soil_nutrition_recover()
-	spawn(12000) // Every 20 minutes the soil will recover
+	spawn(rand(12000,12010)) // Every 20 minutes the soil will recover. Randomised values to prevent all the turfs from running it at the same time lagging the game
 		if(!istype(src, /turf/floor/dirt)) // It could be that the turf has ceased to be dirt during the wait
 			return
 		if(soil_nutrition < max_soil_nutrition)
@@ -258,19 +257,19 @@
 /turf/floor/dirt/examine(mob/user)
 	if (get_dist(src, user) <= 1)
 		if (soil_nutrition >= 130)
-			user << "<span class='notice'>The soil looks very alive and the plants will grow very easily.</span>"
+			to_chat(user, "<span class='notice'>The soil looks very alive and the plants will grow very easily.</span>")
 		else if (soil_nutrition >= 80)
-			user << "<span class='notice'>The soil looks alive, plants would grow very well.</span>"
+			to_chat(user, "<span class='notice'>The soil looks alive, plants would grow very well.</span>")
 		else if (soil_nutrition >= 25)
-			user << "<span class='notice'>The soil seems half dead and the plants would not develop as well as they should.</span>"
+			to_chat(user, "<span class='notice'>The soil seems half dead and the plants would not develop as well as they should.</span>")
 		else if (soil_nutrition > 0)
-			user << "<span class='notice'>The soil looks pretty dead and the plants would have a tough time growing.</span>"
+			to_chat(user, "<span class='notice'>The soil looks pretty dead and the plants would have a tough time growing.</span>")
 		else
-			user << "<span class='notice'>The soil looks dead and plants would hardly grow.</span>"
+			to_chat(user, "<span class='notice'>The soil looks dead and plants would hardly grow.</span>")
 	if (ishuman(user))
 		var/mob/living/human/H = user
 		if (H.getStatCoeff("farming")>= 2.2)
-			user << "[src]'s nutrition level is at <b>[soil_nutrition]/[max_soil_nutrition]</b>."
+			to_chat(user, "[src]'s nutrition level is at <b>[soil_nutrition]/[max_soil_nutrition]</b>.")
 	return ..()
 
 /turf/floor/space
@@ -321,7 +320,7 @@
 	may_become_muddy = TRUE
 	available_dirt = 0
 	is_diggable = TRUE
-	initial_flooring = null
+	initial_flooring = /decl/flooring/dirt/dry_lava
 
 /turf/floor/dirt/burned
 	name = "burnt ground"
@@ -330,7 +329,7 @@
 	may_become_muddy = TRUE
 	available_dirt = 1
 	is_diggable = TRUE
-	initial_flooring = null
+	initial_flooring = /decl/flooring/dirt/burned
 
 /turf/floor/dirt/underground
 	name = "underground rock"
@@ -344,8 +343,7 @@
 	is_mineable = TRUE
 	opacity = TRUE
 	density = TRUE
-	initial_flooring = null
-	var/rocktype = "default" //Default, Sand, and Ice.
+	initial_flooring = /decl/flooring/dirt/underground
 	New()
 		..()
 
@@ -354,7 +352,7 @@
 	if(istype(W, /obj/item/weapon/chisel))
 		var design = "smooth"
 		if (!istype(H.l_hand, /obj/item/weapon/hammer) && !istype(H.r_hand, /obj/item/weapon/hammer))
-			user << "<span class = 'warning'>You need to have a hammer in one of your hands to use a chisel.</span>"
+			to_chat(user, "<span class = 'warning'>You need to have a hammer in one of your hands to use a chisel.</span>")
 			return
 		else
 			var/display = list("Smooth", "Cave", "Underground Cave", "Brick", "Cobbled", "Tiled", "Cancel")
@@ -362,22 +360,22 @@
 			if (input == "Cancel")
 				return
 			else if  (input == "Smooth")
-				user << "<span class='notice'>You will now carve the smooth design!</span>"
+				to_chat(user, "<span class='notice'>You will now carve the smooth design!</span>")
 				design = "smooth"
 			else if  (input == "Cave")
-				user << "<span class='notice'>You will now carve the cave design!</span>"
+				to_chat(user, "<span class='notice'>You will now carve the cave design!</span>")
 				design = "cave"
 			else if  (input == "Underground Cave")
-				user << "<span class='notice'>You will now carve the cave design!</span>"
+				to_chat(user, "<span class='notice'>You will now carve the cave design!</span>")
 				design = "undercave"
 			else if  (input == "Brick")
-				user << "<span class='notice'>You will now carve the brick design!</span>"
+				to_chat(user, "<span class='notice'>You will now carve the brick design!</span>")
 				design = "brick"
 			else if  (input == "Cobbled")
-				user << "<span class='notice'>You will now carve the cobbled design!</span>"
+				to_chat(user, "<span class='notice'>You will now carve the cobbled design!</span>")
 				design = "cobbled"
 			else if  (input == "Tiled")
-				user << "<span class='notice'>You will now carve the tiled design!</span>"
+				to_chat(user, "<span class='notice'>You will now carve the tiled design!</span>")
 				design = "tiled"
 			visible_message("<span class='danger'>[user] starts to chisel a design!</span>", "<span class='danger'>You start chiseling a design.</span>")
 			playsound(src,'sound/effects/pickaxe.ogg',60,1)
@@ -419,7 +417,7 @@
 		..()
 /turf/floor/dirt/underground/sandy/attackby(obj/item/W as obj, mob/user as mob)
 	if(istype(W, /obj/item/weapon/chisel))
-		user << "The sandy rock is too brittle to carve!"
+		to_chat(user, "The sandy rock is too brittle to carve!")
 		return//Temp until I feel like improving chisel system.
 	..()
 /turf/floor/dirt/underground/icy
@@ -435,7 +433,7 @@
 
 /turf/floor/dirt/underground/icy/attackby(obj/item/W as obj, mob/user as mob)
 	if(istype(W, /obj/item/weapon/chisel))
-		user << "The frozen rock is too hard to carve!"
+		to_chat(user, "The frozen rock is too hard to carve!")
 		return //Temp until I feel like improving chisel system.
 	..()
 
@@ -470,7 +468,7 @@
 	icon = 'icons/turf/floors.dmi'
 	icon_state = "dirt_ploughed"
 	is_plowed = TRUE
-	initial_flooring = null
+	initial_flooring = /decl/flooring/dirt/ploughed
 
 /turf/floor/dirt/ploughed/fertile
 	soil_nutrition = 150
@@ -486,7 +484,7 @@
 	icon = 'icons/turf/floors.dmi'
 	icon_state = "flood_dirt_ploughed"
 	is_plowed = TRUE
-	initial_flooring = null
+	initial_flooring = /decl/flooring/dirt/ploughed
 
 /turf/floor/dirt/dust
 	name = "dry dirt"

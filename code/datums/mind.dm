@@ -43,8 +43,6 @@
 	var/assigned_role
 	var/special_role
 
-	var/role_alt_title
-
 	var/datum/job/assigned_job
 
 	var/list/datum/objective/objectives = list()
@@ -54,11 +52,6 @@
 
 	var/datum/faction/faction 			//associated faction
 	var/datum/changeling/changeling		//changeling holder
-
-	var/rev_cooldown = FALSE
-
-	// the world.time since the mob has been brigged, or -1 if not at all
-	var/brigged_since = -1
 
 	//put this here for easier tracking ingame
 	var/datum/money_account/initial_account
@@ -106,6 +99,11 @@
 	memory += "[new_text]<BR>"
 
 /datum/mind/proc/show_memory(mob/recipient)
+	if (!recipient)
+		return
+	var/client/C = recipient.client
+	if(!C)
+		return
 	var/output = "<b>You are <span style = 'font-size: 1.25em; color: #E1E1FF'>[current.real_name]</span></b><hr>"
 	for (var/title in notes)
 		output += "<br><br>"
@@ -193,14 +191,11 @@
 /datum/mind/proc/reset()
 	assigned_role =   null
 	special_role =	null
-	role_alt_title =  null
 	assigned_job =	null
 	//faction =	   null //Uncommenting this causes a compile error due to 'undefined type', fucked if I know.
 //	objectives =	  list()
 //	special_verbs =   list()
 	has_been_rev =	FALSE
-	rev_cooldown =	FALSE
-	brigged_since =   -1
 
 //Antagonist role check
 /mob/living/proc/check_special_role(role)

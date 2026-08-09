@@ -1,7 +1,8 @@
 /obj/map_metadata/tadojsville
 	ID = MAP_TADOJSVILLE
 	title = "Tadojsville Siege"
-	lobby_icon = 'icons/lobby/tadojsville.png'
+	description = "The Katnegwa Mercenaries have been hired together to capture the local clinic!"
+	lobby_icon = "icons/lobby/tadojsville.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall/jungle,/area/caribbean/no_mans_land/invisible_wall/jungle/one)
 	respawn_delay = 300
 	no_winner ="No warband has captured the clinic yet."
@@ -22,25 +23,12 @@
 	mission_start_message = "<font size=4><b>The Katnegwa Mercenaries</b> have been hired together to capture the local clinic! It will take <b>5 minutes</b> for the Warbands to capture the clinic but the <b>United Nations Peacekeepers</b> garrisoned there will be reinforced and drive off the attackers if they manage to hold out for 35 minutes. <br> The Warbands will start to cross the river in <b>6 minutes!</b></font>"
 	faction1 = CIVILIAN
 	faction2 = INDIANS
-	ambience = list('sound/ambience/jungle1.ogg')
+	ambience = list("sound/ambience/jungle1.ogg")
 	gamemode = "Siege"
 	grace_wall_timer = 3600
 	valid_weather_types = list(WEATHER_WET, WEATHER_NONE, WEATHER_EXTREME)
 	songs = list(
-		"The Hygrades - Rough Rider:1" = 'sound/music/roughrider.ogg',)
-
-/obj/map_metadata/tadojsville/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_un)
-		. = TRUE
-	else if (J.is_warlords)
-		if (J.is_tadoj)
-			if (J.title != "Mercenary (do not use)")
-				. = TRUE
-		else
-			. = FALSE
-	else
-		. = FALSE
+		"The Hygrades - Rough Rider:1" = "sound/music/roughrider.ogg",)
 
 /obj/map_metadata/tadojsville/roundend_condition_def2name(define)
 	..()
@@ -76,14 +64,14 @@
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The United Nations troops have managed to defend the clinic!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_rom == FALSE)
 		ticker.finished = TRUE
 		var/message = "The Warband Mercenaries have captured the clinic! The remaining United Nations troops have surrendered!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_rom = TRUE
@@ -126,7 +114,7 @@
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The United Nations troops have recaptured the clinic!</font>"
+			to_chat(world, "<font size = 3>The United Nations troops have recaptured the clinic!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1
@@ -156,7 +144,6 @@
 			if (H.faction_text == faction1)
 				return TRUE
 			return !faction1_can_cross_blocks()
-			return !faction2_can_cross_blocks()
 	return FALSE
 
 /obj/map_metadata/tadojsville/cross_message(faction)
@@ -187,16 +174,16 @@
 /obj/structure/altar/darkstone/unsacrifice/attackby(obj/item/W, mob/living/human/user)
 	if (istype(W, /obj/item/organ/external/head) && map.ID == MAP_TADOJSVILLE)
 		if (!W)
-			user << "This is not even a head, it is worthless. Only Peacekeeper heads will do."
+			to_chat(user, "This is not even a head, it is worthless. Only Peacekeeper heads will do.")
 			return
 		var/obj/item/organ/external/head/HD = W
 		var/head_nationality = HD.nationality
 		qdel(W)
 		if (head_nationality != "United Nations")
-			user << "This head is worthless, only Peacekeeper heads will do."
+			to_chat(user, "This head is worthless, only Peacekeeper heads will do.")
 
 		else
-			user << "You place the Peacekeeper's head on the shaman's altar."
+			to_chat(user, "You place the Peacekeeper's head on the shaman's altar.")
 			if(prob(20))
 				var/randmed = rand(1,3)
 				switch (randmed)

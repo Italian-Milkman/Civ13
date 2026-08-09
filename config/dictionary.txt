@@ -11,11 +11,13 @@ admins,gods
 afk,i am busy
 brb,be right back
 cuck,weakling
+kek,laughing
 dope,nice
 faggot,nancy boy
 feminazi,woman
 Fortnite,game
 fuk,fuck
+tldr,too long didn't read
 gamer,brother
 gamergirl,woman
 gamers rise up,brothers let's fight
@@ -28,8 +30,16 @@ idk,I don't know
 incel,weakling
 joker 2019,clown
 lmao,hahaha
+lmfao,laughing my fucking ass off
 lol,hahaha
 mfw,oh boy
+rekt,wrecked
+cope and seethe,deal with it
+sussy,suspicious
+sigma,peak performance
+pog,awesome
+poggers,awesome
+cringe,embarrassing
 Minecraft,game
 noob,newbie
 omg,oh my god
@@ -38,9 +48,10 @@ UwU,hmm
 pm the admins,pray to the gods
 roblox,game
 rofl,hahaha
+gyatt,god damm
+rizz,charisma
 smh,oh boy
 SS13,game
 unbased,that's stupid
 wdym,what do you mean
 wtf,what the fuck
-yeet,throw

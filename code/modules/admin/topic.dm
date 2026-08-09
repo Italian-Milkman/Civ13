@@ -1,3 +1,15 @@
+//probably a bit iffy - will hopefully figure out a better solution
+/proc/check_if_greater_rights_than(client/other)
+	if (usr && usr.client)
+		if (usr.client.holder)
+			if (!other || !other.holder)
+				return TRUE
+			if (usr.client.holder.rights != other.holder.rights)
+				if ( (usr.client.holder.rights & other.holder.rights) == other.holder.rights )
+					return TRUE	//we have all the rights they have and more
+		to_chat(usr, "<font color='red'>Error: Cannot proceed. They have more or equal rights to us.</font>")
+	return FALSE
+
 /datum/admins/Topic(href, href_list)
 	..()
 
@@ -95,7 +107,7 @@
 			D.rights ^= permissionlist[new_permission]
 
 			var/client/C = directory[adm_ckey]
-			C << "[key_name_admin(usr)] has toggled your permission: [new_permission]."
+			to_chat(C, "[key_name_admin(usr)] has toggled your permission: [new_permission].")
 			message_admins("[key_name_admin(usr)] toggled the [new_permission] permission of [adm_ckey]", key_name_admin(usr))
 			log_admin("[key_name(usr)] toggled the [new_permission] permission of [adm_ckey]")
 			log_admin_permission_modification(adm_ckey, permissionlist[new_permission])
@@ -136,7 +148,7 @@
 			if ("observer")			M.change_mob_type( /mob/observer/ghost , null, null, delmob )
 			if ("human")			New = M.change_mob_type( /mob/living/human , null, null, FALSE, href_list["species"])
 			if ("monkey")			M.change_mob_type( /mob/living/simple_animal/monkey , null, null, delmob )
-			if ("cat")				M.change_mob_type( /mob/living/simple_animal/cat , null, null, delmob )
+			if ("cat")				M.change_mob_type( /mob/living/simple_animal/pet/cat , null, null, delmob )
 			if ("parrot")			M.change_mob_type( /mob/living/simple_animal/parrot , null, null, delmob )
 			if ("chicken")			M.change_mob_type( /mob/living/simple_animal/chicken , null, null, delmob )
 			if ("turkey")			M.change_mob_type( /mob/living/simple_animal/turkey_m , null, null, delmob )
@@ -407,9 +419,9 @@
 				return
 			var/reason = sanitize(input("Please enter reason"))
 			if (!reason)
-				M << "<span class = 'userdanger'>You have been kicked from the server.</span>"
+				to_chat(M, "<span class = 'userdanger'>You have been kicked from the server.</span>")
 			else
-				M << "<span class = 'userdanger'>You have been kicked from the server. ([reason])</span>"
+				to_chat(M, "<span class = 'userdanger'>You have been kicked from the server. ([reason])</span>")
 			log_admin("[key_name(usr)] booted [key_name(M)].")
 			message_admins(SPAN_NOTICE("[key_name_admin(usr)] booted [key_name_admin(M)]."), key_name_admin(usr))
 			//M.client = null
@@ -826,6 +838,154 @@
 				show_player_info(ckey)
 			if ("list")
 				PlayerNotesPage(text2num(href_list["index"]))
+		return
+
+	// --- SUBCOM13 Admin Panel ---
+	if (href_list["subcom_speed"])
+		if (!check_rights(R_ADMIN)) return
+		var/obj/map_metadata/subcom13/SM = map
+		if(SM?.created_sub)
+			SM.created_sub.target_speed = text2num(href_list["subcom_speed"])
+			to_chat(usr, "<span class='notice'>Set target speed to [href_list["subcom_speed"]] kts.</span>")
+			src.show_subcom13_panel()
+		return
+
+	if (href_list["subcom_surface"])
+		if (!check_rights(R_ADMIN)) return
+		var/obj/map_metadata/subcom13/SM = map
+		if(SM?.created_sub)
+			SM.created_sub.target_depth = 0
+			to_chat(usr, "<span class='notice'>Surfacing submarine.</span>")
+			src.show_subcom13_panel()
+		return
+
+	if (href_list["subcom_crash"])
+		if (!check_rights(R_ADMIN)) return
+		var/obj/map_metadata/subcom13/SM = map
+		if(SM?.created_sub)
+			SM.created_sub.target_depth = 250
+			if(SM.created_sub.internal_turfs.len)
+				playsound(pick(SM.created_sub.internal_turfs), 'sound/machines/submarine/dive_alarm.ogg', 80, 1)
+			to_chat(usr, "<span class='notice'>Crash diving to 250m.</span>")
+			src.show_subcom13_panel()
+		return
+
+	if (href_list["subcom_load_all"])
+		if (!check_rights(R_ADMIN)) return
+		var/obj/map_metadata/subcom13/SM = map
+		if(SM?.created_sub)
+			for(var/i = 1, i <= 4, i++)
+				SM.created_sub.tubes_loaded[i] = TRUE
+			// Update tube icon states
+			for(var/obj/structure/machinery/sub_physical/torpedo_tube/TT in world)
+				if(TT.my_sub == SM.created_sub)
+					TT.is_loaded = TRUE
+					TT.icon_state = "torpedo_tube1_closed"
+			to_chat(usr, "<span class='notice'>All torpedo tubes loaded.</span>")
+			src.show_subcom13_panel()
+		return
+
+	if (href_list["subcom_arm_toggle"])
+		if (!check_rights(R_ADMIN)) return
+		var/obj/map_metadata/subcom13/SM = map
+		if(SM?.created_sub)
+			SM.created_sub.master_arm = !SM.created_sub.master_arm
+			to_chat(usr, "<span class='notice'>Master arm: [SM.created_sub.master_arm ? "ARMED" : "SAFE"].</span>")
+			src.show_subcom13_panel()
+		return
+
+	if (href_list["subcom_attack"])
+		if (!check_rights(R_ADMIN)) return
+		var/attack_type = href_list["subcom_attack"]
+		var/obj/map_metadata/subcom13/SM = map
+		if(SM?.created_sub)
+			SM.created_sub.simulate_attack(attack_type)
+			to_chat(usr, "<span class='notice'>Simulated attack: [attack_type].</span>")
+			src.show_subcom13_panel()
+		return
+
+	if (href_list["subcom_spawn"])
+		if (!check_rights(R_ADMIN)) return
+		var/spawn_type = href_list["subcom_spawn"]
+		var/spawn_x = 500
+		var/spawn_y = 500
+		var/obj/map_metadata/subcom13/SM = map
+		if(SM?.created_sub)
+			spawn_x = SM.created_sub.x_pos + rand(30, 60)
+			spawn_y = SM.created_sub.y_pos + rand(30, 60)
+			spawn_x = clamp(spawn_x, 50, 950)
+			spawn_y = clamp(spawn_y, 50, 950)
+
+		var/datum/subcom_enemy/enemy_path
+		switch(spawn_type)
+			if("destroyer") enemy_path = /datum/subcom_enemy/destroyer
+			if("frigate_kirov") enemy_path = /datum/subcom_enemy/cruiser
+			if("frigate_krivak") enemy_path = /datum/subcom_enemy/frigate
+			if("corvette") enemy_path = /datum/subcom_enemy/corvette
+			if("patrol_boat") enemy_path = /datum/subcom_enemy/patrol_boat
+			if("cargo_freight") enemy_path = /datum/subcom_enemy/cargo_ship
+			if("cargo_tanker") enemy_path = /datum/subcom_enemy/tanker
+			if("bomber") enemy_path = /datum/subcom_enemy/tu22m
+			if("strike") enemy_path = /datum/subcom_enemy/su24
+			if("asw_patrol") enemy_path = /datum/subcom_enemy/Il38
+			if("sub_diesel") enemy_path = /datum/subcom_enemy/sub_diesel
+			if("sub_nuclear") enemy_path = /datum/subcom_enemy/sub_nuclear
+			if("sub_ballistic") enemy_path = /datum/subcom_enemy/sub_ballistic
+
+		if(enemy_path)
+			var/datum/vessel_contact/npc/NPC = spawn_enemy_npc(enemy_path, spawn_x, spawn_y)
+			if(NPC)
+				if(global.subcom_map)
+					global.subcom_map.active_vessels += NPC
+				to_chat(usr, "<span class='notice'>Spawned [NPC.name] at ([spawn_x], [spawn_y]).</span>")
+			else
+				to_chat(usr, "<span class='warning'>Failed to spawn NPC.</span>")
+		src.show_subcom13_panel()
+		return
+
+	if (href_list["subcom_spawn_random"])
+		if (!check_rights(R_ADMIN)) return
+		var/spawn_x = 500
+		var/spawn_y = 500
+		var/obj/map_metadata/subcom13/SM = map
+		if(SM?.created_sub)
+			spawn_x = SM.created_sub.x_pos + rand(30, 60)
+			spawn_y = SM.created_sub.y_pos + rand(30, 60)
+			spawn_x = clamp(spawn_x, 50, 950)
+			spawn_y = clamp(spawn_y, 50, 950)
+
+		var/datum/vessel_contact/npc/NPC = spawn_random_enemy(spawn_x, spawn_y)
+		if(NPC)
+			if(global.subcom_map)
+				global.subcom_map.active_vessels += NPC
+			to_chat(usr, "<span class='notice'>Spawned random hostile [NPC.name] at ([spawn_x], [spawn_y]).</span>")
+		else
+			to_chat(usr, "<span class='warning'>Failed to spawn random NPC.</span>")
+		show_subcom13_panel()
+		return
+
+	if (href_list["subcom_despawn_all"])
+		if (!check_rights(R_ADMIN)) return
+		if(global.subcom_map)
+			for(var/datum/vessel_contact/npc/NPC in global.subcom_map.active_vessels)
+				qdel(NPC)
+			global.subcom_map.active_vessels.Cut()
+		to_chat(usr, "<span class='notice'>All NPC vessels removed.</span>")
+		src.show_subcom13_panel()
+		return
+
+	if (href_list["subcom_toggle_sp"])
+		if (!check_rights(R_ADMIN)) return
+		var/obj/map_metadata/subcom13/SM = map
+		if(SM)
+			SM.single_player = !SM.single_player
+			world << "<font size=3 color='yellow'><b>Single Player Mode [SM.single_player ? "ENABLED" : "DISABLED"].</b></font>"
+		src.show_subcom13_panel()
+		return
+
+	if (href_list["subcom_refresh"])
+		if (!check_rights(R_ADMIN)) return
+		src.show_subcom13_panel()
 		return
 
 mob/living/proc/can_centcom_reply()

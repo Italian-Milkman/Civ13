@@ -33,9 +33,8 @@
 		living_mob_list += src
 	..()
 
-
-	if (!isnewplayer(src))
-		src << browse(null, "window=playersetup;")
+	if (!isnewplayer(src) && !istype(src, /mob/dview) && src.client)
+		src.client << browse(null, "window=playersetup;")
 
 	spawn (10)
 		if (client)
@@ -64,9 +63,9 @@
 					return
 	// Added voice muffling for Issue 41.
 	if (stat == UNCONSCIOUS || sleeping > 0)
-		src << "<I>... You can almost hear someone talking ...</I>"
+		to_chat(src, "<I>... You can almost hear someone talking ...</I>")
 	else
-		src << msg
+		to_chat(src, msg)
 	return
 
 // Show a message to all mobs and objects in sight of this one
@@ -187,20 +186,12 @@
 /mob/proc/show_inv(mob/user as mob)
 	return
 
-/*atom/verb/Interact()
-	set name = "Interact"
-	set category = "IC"
 
-	set src in view(1)
-	var/mob/user = usr
-	if(src in range(1,usr))
-		user.ClickOn(src)
-	else
-		src.examine(user)*/
 
 /mob/verb/interact(atom/A as mob|obj|turf in view(1))
 	set name = "Interact"
 	set category = "IC"
+	if(!A) return
 	if (ishuman(src))
 		if(A in range(1,src))
 			src.ClickOn(A)
@@ -211,6 +202,7 @@
 /mob/verb/examinate(atom/A as mob|obj|turf in view())
 	set name = "Examine"
 	set category = "IC"
+	if(!A) return
 
 	if ((is_blind(src) || stat) && !isobserver(src))
 		to_chat(src, SPAN_NOTICE("Something is there but you can't see it."))
@@ -262,70 +254,16 @@
 	set src = usr
 	if (ishuman(src))
 		var/mob/living/human/H = src
-		if (H.football && H.shoes && istype(H.shoes, /obj/item/clothing/shoes/football)) //if we have the ball, pass it to nearest friendly player
-			var/mob/living/human/NEAR = null
-			for (var/mob/living/human/PNEAR in range(1,H))
-				if (!NEAR && PNEAR != H && PNEAR.civilization == H.civilization)
-					NEAR = PNEAR
-					break
-			if (!NEAR)
-				for (var/mob/living/human/PNEAR in range(2,H))
-					if (!NEAR && PNEAR != H && PNEAR.civilization == H.civilization)
-						NEAR = PNEAR
-						break
-				if (!NEAR)
-					for (var/mob/living/human/PNEAR in range(3,H))
-						if (!NEAR && PNEAR != H && PNEAR.civilization == H.civilization)
-							NEAR = PNEAR
-							break
-					if (!NEAR)
-						for (var/mob/living/human/PNEAR in range(3,H))
-							if (!NEAR && PNEAR != H && PNEAR.civilization == H.civilization)
-								NEAR = PNEAR
-								break
-			if (NEAR)
-				var/obj/item/football/FB = H.football
-				H.do_attack_animation(H.football)
-				H.football = null
-				FB.owner = null
-				FB.last_owner = H
-				FB.throw_at(NEAR, FB.throw_range, FB.throw_speed, H)
-				H.do_attack_animation(get_step(H,H.dir))
-				playsound(loc, 'sound/effects/football_kick.ogg', 100, 1)
-				visible_message("[H] passes \the [FB] to [NEAR].")
-				return
-		else if (!H.football && H.gloves && istype(H.gloves, /obj/item/clothing/gloves/goalkeeper))
-			var/area/A = get_area(H.loc)
-			if (istype(A, /area/caribbean/football/blue/goalkeeper) || istype(A, /area/caribbean/football/red/goalkeeper))
-				for(var/obj/item/football/FB in range(1,H))
-					if ((!FB.owner || FB.owner == H || H.football == FB) && isturf(FB.loc))
-						H.put_in_active_hand(FB)
-						FB.pickup(H)
-						H.football = null
-						FB.owner = null
-						visible_message("<font color='yellow'>[H] picks up the ball!</font>")
-						return
-		else if (!H.football && H.shoes && istype(H.shoes, /obj/item/clothing/shoes/football) && H.stats["stamina"][1] >= 15) //proceed to tackle whoever is in front
-			H.stats["stamina"][1] = max(H.stats["stamina"][1] - 15, 0)
-			src.do_attack_animation(get_step(src,dir))
-			Weaken(1)
-			for (var/mob/living/human/HM in range(1,H))
-				if (HM.civilization != H.civilization) //no tackling on same team
-					if (prob(60))
-						visible_message("<font color='red'>[src] tackles [HM]!</font>")
-						playsound(loc, 'sound/weapons/punch1.ogg', 50, 1)
-						H.do_attack_animation(get_step(H,H.dir))
-						HM.Weaken(1)
-						if (HM.football)
-							HM.football.last_owner = HM
-							HM.football.owner = null
-							HM.football.throw_at(get_step(HM.loc,HM.dir), 1, 1, HM)
-							HM.football = null
-						return
-					else
-						visible_message("<font color='yellow'>[src] tries to tackle [HM] but fails!</font>")
-						playsound(loc, 'sound/weapons/punchmiss.ogg', 50, 1)
-					return
+		//ball possession, kick
+		if (H.football && istype(H.shoes, /obj/item/clothing/shoes/football))
+			H.football_shoot(null)
+		//no ball & GK, pick ball up
+		else if (!H.football)
+			if (H.gloves && istype(H.gloves, /obj/item/clothing/gloves/goalkeeper))
+				H.football_gk_pickup()
+		//no ball, tackle
+			else if (H.shoes && istype(H.shoes, /obj/item/clothing/shoes/football) && H.stats["stamina"][1] >= 15) //proceed to tackle whoever is in front
+				H.football_tackle()
 	if (hand)
 		var/obj/item/W = l_hand
 		if (W)
@@ -343,6 +281,14 @@
 	set name = "Activate Secondary Object"
 	set category = null
 	set src = usr
+	if (ishuman(src))
+		var/mob/living/human/H = src
+		//ball possession, pass to nearest
+		if (H.football && H.shoes && istype(H.shoes, /obj/item/clothing/shoes/football)) //if we have the ball, pass it to nearest friendly player
+			H.football_pass()
+		//no ball, pressure nearest player with ball
+		else if (!H.football && H.shoes && istype(H.shoes, /obj/item/clothing/shoes/football))
+			H.football_pressure(null)
 	if (hand)
 		var/obj/item/W = l_hand
 		if (W)
@@ -354,16 +300,7 @@
 			W.secondary_attack_self(src)
 			update_inv_r_hand()
 	return
-/*
-/mob/verb/dump_source()
 
-	var/master = "<PRE>"
-	for (var/t in typesof(/area))
-		master += text("[]\n", t)
-		//Foreach goto(26)
-	src << browse(master)
-	return
-*/
 
 /mob/verb/memory()
 	set name = "Notes"
@@ -371,7 +308,7 @@
 	if (mind)
 		mind.show_memory(src)
 	else
-		src << "The game appears to have misplaced your mind datum, so we can't show you your notes."
+		to_chat(src, "The game appears to have misplaced your mind datum, so we can't show you your notes.")
 
 
 /mob/verb/add_memory(msg as message)
@@ -461,22 +398,22 @@
 	set name = "Respawn"
 	set category = "IC"
 
-	if (!( config.abandon_allowed ))
-		to_chat(usr, SPAN_NOTICE("Respawn is disabled."))
+	if (!( global.config.abandon_allowed ))
+		to_chat(src, SPAN_NOTICE("Respawn is disabled."))
 		return
 
-	if ((stat != DEAD || !( ticker )))
-		to_chat(usr, SPAN_NOTICE("<b>You must be dead to use this!</b>"))
+	if ((src.stat != DEAD || !( global.ticker )))
+		to_chat(src, SPAN_NOTICE("<b>You must be dead to use this!</b>"))
 		return
 
 	src << browse(null, "window=memory")
 
 	to_chat(src, "You can respawn now, enjoy your new life!")
-	stop_ambience(usr)
+	stop_ambience(src)
 
 	log_game("[name]/[key] used abandon mob.")
 
-	to_chat(usr, SPAN_NOTICE("<b>Make sure to play a different character, and please roleplay correctly!</b>"))
+	to_chat(src, SPAN_NOTICE("<b>Make sure to play a different character, and please roleplay correctly!</b>"))
 
 	if (!client)
 		log_game("[key] AM failed due to disconnect.")
@@ -491,10 +428,21 @@
 	var/mob/new_player/M = new /mob/new_player()
 	if (!client)
 		log_game("[key] AM failed due to disconnect.")
-		qdel(M)
+		if (M)
+			qdel(M)
 		return
 
 	M.key = key
+
+	if (map && istype(map, /obj/map_metadata/wizard_boy))
+		for (var/mob/living/human/O in world)
+			if (O.stat == DEAD && ckey(O.lastKnownCkey) == ckey(M.ckey))
+				var/turf/O_turf = get_turf(O)
+				if (O_turf)
+					for (var/obj/item/weapon/material/magic/wand/W in O_turf)
+						qdel(W)
+				qdel(O)
+
 	if (M.mind)
 		M.mind.reset()
 	return
@@ -555,8 +503,9 @@
 
 	if (href_list["flavor_more"])
 		if (src in view(usr))
-			usr << browse(text("<HTML><HEAD><TITLE>[]</TITLE></HEAD><BODY><TT>[]</TT></BODY></HTML>", name, replacetext(flavor_text, "\n", "<BR>")), text("window=[];size=500x200", name))
-			onclose(usr, "[name]")
+			var/window_name = "flavor[ckey(name)]"
+			usr << browse(text("<HTML><HEAD><TITLE>[]</TITLE></HEAD><BODY><TT>[]</TT></BODY></HTML>", name, replacetext(flavor_text, "\n", "<BR>")), "window=[window_name];size=500x200")
+			onclose(usr, window_name)
 	if (href_list["flavor_change"])
 		update_flavor_text()
 //	..()
@@ -572,7 +521,6 @@
 				if (e && H.lying)
 					if (((e.status & ORGAN_BROKEN && !(e.status & ORGAN_SPLINTED)) || e.status & ORGAN_BLEEDING) && (H.getBruteLoss() + H.getBurnLoss() >= 100))
 						return TRUE
-						break
 		return FALSE
 
 /mob/MouseDrop(mob/M as mob)
@@ -600,22 +548,22 @@
 		return
 
 	if (AM.anchored || istype(AM, /obj/item/football))
-		src << "<span class='warning'>It won't budge!</span>"
+		to_chat(src, "<span class='warning'>It won't budge!</span>")
 		return
 
 	var/mob/M = AM
 	if (ismob(AM))
 
 		if (!can_pull_mobs || !can_pull_size)
-			src << "<span class='warning'>It won't budge!</span>"
+			to_chat(src, "<span class='warning'>It won't budge!</span>")
 			return
 
 		if ((mob_size < M.mob_size) && (can_pull_mobs != MOB_PULL_LARGER))
-			src << "<span class='warning'>It won't budge!</span>"
+			to_chat(src, "<span class='warning'>It won't budge!</span>")
 			return
 
 		if ((mob_size == M.mob_size) && (can_pull_mobs == MOB_PULL_SMALLER))
-			src << "<span class='warning'>It won't budge!</span>"
+			to_chat(src, "<span class='warning'>It won't budge!</span>")
 			return
 
 		// If your size is larger than theirs and you have some
@@ -629,9 +577,9 @@
 
 	else if (isobj(AM))
 		var/obj/I = AM
-		if(!istype(I, /obj/structure/cannon/modern/tank/voyage))
+		if(!istype(I, /obj/structure/cannon/modern/voyage))
 			if (!can_pull_size || can_pull_size < I.w_class || istype(I, /obj/item/football))
-				src << "<span class='warning'>It won't budge!</span>"
+				to_chat(src, "<span class='warning'>It won't budge!</span>")
 				return
 
 	if (pulling)
@@ -650,7 +598,7 @@
 	if (ishuman(AM))
 		var/mob/living/human/H = AM
 		if (H.pull_damage())
-			src << SPAN_WARNING("<b>Pulling \the [H] in their current condition would probably be a bad idea.</b>")
+			to_chat(src, SPAN_WARNING("<b>Pulling \the [H] in their current condition would probably be a bad idea.</b>"))
 */
 	//Attempted fix for people flying away through space when cuffed and dragged.
 	if (ismob(AM))
@@ -675,7 +623,7 @@
 /mob/proc/see(message)
 	if (!is_active())
 		return FALSE
-	src << message
+	to_chat(src, message)
 	return TRUE
 
 /mob/proc/show_viewers(message)
@@ -690,14 +638,13 @@
 	..()
 	. = (is_client_active(10 MINUTES))
 	if (.)
-		if (client.status_tabs && statpanel("Status") && ticker)
-			stat("")
-			stat(stat_header("Server"))
-			stat("")
-			stat("Players Online (Playing, Observing, Lobby):", "[clients.len] ([human_clients_mob_list.len], [clients.len-human_clients_mob_list.len-new_player_mob_list.len], [new_player_mob_list.len])")
-			stat("Round Duration:", roundduration2text_days())
-			stat("Game ID:", "<b>[game_id]</b>")
-			stat("")
+		if (client.status_tabs && (client.add_stat_tab("Status") || client.statpanel_tab == "Status") && ticker)
+			client.add_stat("<h3>Server</h3>")
+			client.add_stat("<b>Players Online:</b>", "[clients.len]")
+			client.add_stat("<b>Playing, Observing, Lobby:</b>", "[human_clients_mob_list.len], [clients.len-human_clients_mob_list.len-new_player_mob_list.len], [new_player_mob_list.len]")
+			client.add_stat("<b>Round Duration:</b>", roundduration2text_days())
+			client.add_stat("<b>Game ID:</b>", "<b>[game_id]</b>")
+			client.add_stat("")
 
 			if (map && !map.civilizations)
 				var/grace_period_string = ""
@@ -708,17 +655,17 @@
 						grace_period_string += ", "
 					if (!map.civilizations)
 						if (map.last_crossing_block_status[faction])
-							grace_period_string += "[faction_const2name(faction,map.ordinal_age)] may cross"
+							grace_period_string += "<font color='green'>[faction_const2name(faction,map.ordinal_age)] may cross</font>"
 						else
-							grace_period_string += "[faction_const2name(faction,map.ordinal_age)] may not cross"
+							grace_period_string += "<font color='red'>[faction_const2name(faction,map.ordinal_age)] may not cross</font>"
 					else
 						if (map.last_crossing_block_status[faction])
 							grace_period_string += "The grace wall has been removed."
 						else
 							grace_period_string += "The grace wall is in effect."
 
-				stat("Grace Period Status:", grace_period_string)
-				stat("Round End Condition:", map.current_stat_message())
+				client.add_stat("<b>Grace Period Status:</b>", grace_period_string)
+				client.add_stat("<b>Round End Condition:</b>", map.current_stat_message())
 			if (map)
 				var/gmd = map.gamemode
 				switch(map.gamemode)
@@ -728,13 +675,13 @@
 						gmd = "<font color='yellow'>Competitive</font>"
 					if ("Hardcore")
 						gmd = "<font color='red'>Hardcore</font>"
-				stat("Map:", map.title)
-				stat("Mode:", gmd)
-				stat("Epoch:", map.age)
-				stat("Season:", get_season())
-				stat("Wind:", map.winddesc)
-//				stat("Weather:", get_weather())
-				stat("Time of Day:", time_of_day)
+				client.add_stat("<b>Map:</b>", map.title)
+				client.add_stat("<b>Mode:</b>", gmd)
+				client.add_stat("<b>Epoch:</b>", map.age)
+				client.add_stat("<b>Season:</b>", get_season())
+				client.add_stat("<b>Wind:</b>", map.winddesc)
+//				client.add_stat("Weather:", get_weather())
+				client.add_stat("<b>Time of Day:</b>", time_of_day)
 
 			// give the client some information about how the server is running
 			if (processes.ping_track && client)
@@ -742,40 +689,78 @@
 				var/avg_ping = ceil(processes.ping_track.avg)
 				if (clients.len == 1)
 					avg_ping = our_ping
-				stat("Ping (Average):", "[our_ping] ms ([avg_ping] ms)")
-			stat("Time Dilation (Average):", processes.time_track ? "[ceil(processes.time_track.dilation)]% ([ceil(processes.time_track.stored_averages["dilation"])]%)" : "0% (0%)")
+				client.add_stat("<b>Ping (Avg.):</b>", "[our_ping] ms ([avg_ping] ms)")
+			client.add_stat("<b>Time Dilation (Avg.):</b>", processes.time_track ? "[ceil(processes.time_track.dilation)]% ([ceil(processes.time_track.stored_averages["dilation"])]%)" : "0% (0%)")
 
 		if (client.holder && client.status_tabs)
-			if (statpanel("Status"))
-				stat("")
-				stat(stat_header("Developer"))
-				stat("")
+			if ((client.add_stat_tab("Status") || client.statpanel_tab == "Status"))
+				client.add_stat("")
+				client.add_stat("<h3>Developer</h3>")
 				if (processes.time_track && movementMachine)
-					stat("CPU (Average) (Movement Scheduler (Average)):","[world.cpu]% ([ceil(processes.time_track.stored_averages["cpu"])]%) ([ceil(movementMachine.last_cpu)]% ([ceil(movementMachine.average_cpu)]%))")
-					stat("Tick Usage (Average) (Movement Scheduler (Average)):","[ceil(world.tick_usage)]% ([ceil(processes.time_track.stored_averages["tick_usage"])]%) ([ceil(movementMachine.last_tick_usage)]% ([ceil(movementMachine.average_tick_usage)]%))")
+					client.add_stat("<b>CPU (Avg.) (Mov. Sch. (Avg.)):</b>","[world.cpu]% ([ceil(processes.time_track.stored_averages["cpu"])]%) ([ceil(movementMachine.last_cpu)]% ([ceil(movementMachine.average_cpu)]%))")
+					client.add_stat("<b>Tick Use (Avg.) (Mov. S0ch. (Avg.)):</b>","[ceil(world.tick_usage)]% ([ceil(processes.time_track.stored_averages["tick_usage"])]%) ([ceil(movementMachine.last_tick_usage)]% ([ceil(movementMachine.average_tick_usage)]%))")
 				if (client.holder.rights & R_MOD)
-					stat("Location:", "([x], [y], [z]) - [loc ? loc : "nullspace"]")
-				stat("Object Count:","[world.contents.len] Datums")
-/*			if (statpanel("Processes"))
-				if (processScheduler)
-					processScheduler.statProcesses()*/
+					client.add_stat("<b>Location:</b>", "([x], [y], [z]) - [loc ? loc : "nullspace"]")
+				client.add_stat("<b>Object Count:</b>","[world.contents.len] Datums")
+
+/*
+		if (client.holder && (client.holder.rights & R_DEBUG))
+			client.add_stat_tab("Processes")
+			if (processScheduler && client.statpanel_tab == "Processes")
+				processScheduler.statProcesses(client)
+*/
 
 		if (listed_turf && client && client.status_tabs)
 			if (!TurfAdjacent(listed_turf))
 				listed_turf = null
 			else
-				if (statpanel("Turf"))
-					stat(listed_turf)
+				if (client.add_stat_tab("Turf") || client.statpanel_tab == "Turf")
+					client.add_stat("[listed_turf]")
 					for (var/atom/A in listed_turf)
 						if (!A.mouse_opacity)
 							continue
 						if (A.invisibility > see_invisible)
 							continue
-						if (is_type_in_list(A, shouldnt_see))
+						if (is_type_in_list(A, shouldnt_see) || !A.name)
 							continue
-						stat(A)
+						client.add_stat("[A.name]")
 
+		if (client && client.status_tabs && spell_list && spell_list.len)
+			client.add_stat_tab("Spells")
+			if (client.statpanel_tab == "Spells")
+				var/obj/item/weapon/material/magic/wand/W = null
+				if (ishuman(src))
+					var/mob/living/human/H = src
+					if (H.l_hand && istype(H.l_hand, /obj/item/weapon/material/magic/wand))
+						W = H.l_hand
+					else if (H.r_hand && istype(H.r_hand, /obj/item/weapon/material/magic/wand))
+						W = H.r_hand
 
+					if (W)
+						client.add_stat("<b>Active Wand:</b>", "[W.name] ([W.charges]/[W.maxcharges] charges)")
+						client.add_stat("<b>Active Spell:</b>", W.active_spell ? "<b>[W.active_spell.name]</b>" : "<i>None</i>")
+					else
+						client.add_stat("<b>Active Wand:</b>", "<span color='red'><i>None</i></span>")
+						client.add_stat("<b>Active Spell:</b>", "<span color='red'><i>None</i></span>")
+					client.add_stat("<b>Juice:</b>", "[H.juice] / [H.max_juice]")
+					client.add_stat("")
+
+				var/list/usable = list()
+				var/magic_lvl = 0
+				if (ishuman(src))
+					var/mob/living/human/H = src
+					magic_lvl = H.getStat("magic")
+
+				for (var/datum/spell/S in spell_list)
+					if (magic_lvl >= S.skill_level)
+						usable += S
+
+				if (usable.len)
+					client.add_stat("<h3>Available Spells</h3>")
+					for (var/datum/spell/S in usable)
+						client.add_stat(S.name, "<i>[S.description]</i> (<b>Level</b> <span style='color:#00e9ff'>[S.skill_level]</span>, <b>Cost:</b> <span style='color:red'>[S.juice_cost] juice</span>, <b>Cast time:</b> <span style='color:#fff800'>[S.cast_time/10] secs</span>)")
+				else
+					client.add_stat("No spells available.")
 
 // facing verbs
 /mob/proc/canface()
@@ -836,7 +821,16 @@
 			prone = FALSE
 			update_icons()
 	if (!gallows)
-		if (buckled)
+		var/choked = FALSE
+		if (isliving(src))
+			var/mob/living/L = src
+			if (L.choked_by)
+				choked = TRUE
+		if (choked)
+			anchored = TRUE
+			canmove = FALSE
+			lying = FALSE
+		else if (buckled)
 			anchored = TRUE
 			canmove = FALSE
 			if (istype(buckled))

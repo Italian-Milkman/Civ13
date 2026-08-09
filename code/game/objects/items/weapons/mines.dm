@@ -23,7 +23,7 @@
 //Arming
 /obj/item/mine/attack_self(mob/living/user as mob)
 	if (locate(/obj/item/mine) in get_turf(src))
-		src << "There's already a mine at this position!"
+		to_chat(user, "There's already a mine at this position!")
 		return
 
 	if (!anchored)
@@ -37,7 +37,7 @@
 		layer = TURF_LAYER + 0.01
 		icon_state = "mine_armed"
 		user.drop_item()
-		if (map.ID == MAP_CAMPAIGN)
+		if (map.ID == MAP_CAMPAIGN || map.ID == CAMPAIGN_MAP_LIST_MAPID_OR)
 			var/obj/map_metadata/campaign/CM = map
 			if (istype(src, (/obj/item/mine/at)))
 				CM.at_mines_placed++
@@ -73,7 +73,7 @@
 					anchored = FALSE
 					icon_state = "mine"
 					layer = initial(layer)
-					if (map.ID == MAP_CAMPAIGN)
+					if (map.ID == MAP_CAMPAIGN || map.ID == CAMPAIGN_MAP_LIST_MAPID_OR)
 						var/obj/map_metadata/campaign/CM = map
 						if (istype(src, (/obj/item/mine/at)))
 							CM.at_mines_placed--
@@ -100,7 +100,7 @@
 				anchored = FALSE
 				icon_state = "mine"
 				layer = initial(layer)
-				if (map.ID == MAP_CAMPAIGN)
+				if (map.ID == MAP_CAMPAIGN || map.ID == CAMPAIGN_MAP_LIST_MAPID_OR)
 					var/obj/map_metadata/campaign/CM = map
 					if (istype(src, (/obj/item/mine/at)))
 						CM.at_mines_placed--
@@ -148,7 +148,7 @@
 		return
 	if (istype(AM, /mob/living))
 		for (var/mob/O in viewers(7, loc))
-			O << "<font color='red'>[AM] triggered the [src]!</font>"
+			to_chat(O, "<font color='red'>[AM] triggered the [src]!</font>")
 		triggered = TRUE
 		visible_message("<span class = 'red'><b>Click!</b></span>")
 		explosion(get_turf(src),1,2,6)
@@ -175,7 +175,6 @@
 	var/num_fragments = 30  //total number of fragments produced by the grenade
 	var/fragment_damage = 15
 	var/damage_step = 2	  //projectiles lose a fragment each time they travel this distance. Can be a non-integer.
-	var/big_bomb = FALSE
 	var/spread_range = 7
 
 /obj/item/mine/ap/armed
@@ -188,7 +187,7 @@
 		return
 	if (istype(AM, /mob/living))
 		for (var/mob/O in viewers(7, loc))
-			O << "<font color='red'>[AM] triggered the [src]!</font>"
+			to_chat(O, "<font color='red'>[AM] triggered the [src]!</font>")
 		triggered = TRUE
 		visible_message("<span class = 'red'><b>Click!</b></span>")
 		explosion(get_turf(src),1,2,4)
@@ -245,7 +244,7 @@
 
 /obj/item/mine/at/trigger(atom/movable/AM)
 	for (var/mob/O in viewers(7, loc))
-		O << "<font color='red'>[AM] triggered the [src]!</font>"
+		to_chat(O, "<font color='red'>[AM] triggered the [src]!</font>")
 	triggered = TRUE
 	visible_message("<span class = 'red'><b>Click!</b></span>")
 	for(var/obj/structure/vehicleparts/frame/F in range(1,src))
@@ -266,7 +265,7 @@
 	spawn(3)
 		if (src)
 			qdel(src)
-			return TRUE
+			return
 
 /obj/item/mine/boobytrap
 	name = "booby trap"
@@ -280,13 +279,7 @@
 	throw_speed = 3
 	anchored = TRUE
 	var/origin = null
-/*	var/explosion_size = 2
-	var/fragment_type = /obj/item/projectile/bullet/pellet/fragment
-	var/num_fragments = 30  //total number of fragments produced by the grenade
-	var/fragment_damage = 15
-	var/damage_step = 2	  //projectiles lose a fragment each time they travel this distance. Can be a non-integer.
-	var/big_bomb = FALSE
-	var/spread_range = 7 */
+
 
 //Disarming
 /obj/item/mine/boobytrap/attackby(obj/item/W as obj, mob/user as mob)
@@ -352,7 +345,7 @@
 		return
 	if (istype(AM, /mob/living))
 		for (var/mob/O in viewers(7, loc))
-			O << "<font color='red'>[AM] triggered the [src]!</font>"
+			to_chat(O, "<font color='red'>[AM] triggered the [src]!</font>")
 		triggered = TRUE
 		visible_message("<span class = 'red'><b>Click!</b></span>")
 		explosion(get_turf(src),1,2,4)
@@ -384,7 +377,7 @@
 			return
 		if (istype(AM, /mob/living))
 			for (var/mob/O in viewers(7, loc))
-				O << "<font color='red'>[AM] tripped over the [src]!</font>"
+				to_chat(O, "<font color='red'>[AM] tripped over the [src]!</font>")
 			triggered = TRUE
 			visible_message("<span class = 'red'><b>SSSShh!</b></span>")
 			explosion(get_turf(src),1,2,3)

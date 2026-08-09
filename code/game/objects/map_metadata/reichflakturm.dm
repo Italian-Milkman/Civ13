@@ -1,7 +1,8 @@
 /obj/map_metadata/reichflakturm
 	ID = MAP_REICHFLAKTURM
 	title = "Reichflakturm"
-	lobby_icon = 'icons/lobby/ww2.png'
+	description = "The Germans will win if they hold out for 40 minutes. The Americans will win if they manage to capture the anti-air guns at the top of the tower!"
+	lobby_icon = "icons/lobby/ww2.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall)
 	respawn_delay = 1200
 	no_hardcore = TRUE
@@ -24,19 +25,8 @@
 	faction2 = AMERICAN
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET)
 	songs = list(
-		"Over There!:1" = 'sound/music/overthere.ogg',)
+		"Over There!:1" = "sound/music/overthere.ogg",)
 	gamemode = "Siege"
-/obj/map_metadata/reichflakturm/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_tanker == TRUE || J.is_occupation == TRUE || J.is_reichstag == TRUE || J.is_ss_panzer == TRUE || J.is_navy == TRUE || (istype(J, /datum/job/american/soldier_ww2_filipino)))
-		. = FALSE
-	else if (J.is_ww2 == TRUE && J.is_reichstag == FALSE)
-		. = TRUE
-	else if (istype(J, /datum/job/german/german_antitank) || istype(J, /datum/job/german/german_antitankassitant))
-		. = FALSE
-	else
-		. = FALSE
-
 /obj/map_metadata/reichflakturm/faction2_can_cross_blocks()
 	return (processes.ticker.playtime_elapsed >= 2400 || admin_ended_all_grace_periods)
 
@@ -103,14 +93,14 @@
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The <b>Wehrmacht</b> has sucessfuly defended the Reichflakturm! The Americans halted the attack!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_o == FALSE)
 		ticker.finished = TRUE
 		var/message = "The <b>Americans</b> have captured the anti-air guns! The Battle for the Reichflakturmis over!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_o = TRUE
@@ -153,7 +143,7 @@
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The <b>Germans</b> have recaptured the anti-air guns!</font>"
+			to_chat(world, "<font size = 3>The <b>Germans</b> have recaptured the anti-air guns!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1

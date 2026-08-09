@@ -1,7 +1,7 @@
 /obj/map_metadata/fallujah
 	ID = MAP_FALLUJAH
 	title = "Fallujah"
-	lobby_icon = 'icons/lobby/fallujah.png'
+	lobby_icon = "icons/lobby/fallujah.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall/desert)
 	respawn_delay = 1200
 	no_winner = "The operation is still underway."
@@ -24,18 +24,10 @@
 	faction2 = AMERICAN
 	valid_weather_types = list(WEATHER_NONE, WEATHER_EXTREME)
 	songs = list(
-		"The Handsome Family - Far From Any Road:1" = 'sound/music/farfromanyroad.ogg',)
+		"The Handsome Family - Far From Any Road:1" = "sound/music/farfromanyroad.ogg",)
 	artillery_count = 3
 	valid_artillery = list("Explosive")
 
-/obj/map_metadata/fallujah/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_modernday && istype(J, /datum/job/american) && !istype(J, /datum/job/american/idf))
-		. = TRUE
-	else if (J.is_specops && istype(J, /datum/job/arab))
-		. = TRUE
-	else
-		. = FALSE
 /obj/map_metadata/fallujah/faction1_can_cross_blocks()
 	return (processes.ticker.playtime_elapsed >= 30000 || admin_ended_all_grace_periods)
 
@@ -93,14 +85,14 @@ var/no_loop_fj = FALSE
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The Insurgents pushed back the USMC from the city!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_fj == FALSE)
 		ticker.finished = TRUE
 		var/message = "The USMC has captured the city! The Insurgents retreat!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_arab = TRUE
@@ -143,7 +135,7 @@ var/no_loop_fj = FALSE
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The Insurgents reclaime their sector!</font>"
+			to_chat(world, "<font size = 3>The Insurgents reclaime their sector!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1

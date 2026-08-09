@@ -90,7 +90,7 @@ You can set verify to TRUE if you want send() to sleep until the client has the 
 	if (!unreceived || !unreceived.len)
 		return FALSE
 	if (unreceived.len >= ASSET_CACHE_TELL_CLIENT_AMOUNT)
-		client << "Sending Resources..."
+		to_chat(client, "Sending Resources...")
 	for (var/asset in unreceived)
 		if (asset in asset_cache.cache)
 			client << browse_rsc(asset_cache.cache[asset], asset)
@@ -186,7 +186,8 @@ You can set verify to TRUE if you want send() to sleep until the client has the 
 		"UI/css/",
 		"UI/images/",
 		"UI/images/status_icons/",
-		"UI/js/"
+		"UI/js/",
+		"UI/fonts/"
 	)
 	var/list/uncommon_dirs = list(
 		"UI/templates/"
@@ -226,6 +227,7 @@ var/decl/asset_cache/asset_cache = new()
 /decl/asset_cache/New()
 	..()
 	cache = new
+
 
 /hook/roundstart/proc/send_assets()
 	for (var/type in typesof(/datum/asset) - list(/datum/asset, /datum/asset/simple))

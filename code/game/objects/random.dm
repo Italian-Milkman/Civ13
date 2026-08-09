@@ -37,17 +37,14 @@ Example for later use:
 /obj/random/proc/spawn_item()
 	if(prob(spawn_nothing_percentage))
 		return
-    
+
 	if(isnull(loc))
 		return
 
 	var/build_path = pickweight(spawn_choices())
 	if (build_path)
 		for (var/i = 1, i <= number_to_spawn, i++)
-		var/atom/A = new build_path(src.loc)
-		if(pixel_x || pixel_y)
-			A.pixel_x = pixel_x
-			A.pixel_y = pixel_y
+		new build_path(src.loc)
 
 // Returns an associative list in format path:weight
 /obj/random/proc/spawn_choices()
@@ -91,8 +88,8 @@ Example for later use:
 	return list(
 				/obj/item/weapon/gun/projectile/submachinegun/ak74 = 25,
 				/obj/item/weapon/gun/projectile/submachinegun/ak74/aks74 = 25,
-                /obj/item/weapon/gun/projectile/submachinegun/ak74/aks74/aks74u = 25,
-                /obj/item/weapon/gun/projectile/submachinegun/ak74m = 25)
+				/obj/item/weapon/gun/projectile/submachinegun/ak74/aks74/aks74u = 25,
+				/obj/item/weapon/gun/projectile/submachinegun/ak74m = 25)
 
 /obj/random/gun/ak_modern
 	name = "random modern ak"
@@ -148,20 +145,20 @@ Example for later use:
 	icon_state = "dice"
 
 /obj/random/magazine/ak47
-    name = "random ak magazine"
-    icon_state = "magazine"
+	name = "random ak magazine"
+	icon_state = "magazine"
 /obj/random/magazine/ak47/spawn_choices()
 	return list(
 				/obj/item/ammo_magazine/ak47 = 95,
-                /obj/item/ammo_magazine/ak47/drum = 5)
+				/obj/item/ammo_magazine/ak47/drum = 5)
 
 /obj/random/magazine/ak74
-    name = "random ak magazine"
-    icon_state = "magazine"
+	name = "random ak magazine"
+	icon_state = "magazine"
 /obj/random/magazine/ak74/spawn_choices()
 	return list(
 				/obj/item/ammo_magazine/ak74 = 95,
-                /obj/item/ammo_magazine/ak74/drum = 5)
+				/obj/item/ammo_magazine/ak74/drum = 5)
 
 /obj/random/magazine/western_random
 	name = "random western magazine"
@@ -174,12 +171,12 @@ Example for later use:
 				/obj/item/ammo_magazine/p90 = 15)
 
 /obj/random/magazine/german
-    name = "random german magazine"
-    icon_state = "magazine"
+	name = "random german magazine"
+	icon_state = "magazine"
 /obj/random/magazine/german/spawn_choices()
 	return list(
 				/obj/item/ammo_magazine/gewehr98 = 90,
-                /obj/item/ammo_magazine/fg42 = 10,
+				/obj/item/ammo_magazine/fg42 = 10,
 				/obj/item/ammo_magazine/g43 = 10)
 
 ////////////////////////////
@@ -279,8 +276,8 @@ Example for later use:
 /obj/random/medical/bandage/spawn_choices()
 	return list(
 				/obj/item/stack/medical/advanced/sulfa/small = 1,
-                /obj/item/stack/medical/advanced/herbs/small = 1,
-                /obj/item/stack/medical/bruise_pack/bint/small = 1)
+				/obj/item/stack/medical/advanced/herbs/small = 1,
+				/obj/item/stack/medical/bruise_pack/bint/small = 1)
 
 /obj/random/medical/drugs
 	name = "Medical Drugs"
@@ -289,7 +286,7 @@ Example for later use:
 /obj/random/medical/drugs/spawn_choices()
 	return list(
 				/obj/item/weapon/reagent_containers/syringe/morphine = 1,
-                /obj/item/weapon/reagent_containers/syringe/thc = 1)
+				/obj/item/weapon/reagent_containers/syringe/thc = 1)
 
 ////////////////Barricades, Mines & Trees////////////////
 /obj/random/mine/ap
@@ -337,7 +334,7 @@ Example for later use:
 	name = "Tree"
 	icon_state = "tree"
 	spawn_nothing_percentage = 75
-/obj/random/plants/tree/spawn_choices()
+/obj/random/plants/tree_lowchance/spawn_choices()
 	return list(
 				/obj/structure/wild/tree/live_tree = 1,
 				/obj/structure/wild/tallgrass = 1,
@@ -421,13 +418,13 @@ Example for later use:
 					/obj/item/weapon/gun/projectile/submachinegun/mp40,
 					/obj/item/ammo_magazine/mp40 = 2)
 /obj/item/weapon/hiddenstash/grenade
-	stashed = list(	
+	stashed = list(
 					/obj/item/weapon/grenade/modern/custom)
 /obj/item/weapon/hiddenstash/makarov
-	stashed = list(	
+	stashed = list(
 					/obj/item/weapon/gun/projectile/pistol/makarov,
 					/obj/item/ammo_magazine/makarov = 3)
 /obj/item/weapon/hiddenstash/luger
-	stashed = list(	
+	stashed = list(
 					/obj/item/weapon/gun/projectile/pistol/luger,
 					/obj/item/ammo_magazine/luger = 3)

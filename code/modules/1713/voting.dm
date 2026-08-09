@@ -108,22 +108,22 @@
 // Voyage defines find_roles [getter] proc.
 
 /obj/structure/voting/proc/find_roles()
-    // Initialize the roles to FALSE, we're about to get them.
-    found_captain = FALSE
-    found_boatswain = FALSE
-    found_quartermaster = FALSE
+	// Initialize the roles to FALSE, we're about to get them.
+	found_captain = FALSE
+	found_boatswain = FALSE
+	found_quartermaster = FALSE
 
-    // Loop through each human in the mob list
-    for(var/mob/living/human/H in living_mob_list)
-        // We are iterating through the `List of all alive mobs, including clientless. Excludes /mob/new_player`. Safety check anyway;
-        if(H.stat != DEAD)
-            switch(H.original_job_title) // Switch job title.
-                if("Pirate Captain")
-                    found_captain = TRUE
-                if("Pirate Boatswain")
-                    found_boatswain = TRUE
-                if("Pirate Quartermaster")
-                    found_quartermaster = TRUE
+	// Loop through each human in the mob list
+	for(var/mob/living/human/H in living_mob_list)
+		// We are iterating through the `List of all alive mobs, including clientless. Excludes /mob/new_player`. Safety check anyway;
+		if(H.stat != DEAD)
+			switch(H.original_job_title) // Switch job title.
+				if("Pirate Captain")
+					found_captain = TRUE
+				if("Pirate Boatswain")
+					found_boatswain = TRUE
+				if("Pirate Quartermaster")
+					found_quartermaster = TRUE
 
 // General Procs 
 
@@ -199,6 +199,8 @@
 		to_chat(world, "<big><font color='yellow'><b><i>[election_desc]</i></b></big></font>")
 		for(var/i in vote_options)
 			to_chat(world, "<font color='yellow'><b><i>&nbsp;&nbsp;&nbsp;&nbsp;[i]</i></b></font>")
+		log_admin("[user.ckey] triggered a ballot box vote.")
+		message_admins("[user.ckey] triggered a ballot box vote.")
 		start_timer(1200)
 
 /obj/structure/voting/proc/start_timer(var/time = 1800)

@@ -10,7 +10,6 @@
 	en_meaning = "Ship Captain"
 	rank_abbreviation = "Kapitein"
 
-
 	spawn_location = "JoinLateRNCap"
 	is_officer = TRUE
 	is_commander = TRUE
@@ -34,7 +33,7 @@
 
 	H.equip_to_slot_or_del(new /obj/item/weapon/attachment/scope/adjustable/binoculars(H), slot_l_store)
 	H.equip_to_slot_or_del(new /obj/item/weapon/material/sword/spadroon(H), slot_belt)
-	world << "<b><big>[H.real_name] is the Captain of the Dutch Navy ship!</big></b>"
+	to_chat(world, "<big><b>[H.real_name] is the Captain of the Dutch Navy ship!</b></big>")
 	H.add_note("Role", "You are a <b>[title]</b>, the highest ranking officer present. Your job is to command the ship.")
 	H.setStat("strength", STAT_MEDIUM_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -75,7 +74,7 @@
 	H.equip_to_slot_or_del(new /obj/item/clothing/head/tricorne_dutch(H), slot_head)
 
 	H.equip_to_slot_or_del(new /obj/item/weapon/material/sword/spadroon(H), slot_belt)
-	world << "<b><big>[H.real_name] is the Quartermaster of the Dutch Navy ship!</big></b>"
+	to_chat(world, "<big><b>[H.real_name] is the Quartermaster of the Dutch Navy ship!</b></big>")
 	H.add_note("Role", "You are a <b>[title]</b>, an officer in charge of the ship's supply allocation. You are also the second in command, after the <b>Capitaine</b>.")
 	H.setStat("strength", STAT_MEDIUM_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -119,7 +118,7 @@
 
 	H.equip_to_slot_or_del(new /obj/item/weapon/attachment/scope/adjustable/binoculars(H), slot_l_store)
 	H.equip_to_slot_or_del(new /obj/item/weapon/material/sword/spadroon(H), slot_belt)
-	world << "<b><big>[H.real_name] is the Boatswain of the Dutch Navy ship!</big></b>"
+	to_chat(world, "<big><b>[H.real_name] is the Boatswain of the Dutch Navy ship!</b></big>")
 	H.add_note("Role", "You are a <b>[title]</b>, an officer in charge of the crew and their job allocation. The whole ship relies on you!")
 	H.setStat("strength", STAT_MEDIUM_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -354,10 +353,9 @@
 	title = "Luitenant"
 	en_meaning = "Infantry Commander"
 	rank_abbreviation = "Luit."
-
 	spawn_location = "JoinLateRNCap"
 	is_officer = TRUE
-
+	allowed_maps = list(MAP_RECIFE)
 	is_army = TRUE
 	is_commander = TRUE
 
@@ -397,12 +395,10 @@
 	title = "Sergeant"
 	en_meaning = "Infantry Squad Leader"
 	rank_abbreviation = "Srg."
-
+	allowed_maps = list(MAP_RECIFE)
 	spawn_location = "JoinLateRNMidshipman"
 	is_officer = TRUE
-
 	is_army = TRUE
-
 
 	min_positions = 2
 	max_positions = 20
@@ -437,12 +433,10 @@
 	title = "Veld Dokter"
 	en_meaning = "Infantry Field Medic"
 	rank_abbreviation = "V. Dk."
-
+	allowed_maps = list(MAP_RECIFE)
 	spawn_location = "JoinLateRNSurgeon"
-
 	is_medic = TRUE
 	is_army = TRUE
-
 
 	min_positions = 1
 	max_positions = 6
@@ -476,11 +470,9 @@
 	title = "Soldaat"
 	en_meaning = "Infantry Soldier"
 	rank_abbreviation = ""
-
+	allowed_maps = list(MAP_RECIFE)
 	spawn_location = "JoinLateRN"
-
 	is_army = TRUE
-
 
 	min_positions = 12
 	max_positions = 100
@@ -515,9 +507,8 @@
 	title = "Jager"
 	en_meaning = "Light Infantry"
 	rank_abbreviation = "Jag."
-
+	allowed_maps = list(MAP_RECIFE)
 	spawn_location = "JoinLateRN"
-
 	is_army = TRUE
 
 	min_positions = 4
@@ -556,8 +547,9 @@
 	en_meaning = "Commander"
 	rank_abbreviation = "Com."
 	spawn_location = "JoinLateRNCap"
+	allowed_maps = list(MAP_OPERATION_FALCON, MAP_VADSO_CITY)
 
-	is_operation_falcon = TRUE
+
 	is_commander = TRUE
 	is_officer = TRUE
 
@@ -611,8 +603,9 @@
 	en_meaning = "Squad Leader"
 	rank_abbreviation = "Sgt."
 	spawn_location = "JoinLateRNSL"
+	allowed_maps = list(MAP_OPERATION_FALCON, MAP_VADSO_CITY)
 
-	is_operation_falcon = TRUE
+
 	is_squad_leader = TRUE
 	uses_squads = TRUE
 
@@ -664,8 +657,9 @@
 	en_meaning = "Doctor"
 	rank_abbreviation = "Ar."
 	spawn_location = "JoinLateRN"
+	allowed_maps = list(MAP_OPERATION_FALCON, MAP_VADSO_CITY)
 
-	is_operation_falcon = TRUE
+
 	is_medic = TRUE
 	uses_squads = TRUE
 
@@ -720,8 +714,9 @@
 	en_meaning = "Radioman"
 	rank_abbreviation = "Kpl1."
 	spawn_location = "JoinLateRN"
+	allowed_maps = list(MAP_OPERATION_FALCON, MAP_VADSO_CITY)
 
-	is_operation_falcon = TRUE
+
 	is_radioman = TRUE
 	uses_squads = TRUE
 
@@ -772,8 +767,9 @@
 	en_meaning = "Breacher"
 	rank_abbreviation = "Sld1."
 	spawn_location = "JoinLateRN"
+	allowed_maps = list(MAP_OPERATION_FALCON, MAP_VADSO_CITY)
 
-	is_operation_falcon = TRUE
+
 	uses_squads = TRUE
 
 	min_positions = 1
@@ -825,8 +821,9 @@
 	en_meaning = "Soldier First Class"
 	rank_abbreviation = "Sld1."
 	spawn_location = "JoinLateRN"
+	allowed_maps = list(MAP_OPERATION_FALCON, MAP_VADSO_CITY)
 
-	is_operation_falcon = TRUE
+
 	uses_squads = TRUE
 
 	min_positions = 5
@@ -875,8 +872,9 @@
 	en_meaning = "Tanker"
 	rank_abbreviation = "Sgt."
 	spawn_location = "JoinLateRN"
+	allowed_maps = list(MAP_OPERATION_FALCON, MAP_VADSO_CITY)
 
-	is_operation_falcon = TRUE
+
 
 	min_positions = 1
 	max_positions = 6
@@ -922,8 +920,9 @@
 	en_meaning = "Emplaced Weapons Specialist"
 	rank_abbreviation = "Kpl"
 	spawn_location = "JoinLateRN"
+	allowed_maps = list(MAP_OPERATION_FALCON, MAP_VADSO_CITY)
 
-	is_operation_falcon = TRUE
+
 
 	min_positions = 1
 	max_positions = 6
@@ -968,8 +967,9 @@
 	en_meaning = "Weapons Specialist"
 	rank_abbreviation = "Kpl."
 	spawn_location = "JoinLateRN"
+	allowed_maps = list(MAP_OPERATION_FALCON, MAP_VADSO_CITY)
 
-	is_operation_falcon = TRUE
+
 
 	min_positions = 1
 	max_positions = 10

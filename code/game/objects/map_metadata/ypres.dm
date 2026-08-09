@@ -2,7 +2,8 @@
 /obj/map_metadata/ypres
 	ID = MAP_YPRES
 	title = "2nd Battle of Ypres"
-	lobby_icon = 'icons/lobby/ww1.png'
+	description = "The German and the Allied forces are facing eachother in the trenches near Ypres! It will start in 5 minutes."
+	lobby_icon = "icons/lobby/ww1.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall/)
 	respawn_delay = 300
 
@@ -25,7 +26,7 @@
 	faction2 = GERMAN
 	grace_wall_timer = 3000
 	songs = list(
-		"Argonnerwaldlied:1" = 'sound/music/argonnerwaldlied.ogg')
+		"Argonnerwaldlied:1" = "sound/music/argonnerwaldlied.ogg")
 
 /obj/map_metadata/ypres/New()
 	..()
@@ -75,14 +76,7 @@
 			british_toggled = TRUE
 			french_toggled = FALSE
 	spawn(30)
-		world << "<font size=3>This battle will feature <b>[faction1]</b> and <b>[faction2]</b> troops.</font>"
-/obj/map_metadata/ypres/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_ww1 == TRUE)
-		. = TRUE
-	else
-		. = FALSE
-
+		to_chat(world, "<font size=3>This battle will feature <b>[faction1]</b> and <b>[faction2]</b> troops.</font>")
 /obj/map_metadata/ypres/update_win_condition()
 
 	if (world.time >= next_win && next_win != -1)
@@ -93,7 +87,7 @@
 		message = "The [battle_name ? battle_name : "battle"] has ended in a stalemate!"
 		if (current_winner && current_loser)
 			message = "The battle is over! The [current_winner] was victorious over the [current_loser][battle_name ? " in the [battle_name]" : ""]!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		win_condition_spam_check = TRUE
 		return FALSE
 
@@ -171,7 +165,7 @@
 				current_loser = roundend_condition_def2army(roundend_condition_sides[2][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The [current_winner] has lost control of the [army2name(current_loser)] base!</font>"
+			to_chat(world, "<font size = 3>The [current_winner] has lost control of the [army2name(current_loser)] base!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1

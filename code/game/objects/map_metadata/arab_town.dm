@@ -1,11 +1,11 @@
 /obj/map_metadata/arab_town
 	ID = MAP_ARAB_TOWN
 	title = "Arab Town"
-	lobby_icon = 'icons/lobby/modern.png'
+	lobby_icon = "icons/lobby/modern.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall/desert)
 	respawn_delay = 1200
 	no_winner = "The operation is still underway."
-
+	description = "The IDF has launched an operation to capture a town held by Hezbollah. The IDF must capture the Hezbollah HQ (SW corner) within 40 minutes!"
 	faction_organization = list(
 		ARAB,
 		AMERICAN)
@@ -24,16 +24,9 @@
 	faction2 = AMERICAN
 	valid_weather_types = list(WEATHER_NONE, WEATHER_EXTREME)
 	songs = list(
-		"Al-Qussam:1" = 'sound/music/alqassam.ogg',)
+		"Al-Qussam:1" = "sound/music/alqassam.ogg",)
 	artillery_count = 3
 	valid_artillery = list("Explosive")
-
-/obj/map_metadata/arab_town/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_modernday == TRUE && (istype(J, /datum/job/american/idf) || istype(J, /datum/job/arab/hezbollah)))
-		. = TRUE
-	else
-		. = FALSE
 
 /obj/map_metadata/arab_town/faction1_can_cross_blocks()
 	return (processes.ticker.playtime_elapsed >= 30000 || admin_ended_all_grace_periods)
@@ -92,14 +85,14 @@ var/no_loop_arab = FALSE
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The Hezbollah has managed to defend their HQ!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_arab == FALSE)
 		ticker.finished = TRUE
 		var/message = "The IDF has captured Hezbollah's HQ! Hezbollah retreats!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_arab = TRUE
@@ -142,7 +135,7 @@ var/no_loop_arab = FALSE
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The Hezbollah has recaptured their HQ!</font>"
+			to_chat(world, "<font size = 3>The Hezbollah has recaptured their HQ!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1
@@ -154,10 +147,10 @@ var/no_loop_arab = FALSE
 /obj/map_metadata/arab_town_2
 	ID = MAP_ARAB_TOWN_2
 	title = "Arab Town II"
-	lobby_icon = 'icons/lobby/modern.png'
+	lobby_icon = "icons/lobby/modern.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall/desert)
 	respawn_delay = 1200
-	
+	description = "US Marines have launched an operation to capture a town held by insurgents. The Marines must capture the insurgent HQ (SW corner) within 40 minutes!"
 	faction_organization = list(
 		AMERICAN,
 		ARAB)
@@ -175,18 +168,9 @@ var/no_loop_arab = FALSE
 	faction2 = ARAB
 	valid_weather_types = list(WEATHER_NONE, WEATHER_EXTREME)
 	songs = list(
-		"Al-Qussam:1" = 'sound/music/alqassam.ogg',)
+		"Al-Qussam:1" = "sound/music/alqassam.ogg",)
 	artillery_count = 3
 	valid_artillery = list("Explosive")
-
-/obj/map_metadata/arab_town_2/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_modernday && istype(J, /datum/job/american) && !istype(J, /datum/job/american/idf))
-		. = TRUE
-	else if (J.is_specops && istype(J, /datum/job/arab))
-		. = TRUE
-	else
-		. = FALSE
 
 /obj/map_metadata/arab_town_2/faction2_can_cross_blocks()
 	return (processes.ticker.playtime_elapsed >= 3000 || admin_ended_all_grace_periods)

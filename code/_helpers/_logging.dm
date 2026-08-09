@@ -43,11 +43,6 @@
 	if (map)
 		oocdiary << "__**\[[time_stamp()]] ([map.ID]) OOC:**__ **[name]** [text]"
 
-/proc/discord_admin_log(name,text)
-	var/admindiary = file("admin.log")
-	if (map)
-		admindiary << "__**\[[time_stamp()]] ([map.ID]) ASAY:**__ **[name]** [text]"
-
 /proc/discord_ahelp_log(name,text)
 	var/admindiary = file("admin.log")
 	if (map)
@@ -97,7 +92,7 @@
 		message_admins("[banner] unbanned '[banned]' using the Discord.")
 		for (var/client/C in clients)
 			if (C.ckey == banned)
-				C << "<span class = 'good'>href_list["Your ban has been lifted."]</span>"
+				to_chat(C, "<span class = 'good'>href_list["Your ban has been lifted."]</span>")
 /proc/attack_log(category, text)
 	attack_log << "\[[time_stamp()]] [game_id] [category]: [text][log_end]"
 
@@ -120,7 +115,7 @@
 
 	for (var/client/C in admins)
 		if (C.is_preference_enabled(/datum/client_preference/admin/show_debug_logs))
-			C << "<span class=\"log_message\">DEBUG: [text]</span>"
+			to_chat(C, "<span class=\"log_message\">DEBUG: [text]</span>")
 
 /proc/log_game(text)
 	if (config.log_game)
@@ -160,7 +155,7 @@
 
 /proc/log_to_dd(text)
 	world.log << text //this comes before the config check because it can't possibly runtime
-	if (config.log_world_output)
+	if (config && config.log_world_output)
 		game_log("DD_OUTPUT", text)
 
 /proc/log_misc(text)
@@ -169,18 +164,6 @@
 /proc/log_unit_test(text)
 	world.log << "## UNIT_TEST ##: [text]"
 	log_debug(text)
-
-//pretty print a direction bitflag, can be useful for debugging.
-/proc/print_dir(var/dir)
-	var/list/comps = list()
-	if (dir & NORTH) comps += "NORTH"
-	if (dir & SOUTH) comps += "SOUTH"
-	if (dir & EAST) comps += "EAST"
-	if (dir & WEST) comps += "WEST"
-	if (dir & UP) comps += "UP"
-	if (dir & DOWN) comps += "DOWN"
-
-	return english_list(comps, nothing_text="0", and_text="|", comma_text="|")
 
 //more or less a logging utility
 /proc/key_name(var/whom, var/include_link = null, var/include_name = TRUE, var/highlight_special_characters = TRUE)

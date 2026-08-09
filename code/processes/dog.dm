@@ -2,7 +2,7 @@
 
 /process/dog/setup()
 	name = "dog process"
-	schedule_interval = 0.2 SECONDS // a bit slower than humans run (1.42 to 1.76 deciseconds)
+	schedule_interval = 0.2 SECONDS
 	start_delay = 0.5 MINUTES
 	fires_at_gamestates = list(GAME_STATE_PLAYING, GAME_STATE_FINISHED)
 	priority = PROCESS_PRIORITY_HIGH
@@ -40,9 +40,9 @@
 /process/dog/reset_current_list()
 	PROCESS_USE_FASTEST_LIST(dog_mob_list)
 
-/process/dog/statProcess()
-	..()
-	stat(null, "[dog_mob_list.len] mobs")
+/process/dog/statProcess(client/C)
+	..(C)
+	C.add_stat("[dog_mob_list.len] mobs")
 
 /process/dog/htmlProcess()
 	return ..() + "[dog_mob_list.len] mobs"

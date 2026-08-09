@@ -5,14 +5,27 @@
 		GLOB.nanomanager.close_uis(mob)
 	cache.Cut()
 	sending.Cut()
-	src << "<span class = 'good'>Cache successfully cleared!</span>"
+	to_chat(src, "<span class = 'good'>Cache successfully cleared!</span>")
+
+/client/verb/reload_chat()
+	set category = "OOC"
+	set name = "Reload Chat"
+	if (chat)
+		chat.load()
+		to_chat(src, "<span class = 'good'>Chat reloaded!</span>")
+
+/client/verb/clear_chat_verb()
+	set category = "OOC"
+	set name = "Clear Chat"
+	src << output(null, "browser_chat:clearChat")
+	to_chat(src, "<span class = 'good'>Chat cleared!</span>")
 
 /client/verb/open_embed_wiki()
 	set category = "OOC"
 	set name = "Open Wiki"
 	if (mob)
 		var/htmlfile = "<!DOCTYPE html><HTML><HEAD><TITLE>Civ13 Wiki</TITLE><META http-equiv=\"X-UA-Compatible\" content=\"IE=edge\"></HEAD> \
-		<BODY><iframe src=\"http://civ13.com/wiki/index.php\" style=\"position: absolute; height: 97%; width: 97%; border: none\"></iframe></BODY></HTML>"
+		<BODY><iframe src=\"https://civ13.github.io/civ13-wiki\" style=\"position: absolute; height: 97%; width: 97%; border: none\"></iframe></BODY></HTML>"
 		src << browse(htmlfile,"window=wiki;size=820x650")
 
 
@@ -21,20 +34,6 @@
 	set name = "See MOTD"
 	if (mob) // sanity
 		mob.see_personalized_MOTD()
-
-/client/proc/hide_status_tabs()
-	set category = "OOC"
-	set name = "Hide Status Tabs"
-	status_tabs = FALSE
-	verbs -= /client/proc/hide_status_tabs
-	verbs += /client/proc/show_status_tabs
-
-/client/proc/show_status_tabs()
-	set category = "OOC"
-	set name = "Show Status Tabs"
-	status_tabs = TRUE
-	verbs -= /client/proc/show_status_tabs
-	verbs += /client/proc/hide_status_tabs
 
 /client/verb/who()
 	set name = "Who"
@@ -129,9 +128,9 @@
 				highstaff_message += "\n"
 				num_highstaff_online++
 
-			else if (R_ADMIN & C.holder.rights || (!R_MOD & C.holder.rights && !R_MENTOR & C.holder.rights))	//Used to determine who shows up in admin rows
+			else if (R_ADMIN & C.holder.rights || (!(R_MOD & C.holder.rights) && !(R_MENTOR & C.holder.rights)))	//Used to determine who shows up in admin rows
 
-				if (C.holder.fakekey && (!R_ADMIN & holder.rights && !R_MOD & holder.rights))		//Mentors can't see stealthmins
+				if (C.holder.fakekey && (!(R_ADMIN & holder.rights) && !(R_MOD & holder.rights)))		//Mentors can't see stealthmins
 					continue
 
 				adminmsg += "\t[C] is a [C.holder.rank]"
@@ -199,7 +198,7 @@
 
 	else
 		for (var/client/C in admins)
-			if (R_ADMIN & C.holder.rights || (!R_MOD & C.holder.rights && !R_MENTOR & C.holder.rights))
+			if (R_ADMIN & C.holder.rights || (!(C.holder.rights & R_MOD) && !(C.holder.rights & R_MENTOR)))
 				if (!C.holder.fakekey)
 					adminmsg += "\t[C] is a [C.holder.rank]\n"
 					num_admins_online++
@@ -211,7 +210,7 @@
 				num_mentors_online++
 /* todo: discord bot
 	if (config.admin_irc)
-		src << "<span class='info'>Adminhelps are also sent to IRC. If no admins are available in game try anyway and an admin on IRC may see it and respond.</span>"*/
+		to_chat(src, "<span class='info'>Adminhelps are also sent to IRC. If no admins are available in game try anyway and an admin on IRC may see it and respond.</span>"*/
 
 	var/msg = "<b>Current High Staff ([num_highstaff_online]):</b>\n" + highstaff_message
 
@@ -225,7 +224,7 @@
 
 //	msg += "\n<b> Current Developers ([num_devs_online]):</b>\n" + devmsg
 
-	src << msg
+	to_chat(src, msg)
 
 // OOC
 
@@ -234,20 +233,20 @@
 	set category = "OOC"
 
 	if (say_disabled)	//This is here to try to identify lag problems
-		usr << "<span class='warning'>Speech is currently admindisabled.</span>"
+		to_chat(usr, "<span class='warning'>Speech is currently admindisabled.</span>")
 		return
 
 	if (!mob)	return
 	if (IsGuestKey(key))
-		src << "Guests may not use OOC."
+		to_chat(src, "Guests may not use OOC.")
 		return
 
 	if (!is_preference_enabled(/datum/client_preference/show_ooc))
-		src << "<span class='warning'>You have OOC muted.</span>"
+		to_chat(src, "<span class='warning'>You have OOC muted.</span>")
 		return
 
 	if (quickBan_isbanned("OOC"))
-		src << "<span class = 'danger'>You're banned from OOC.</span>"
+		to_chat(src, "<span class = 'danger'>You're banned from OOC.</span>")
 		return
 
 	var/msg_prefix = ""
@@ -259,18 +258,18 @@
 
 	if (!holder)
 		if (!config.ooc_allowed)
-			src << "<span class='danger'>OOC is globally muted.</span>"
+			to_chat(src, "<span class='danger'>OOC is globally muted.</span>")
 			return
 		if (!config.dooc_allowed && (mob.stat == DEAD))
-			usr << "<span class='danger'>OOC for dead mobs has been turned off.</span>"
+			to_chat(usr, "<span class='danger'>OOC for dead mobs has been turned off.</span>")
 			return
 		if (prefs.muted & MUTE_OOC)
-			src << "<span class='danger'>You cannot use OOC (muted).</span>"
+			to_chat(src, "<span class='danger'>You cannot use OOC (muted).</span>")
 			return
 		if (handle_spam_prevention(msg,MUTE_OOC))
 			return
 		if (findtext(msg, "byond://"))
-			src << "<b>Advertising other servers is not allowed.</b>"
+			to_chat(src, "<b>Advertising other servers is not allowed.</b>")
 			log_admin("[key_name(src)] has attempted to advertise in OOC: [msg]")
 			message_admins("[key_name_admin(src)] has attempted to advertise in OOC: [msg]", key_name_admin(src))
 			return
@@ -346,7 +345,7 @@
 				else
 					display_name = "<span class = 'ping'>[holder.OOC_rank()]</span> [display_name]"
 
-			target << "<span class='ooc'><span class='[ooc_style]'>" + create_text_tag("ooc", "OOC:", target) + " <EM>[display_name]:</EM> <span class='message'>[msg]</span></span></span>"
+			to_chat(target, "<span class='ooc'><span class='[ooc_style]'>" + create_text_tag("ooc", "OOC:", target) + " <EM>[display_name]:</EM> <span class='message'>[msg]</span></span></span>")
 
 /client/verb/looc(msg as text)
 	set name = "LOOC"
@@ -354,14 +353,14 @@
 	set category = "OOC"
 
 	if (say_disabled)	//This is here to try to identify lag problems
-		usr << "<span class='danger'>Speech is currently admindisabled.</span>"
+		to_chat(usr, "<span class='danger'>Speech is currently admindisabled.</span>")
 		return
 
 	if (!mob)
 		return
 
 	if (IsGuestKey(key))
-		src << "Guests may not use OOC."
+		to_chat(src, "Guests may not use OOC.")
 		return
 
 	msg = sanitize(msg)
@@ -369,27 +368,27 @@
 		return
 
 	if (!is_preference_enabled(/datum/client_preference/show_looc))
-		src << "<span class='danger'>You have LOOC muted.</span>"
+		to_chat(src, "<span class='danger'>You have LOOC muted.</span>")
 		return
 
 	if (quickBan_isbanned("OOC"))
-		src << "<span class = 'danger'>You're banned from OOC.</span>"
+		to_chat(src, "<span class = 'danger'>You're banned from OOC.</span>")
 		return
 
 	if (!holder)
 		if (!config.looc_allowed)
-			src << "<span class='danger'>LOOC is globally muted.</span>"
+			to_chat(src, "<span class='danger'>LOOC is globally muted.</span>")
 			return
 		if (!config.dooc_allowed && (mob.stat == DEAD))
-			usr << "<span class='danger'>OOC for dead mobs has been turned off.</span>"
+			to_chat(usr, "<span class='danger'>OOC for dead mobs has been turned off.</span>")
 			return
 		if (prefs.muted & MUTE_OOC)
-			src << "<span class='danger'>You cannot use OOC (muted).</span>"
+			to_chat(src, "<span class='danger'>You cannot use OOC (muted).</span>")
 			return
 		if (handle_spam_prevention(msg, MUTE_OOC))
 			return
 		if (findtext(msg, "byond://"))
-			src << "<b>Advertising other servers is not allowed.</b>"
+			to_chat(src, "<b>Advertising other servers is not allowed.</b>")
 			log_admin("[key_name(src)] has attempted to advertise in OOC: [msg]")
 			message_admins("[key_name_admin(src)] has attempted to advertise in OOC: [msg]", key_name_admin(src))
 			return
@@ -437,7 +436,7 @@
 					listening |= M.client
 					continue*/
 
-			if (M.loc && M.locs[1] in hearturfs)
+			if (M.loc && (M.locs[1] in hearturfs))
 				listening |= M.client
 
 
@@ -448,15 +447,18 @@
 			admin_stuff += "/([key])"
 			if (t != src)
 				admin_stuff += "([admin_jump_link(mob, t.holder)])"
-		t << "<span class='ooc'><span class='looc'>" + create_text_tag("looc", "LOOC:", t) + " <span class='prefix'>[prefix]</span><EM>[display_name][admin_stuff]:</EM> <span class='message'>[msg]</span></span></span>"
-
+		to_chat(t, "<span class='ooc'><span class='looc'>" + create_text_tag("looc", "LOOC:", t) + " <span class='prefix'>[prefix]</span><EM>[display_name][admin_stuff]:</EM> <span class='message'>[msg]</span></span></span>")
+		if (t.mob)
+			t.mob.show_chat_overlay(mob, "[key] (LOOC): [msg]", "#A8D8FF")
 
 	for (var/client/adm in admins)	//Now send to all admins that weren't in range.
 		if (!(adm in listening))
 			var/admin_stuff = "/([key])([admin_jump_link(mob, adm.holder)])"
 			var/prefix = "(R)"
 
-			adm << "<span class='ooc'><span class='looc'>" + create_text_tag("looc", "LOOC:", adm) + " <span class='prefix'>[prefix]</span><EM>[display_name][admin_stuff]:</EM> <span class='message'>[msg]</span></span></span>"
+			to_chat(adm, "<span class='ooc'><span class='looc'>" + create_text_tag("looc", "LOOC:", adm) + " <span class='prefix'>[prefix]</span><EM>[display_name][admin_stuff]:</EM> <span class='message'>[msg]</span></span></span>")
+			if (adm.mob)
+				adm.mob.show_chat_overlay(mob, "[key] (LOOC): [msg]", "#A8D8FF")
 
 /mob/proc/get_looc_source()
 	return src

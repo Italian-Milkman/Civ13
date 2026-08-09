@@ -1,7 +1,8 @@
 /obj/map_metadata/pavlov_house
 	ID = MAP_PAVLOV_HOUSE
 	title = "Pavlov House"
-	lobby_icon = 'icons/lobby/stalingrad.png'
+	description = "The Soviets will win if they hold out for 30 minutes. The Germans will win if they manage to reach the Radio Station in the building."
+	lobby_icon = "icons/lobby/stalingrad.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/one,/area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 1200
 	no_winner ="The House stays under Soviet control, stalling the German advance."
@@ -24,25 +25,8 @@
 	grace_wall_timer = 3000
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET)
 	songs = list(
-		"Red Army Choir - Katyusha:1" = 'sound/music/katyusha.ogg',)
+		"Red Army Choir - Katyusha:1" = "sound/music/katyusha.ogg",)
 	gamemode = "Siege"
-
-/obj/map_metadata/pavlov_house/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (istype(J, /datum/job/german/tank_crew) || istype(J, /datum/job/russian/tank_crew) || istype(J, /datum/job/german/german_antitank) || istype(J, /datum/job/german/german_antitankassitant))
-		. = FALSE
-	else if (J.is_ss_panzer == TRUE)
-		. = FALSE
-	else if (J.is_occupation == TRUE)
-		. = FALSE
-	else if (J.is_tanker == TRUE)
-		. = FALSE
-	else if (J.is_ww2 == TRUE && J.is_reichstag == FALSE)
-		. = TRUE
-	else if (J.is_reichstag == TRUE)
-		. = FALSE
-	else
-		. = FALSE
 
 /obj/map_metadata/pavlov_house/roundend_condition_def2name(define)
 	..()
@@ -91,14 +75,14 @@
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The <b>Soviets</b> Have successfully defended the building! The Germans were halted!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_r == FALSE)
 		ticker.finished = TRUE
 		var/message = "The <b>Germans</b> have captured the building! The battle for the Pavlov House is over!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_r = TRUE
@@ -141,7 +125,7 @@
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The <b>Soviets</b> have recaptured the House!</font>"
+			to_chat(world, "<font size = 3>The <b>Soviets</b> have recaptured the House!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1
@@ -163,5 +147,4 @@
 				return TRUE
 		else
 			return !faction1_can_cross_blocks()
-			return !faction2_can_cross_blocks()
 	return FALSE

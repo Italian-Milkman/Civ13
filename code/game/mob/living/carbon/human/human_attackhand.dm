@@ -9,7 +9,7 @@
 	return null
 
 /mob/living/human/attack_hand(mob/living/human/M as mob)
-	if (map && (map.ID == MAP_FOOTBALL || map.ID == MAP_FOOTBALL_CMP))
+	if (map && istype(map, /obj/map_metadata/football))
 		return
 	var/mob/living/human/H = M
 	if (istype(H))
@@ -42,10 +42,10 @@
 			if (I_HELP)
 				if (H != src && istype(H) && health < config.health_threshold_crit && health > config.health_threshold_dead && !on_fire)
 					if (!H.check_has_mouth())
-						to_chat(H, SPAN_DANGER("You don't have a mouth, you cannot perform CPR!"))
+						to_chat(H, SPAN_WARNING("You don't have a mouth, you cannot perform CPR!"))
 						return
 					if (!check_has_mouth())
-						to_chat(H, SPAN_DANGER("They don't have a mouth, you cannot perform CPR!"))
+						to_chat(H, SPAN_WARNING("They don't have a mouth, you cannot perform CPR!"))
 						return
 					if ((H.head && (H.head.body_parts_covered & FACE)) || (H.wear_mask && (H.wear_mask.body_parts_covered & FACE)))
 						to_chat(H, SPAN_NOTICE("Remove your mask!"))
@@ -98,7 +98,7 @@
 						to_chat(H, SPAN_WARNING("You need to remove \the [src]'s mouth covering for mouth-to-mouth resuscitation!"))
 						return 0
 					if (!H.internal_organs_by_name["lungs"])
-						to_chat(H, SPAN_DANGER("You need lungs for mouth-to-mouth resuscitation!"))
+						to_chat(H, SPAN_WARNING("You need lungs for mouth-to-mouth resuscitation!"))
 						return
 					var/obj/item/organ/lungs/L = internal_organs_by_name["lungs"]
 					if(L)
@@ -124,7 +124,7 @@
 
 					if(organ.applied_pressure)
 						var/message = "<span class='warning'>[ismob(organ.applied_pressure)? "Someone" : "\A [organ.applied_pressure]"] is already applying pressure to [src == src? "your [organ.name]" : "[src]'s [organ.name]"].</span>"
-						M << "[message]"
+						to_chat(M, "[message]")
 						return FALSE
 					apply_pressure(src, tgt)
 					return
@@ -179,7 +179,7 @@
 				var/obj/item/organ/external/affecting = get_organ(hit_zone)
 
 				if (!affecting || affecting.is_stump())
-					to_chat(M, SPAN_DANGER("They are missing that limb!"))
+					to_chat(M, SPAN_WARNING("They are missing that limb!"))
 					return TRUE
 
 				switch(a_intent)
@@ -291,7 +291,11 @@
 
 			if (I_DISARM)
 				if (M == src)
-					to_chat(M, SPAN_DANGER("I can't manage to shove myself."))
+					if (M.choked_by)
+						M.setClickCooldown(20)
+						M.resist_grab()
+						return TRUE
+					to_chat(M, SPAN_WARNING("I can't manage to shove myself."))
 					return FALSE
 
 				M.attack_log += text("\[[time_stamp()]\] <font color='red'>Disarmed [name] ([ckey])</font>")
@@ -493,4 +497,4 @@
 
 		spawn(10)
 			check_pressure(user, target_zone)
-			return TRUE
+			return

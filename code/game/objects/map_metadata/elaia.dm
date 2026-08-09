@@ -1,7 +1,7 @@
 /obj/map_metadata/elaia
 	ID = MAP_ELAIA
 	title = "Elaia"
-	lobby_icon = 'icons/lobby/ww2.png'
+	lobby_icon = "icons/lobby/ww2.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/one,/area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 0
 	no_hardcore = TRUE
@@ -22,7 +22,7 @@
 	faction2 = ITALIAN
 	ordinal_age = 5
 	songs = list(
-		"Bella Ciao:1" = 'sound/music/bella_ciao.ogg')
+		"Bella Ciao:1" = "sound/music/bella_ciao.ogg")
 	gamemode = "Siege"
 	grace_wall_timer = 3000
 	var/no_loop_elaia = FALSE
@@ -60,21 +60,6 @@
 
 /obj/map_metadata/elaia/faction2_can_cross_blocks()
 	return (processes.ticker.playtime_elapsed >= 3600 || admin_ended_all_grace_periods)
-
-/obj/map_metadata/elaia/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (istype(J, /datum/job/greek))
-		if (J.is_ww2)
-			. = TRUE
-		else
-			. = FALSE
-	else if (istype(J, /datum/job/italian))
-		if (J.is_ww2)
-			. = TRUE
-		else
-			. = FALSE
-	else
-		. = FALSE
 
 /obj/map_metadata/elaia/short_win_time(faction)
 	if (!(alive_n_of_side(faction1)) || !(alive_n_of_side(faction2)))
@@ -134,14 +119,14 @@
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The <b>Greeks</b> has sucessfuly defended Elaia! The Italians have halted the attack!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_elaia == FALSE)
 		ticker.finished = TRUE
 		var/message = "The <b>Italians</b> have captured Elaia! The Battle of Elaia-Kalamas is over!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_elaia = TRUE
@@ -185,7 +170,7 @@
 
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The [current_winner] has lost control of the Elaia river line!</font>"
+			to_chat(world, "<font size = 3>The [current_winner] has lost control of the Elaia river line!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1

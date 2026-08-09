@@ -1,6 +1,5 @@
 //admin verb groups - They can overlap if you so wish. Only one of each verb will exist in the verbs list regardless
 var/list/admin_verbs_default = list(
-	/client/proc/cmd_staff_say,			//admin-only ooc chat
 	/datum/admins/proc/show_player_panel,	//shows an interface for individual players, with various links (links require additional flags,
 	/client/proc/player_panel,
 	/client/proc/deadmin_self,			//destroys our own admin datum so we can play as a regular player,
@@ -8,7 +7,6 @@ var/list/admin_verbs_default = list(
 	/client/proc/hide_most_verbs,		//hides all our hideable adminverbs,
 	/client/proc/debug_variables,		//allows us to -see- the variables of any instance in the game. +VAREDIT needed to modify,
 	/client/proc/cmd_mentor_check_new_players,
-	/client/proc/see_soldiers,
 	/client/proc/see_world_realtime,
 	/client/proc/see_processes,
 	/client/proc/getserverlog,			//allows us to fetch server logs (diary) for other days,
@@ -22,6 +20,7 @@ var/list/admin_verbs_admin = list(
 	/client/proc/disable_approved_only,
 	/client/proc/enable_whitelist,
 	/client/proc/disable_whitelist,
+	/client/proc/disable_campaign_whitelist,
 	/client/proc/player_panel_new,		//shows an interface for all players, with links to various panels,
 	/client/proc/invisimin,				//allows our mob to go invisible/visible,
 	/datum/admins/proc/toggleenter,		//toggles whether people can join the current game,
@@ -29,7 +28,6 @@ var/list/admin_verbs_admin = list(
 	/client/proc/admin_ghost,			//allows us to ghost/reenter body at will,
 	/client/proc/toggle_view_range,		//changes how far we can see,
 	/datum/admins/proc/view_txt_log,	//shows the server log (diary) for today,
-	/client/proc/cmd_admin_pm_context,	//right-click adminPM interface,
 	/client/proc/cmd_admin_pm_panel,	//admin-pm list,
 	/client/proc/cmd_admin_subtle_message,	//send an message to somebody as a 'voice in their head',
 	/client/proc/cmd_admin_delete,		//delete an instance/object/mob/etc,
@@ -41,10 +39,7 @@ var/list/admin_verbs_admin = list(
 	/client/proc/Getkey,				//teleports a mob with a certain ckey to our location,
 	/client/proc/cmd_admin_direct_narrate,	//send text directly to a player with no padding. Useful for narratives and fluff-text,
 	/client/proc/cmd_admin_world_narrate,	//sends text to all players with no padding,
-	/client/proc/admin_memo,			//admin memo system. show/delete/write. +SERVER needed to delete admin memos of others,
-	/client/proc/player_memo,
 	/client/proc/dsay,					//talk in deadchat using our ckey/fakekey,
-	/client/proc/investigate_show,		//various admintools for investigation. Such as a singulo grief-log,
 	/datum/admins/proc/toggleooc,		//toggles ooc on/off for everyone,
 	/datum/admins/proc/togglelooc,		//toggles looc on/off for everyone,
 	/datum/admins/proc/toggleoocdead,	//toggles ooc on/off for everyone who is dead,
@@ -57,26 +52,22 @@ var/list/admin_verbs_admin = list(
 	/datum/admins/proc/PlayerNotes,
 	/datum/admins/proc/show_player_info,
 	/client/proc/free_slot,			//frees slot for chosen job,
-	/client/proc/cmd_admin_change_custom_event,
 	/client/proc/allow_character_respawn,	// Allows a ghost to respawn ,
 	/datum/admins/proc/ic_announce,
 	/datum/admins/proc/custom_faction_announce, //Allows for a custom faction announcement on TDM maps.
 	/client/proc/change_human_appearance_admin,	// Allows an admin to change the basic appearance of human-based mobs ,
 	/client/proc/change_human_appearance_self,	// Allows the human-based mob itself change its basic appearance ,
-	/client/proc/view_chemical_reaction_logs,
 	/client/proc/end_all_grace_periods,
 	/client/proc/reset_all_grace_periods,
 	/client/proc/faction_species,
 	/datum/admins/proc/paralyze_mob,
 	/datum/admins/proc/punish,
-	/client/proc/toggle_jobs,
 	/client/proc/toggle_factions,
 	/client/proc/forcibly_enable_faction,
 	/client/proc/start_epochswap_vote,
 )
 
 var/list/admin_verbs_trialadmin = list(
-	/client/proc/quickBan_search,
 	/client/proc/quickBan_person,
 	/client/proc/cmd_admin_get,
 	/client/proc/player_panel_new,
@@ -90,9 +81,7 @@ var/list/admin_verbs_trialadmin = list(
 	/client/proc/free_slot,			//frees slot for chosen job,
 	/datum/admins/proc/spawn_player_as_job,
 	/client/proc/respawn_character,
-	/client/proc/trigger_roundend,
 	/datum/admins/proc/immreboot,
-	/client/proc/Jump,
 	/client/proc/jumptocoord,
 	/datum/admins/proc/ic_announce,
 	/datum/admins/proc/custom_faction_announce,
@@ -113,28 +102,24 @@ var/list/admin_verbs_fun = list(
 	/datum/admins/proc/zombiemechanic,
 	/client/proc/make_sound,
 	/client/proc/editappear,
-	/client/proc/show_custom_roundstart_tip,
 	/client/proc/reset_custom_roundstart_tip
 	)
 
 var/list/admin_verbs_spawn = list(
-	/datum/admins/proc/spawn_atom,		// allows us to spawn instances,
+	/datum/admins/proc/spawn_atom,
 	/datum/admins/proc/spawn_player_as_job,
 	/client/proc/game_panel,
 	/client/proc/respawn_character,
 	/client/proc/drop_bomb,
 	/client/proc/drop_airstrike,
 	/client/proc/radiation_emission,
-	/client/proc/nuke,
-	/client/proc/create_crate,
+	/client/proc/nuke
 	)
 
 var/list/admin_verbs_server = list(
-	/client/proc/ToRban,
-	/datum/admins/proc/startnow,
+	/datum/admins/verb/startnow,
 	/datum/admins/proc/restart,
 	/datum/admins/proc/delay,
-	/client/proc/trigger_roundend,
 	/client/proc/toggle_round_ending,
 	/client/proc/toggle_log_hrefs,
 	/datum/admins/proc/immreboot,
@@ -144,8 +129,7 @@ var/list/admin_verbs_server = list(
 	/datum/admins/proc/adspawn,
 	/datum/admins/proc/adjump,
 	/datum/admins/proc/loadmap,
-	/datum/admins/proc/savemap,
-	/client/proc/nanomapgen_DumpImage
+	/datum/admins/proc/savemap
 	)
 var/list/admin_verbs_debug = list(
 	/client/proc/cmd_admin_list_open_jobs,
@@ -160,12 +144,8 @@ var/list/admin_verbs_debug = list(
 	/client/proc/reload_admins,
 	/client/proc/reload_craft_list,
 	/client/proc/reload_bans,
-	/client/proc/purge_all_destroyed_objects,
 //	/client/proc/start_forcelife,
-	/client/proc/restart_controller,
-	/client/proc/callproc,
 	/client/proc/callproc_target,
-	/client/proc/Jump,
 	/client/proc/jumptocoord,
 	/client/proc/dsay,
 	/client/proc/change_time_of_day,
@@ -184,17 +164,12 @@ var/list/admin_verbs_debug = list(
 	/client/proc/load_voyage_event,
 	/client/proc/load_battle_ship,
 	/client/proc/debug_variables_map,
+	/datum/admins/proc/subcom13_panel,
 	)
 
 var/list/admin_verbs_paranoid_debug = list(
-	/client/proc/callproc,
 	/client/proc/callproc_target,
 	/client/proc/debug_controller
-	)
-
-var/list/admin_verbs_possess = list(
-	/proc/possess,
-	/proc/release
 	)
 
 var/list/admin_verbs_permissions = list(
@@ -236,8 +211,7 @@ var/list/admin_verbs_hideable = list(
 	/datum/admins/proc/set_faction2_supply_points,
 	/client/proc/radiation_emission,
 	/client/proc/make_sound,
-	/client/proc/ToRban,
-	/datum/admins/proc/startnow,
+	/datum/admins/verb/startnow,
 	/datum/admins/proc/restart,
 	/datum/admins/proc/delay,
 	/datum/admins/proc/toggleaban,
@@ -246,9 +220,7 @@ var/list/admin_verbs_hideable = list(
 	/datum/admins/proc/adrev,
 	/datum/admins/proc/adspawn,
 	/datum/admins/proc/adjump,
-	/client/proc/restart_controller,
 	/client/proc/cmd_admin_list_open_jobs,
-	/client/proc/callproc,
 	/client/proc/callproc_target,
 	/client/proc/Debug2,
 	/client/proc/reload_admins,
@@ -261,18 +233,14 @@ var/list/admin_verbs_hideable = list(
 	/datum/admins/proc/persistent,
 	/datum/admins/proc/persistent_chad,
 //	/client/proc/roll_dices,
-	/proc/possess,
-	/proc/release
 	)
 var/list/admin_verbs_mod = list(
 	/client/proc/goto_adminzone,
 	/client/proc/who_invisimin,				//allows our mob to go invisible/visible in staffwho
 	/client/proc/cmd_admin_rejuvenate,
 	/client/proc/jumptocoord,			//we ghost and jump to a coordinate,
-	/client/proc/Jump,
 	/client/proc/jumptokey,				//allows us to jump to the location of a mob with a certain ckey,
 	/client/proc/jumptoturf,			//allows us to jump to a specific turf,
-	/client/proc/cmd_admin_pm_context,	// right-click adminPM interface,
 	/client/proc/cmd_admin_pm_panel,	// admin-pm list,
 	/client/proc/debug_variables,		// allows us to -see- the variables of any instance in the game.,
 	/datum/admins/proc/PlayerNotes,
@@ -285,19 +253,15 @@ var/list/admin_verbs_mod = list(
 	/client/proc/cmd_admin_subtle_message, // send an message to somebody as a 'voice in their head',
 	/datum/admins/proc/paralyze_mob,
 	/datum/admins/proc/punish,
-	/client/proc/admin_memo,			//admin memo system. show/delete/write. +SERVER needed to delete admin memos of others,
-	/client/proc/player_memo,
 	/client/proc/game_panel,			//game panel, allows to change game-mode etc,
 	/client/proc/toggle_respawn_delays,
 	/client/proc/see_battle_report,
 	/client/proc/show_battle_report,
-	/client/proc/quickBan_search,
 	/client/proc/quickBan_person,
 	/client/proc/toggle_right_click,
 )
 
 var/list/admin_verbs_mentor = list(
-	/client/proc/cmd_admin_pm_context,
 	/client/proc/cmd_admin_pm_panel,
 	/datum/admins/proc/PlayerNotes,
 	/client/proc/admin_ghost,
@@ -307,23 +271,38 @@ var/list/admin_verbs_mentor = list(
 )
 
 var/list/admin_verbs_manager = list(
-	/client/proc/toggle_BYOND_hub_visibility,
 	/client/proc/toggle_playing,
 	/client/proc/toggle_tts,
 	/client/proc/start_epochswap_vote,
 )
 
 var/list/admin_verbs_host = list(
-	/client/proc/toggle_pingability
+)
+
+var/list/admin_verbs_magic = list(
+	/datum/admins/proc/load_houses,
+	/datum/admins/proc/save_houses,
+	/datum/admins/proc/check_house,
+	/datum/admins/proc/add_to_house,
+	/datum/admins/proc/remove_from_house,
+	/datum/admins/proc/change_house,
+	/datum/admins/proc/check_level,
+	/datum/admins/proc/change_level,
+	/datum/admins/proc/set_house_points,
+	/datum/admins/proc/assign_moldy_man,
+	/datum/admins/proc/remove_moldy_man,
+	/datum/admins/proc/check_moldy_men,
+	/datum/admins/proc/award_sabotage_points,
+	/datum/admins/proc/check_sabotage_progress,
+	/datum/admins/proc/trigger_moldy_reveal,
 )
 
 /client/proc/add_admin_verbs()
 	if (holder)
-//		world << "[src] getting [holder]([holder.rights]) admin verbs."
+//		to_chat(world, "[src] getting [holder]([holder.rights]) admin verbs.")
 		verbs += admin_verbs_default
 	//	if (holder.rights & R_BUILDMODE)		verbs += /client/proc/togglebuildmodeself
 		if (holder.rights & R_ADMIN)			verbs += admin_verbs_admin
-		if (holder.rights & R_ADMIN)			verbs += admin_verbs_magic //magic lol
 		if (holder.rights & R_FUN)			verbs += admin_verbs_fun
 		if (holder.rights & R_SERVER)		verbs += admin_verbs_server
 		if (holder.rights & R_DEBUG)
@@ -354,7 +333,29 @@ var/list/admin_verbs_host = list(
 				/datum/admins/proc/persistent,
 				/datum/admins/proc/persistent_chad,
 			)
-
+		if(map && map.ID == MAP_WIZARD_BOY && (holder.rights & R_ADMIN))
+			verbs += list(
+				/datum/admins/proc/load_houses,
+				/datum/admins/proc/save_houses,
+				/datum/admins/proc/check_house,
+				/datum/admins/proc/add_to_house,
+				/datum/admins/proc/remove_from_house,
+				/datum/admins/proc/change_house,
+				/datum/admins/proc/check_level,
+				/datum/admins/proc/change_level,
+				/datum/admins/proc/set_house_points,
+				/datum/admins/proc/assign_moldy_man,
+				/datum/admins/proc/remove_moldy_man,
+				/datum/admins/proc/check_moldy_men,
+				/datum/admins/proc/award_sabotage_points,
+				/datum/admins/proc/check_sabotage_progress,
+				/datum/admins/proc/trigger_moldy_reveal,
+			)
+		if (map && map.ID == MAP_SUBCOM13 && (holder.rights & R_ADMIN))
+			verbs += list(
+				/datum/admins/proc/toggle_subcom_singleplayer,
+				/datum/admins/proc/subcom13_panel
+			)
 /client/proc/remove_admin_verbs()
 	verbs.Remove(
 		admin_verbs_default,
@@ -372,8 +373,8 @@ var/list/admin_verbs_host = list(
 		admin_verbs_spawn,
 		debug_verbs,
 		admin_verbs_manager,
-		admin_verbs_magic,
-		admin_verbs_host
+		admin_verbs_host,
+		admin_verbs_magic
 		)
 
 /client/proc/hide_most_verbs()//Allows you to keep some functionality while hiding some verbs
@@ -383,7 +384,7 @@ var/list/admin_verbs_host = list(
 	verbs.Remove(/client/proc/hide_most_verbs, admin_verbs_hideable)
 	verbs += /client/proc/show_verbs
 
-	src << "<span class='interface'>Most of your adminverbs have been hidden.</span>"
+	to_chat(src, "<span class='interface'>Most of your adminverbs have been hidden.</span>")
 
 	return
 
@@ -394,7 +395,7 @@ var/list/admin_verbs_host = list(
 	remove_admin_verbs()
 	verbs += /client/proc/show_verbs
 
-	src << "<span class='interface'>Almost all of your adminverbs have been hidden.</span>"
+	to_chat(src, "<span class='interface'>Almost all of your adminverbs have been hidden.</span>")
 
 	return
 
@@ -405,7 +406,7 @@ var/list/admin_verbs_host = list(
 	verbs -= /client/proc/show_verbs
 	add_admin_verbs()
 
-	src << "<span class='interface'>All of your adminverbs are now visible.</span>"
+	to_chat(src, "<span class='interface'>All of your adminverbs are now visible.</span>")
 
 
 /client/proc/admin_ghost()
@@ -420,13 +421,13 @@ var/list/admin_verbs_host = list(
 		if (ghost.can_reenter_corpse)
 			ghost.reenter_corpse()
 		else
-			ghost << "<font color='red'>Error:  Aghost:  Can't reenter corpse, mentors that use adminHUD while aghosting are not permitted to enter their corpse again.</font>"
+			to_chat(ghost, "<font color='red'>Error:  Aghost:  Can't reenter corpse, mentors that use adminHUD while aghosting are not permitted to enter their corpse again.</font>")
 			return
 
 
 
 	else if (istype(mob,/mob/new_player))
-		src << "<font color='red'>Error: Aghost: Can't admin-ghost whilst in the lobby. Join or Observe first.</font>"
+		to_chat(src, "<font color='red'>Error: Aghost: Can't admin-ghost whilst in the lobby. Join or Observe first.</font>")
 	else
 		//ghostize
 		if (ishuman(mob))
@@ -447,15 +448,15 @@ var/list/admin_verbs_host = list(
 	set desc = "Toggles ghost-like invisibility (Don't abuse this)"
 	if (holder && mob)
 		if (istype(mob, /mob/observer))
-			mob << "<span class = 'warning'>You're already invisible!</span>"
+			to_chat(mob, "<span class = 'warning'>You're already invisible!</span>")
 			return
 		if (mob.invisibility == INVISIBILITY_OBSERVER)
 			mob.invisibility = initial(mob.invisibility)
-			mob << "<span class = 'red'><b>Invisimin off. Invisibility reset.</b></span>"
+			to_chat(mob, "<span class = 'red'><b>Invisimin off. Invisibility reset.</b></span>")
 			mob.alpha = max(mob.alpha + 100, 255)
 		else
 			mob.invisibility = INVISIBILITY_OBSERVER
-			mob << "\green <b>Invisimin on. You are now as invisible as a ghost.</b>"
+			to_chat(mob, "\green <b>Invisimin on. You are now as invisible as a ghost.</b>")
 			mob.alpha = max(mob.alpha - 100, 0)
 
 /client/var/visible_in_who = TRUE
@@ -466,9 +467,9 @@ var/list/admin_verbs_host = list(
 	if (holder && mob)
 		visible_in_who = !visible_in_who
 		if (visible_in_who)
-			mob << "<span class = 'notice'>You are now <b>visible</b> in Staffwho.</span>"
+			to_chat(mob, "<span class = 'notice'>You are now <b>visible</b> in Staffwho.</span>")
 		else
-			mob << "<span class = 'notice'>You are <b>no longer visible</b> in Staffwho.</span>"
+			to_chat(mob, "<span class = 'notice'>You are <b>no longer visible</b> in Staffwho.</span>")
 
 /client/proc/player_panel()
 	set name = "Player Panel"
@@ -530,11 +531,11 @@ var/list/admin_verbs_host = list(
 	if (!check_rights(R_SPAWN))
 		return
 	if (!mob || !mob.loc)
-		src << "<span class = 'warning'>You can't drop a bomb here.</span>"
+		to_chat(src, "<span class = 'warning'>You can't drop a bomb here.</span>")
 		return
 
 	if (!processes.explosion || !processes.explosion.fires_at_gamestates.Find(ticker.current_state))
-		src << "<span class = 'warning'>You can't drop a bomb right now.</span>"
+		to_chat(src, "<span class = 'warning'>You can't drop a bomb right now.</span>")
 		return
 
 	var/turf/epicenter = mob.loc
@@ -556,7 +557,7 @@ var/list/admin_verbs_host = list(
 			var/flash_range = WWinput(src, "Flash range (in tiles):", "Drop Bomb", 1, "num")
 			if (max(devastation_range, heavy_impact_range, light_impact_range, flash_range) >= 10)
 				if (!check_rights(R_PERMISSIONS, 0))
-					src << "<span class = 'danger'>You need Manager+ permissions to drop a custom bomb this big.</span>"
+					to_chat(src, "<span class = 'danger'>You need Manager+ permissions to drop a custom bomb this big.</span>")
 					return
 			explosion(epicenter, devastation_range, heavy_impact_range, light_impact_range, flash_range)
 	message_admins("[key] creating an admin explosion at [epicenter.loc].", key)
@@ -568,11 +569,11 @@ var/list/admin_verbs_host = list(
 	if (!check_rights(R_SPAWN))
 		return
 	if (!mob || !mob.loc)
-		src << "<span class = 'warning'>You can't drop an airstrike here.</span>"
+		to_chat(src, "<span class = 'warning'>You can't drop an airstrike here.</span>")
 		return
 
 	if (!processes.explosion || !processes.explosion.fires_at_gamestates.Find(ticker.current_state))
-		src << "<span class = 'warning'>You can't drop an airstrike right now.</span>"
+		to_chat(src, "<span class = 'warning'>You can't drop an airstrike right now.</span>")
 		return
 
 	var/turf/epicenter = mob.loc
@@ -646,10 +647,10 @@ var/list/admin_verbs_host = list(
 	if (config)
 		if (config.log_hrefs)
 			config.log_hrefs = FALSE
-			src << "<b>Stopped logging hrefs</b>"
+			to_chat(src, "<b>Stopped logging hrefs</b>")
 		else
 			config.log_hrefs = TRUE
-			src << "<b>Started logging hrefs</b>"
+			to_chat(src, "<b>Started logging hrefs</b>")
 
 /client/proc/change_human_appearance_admin()
 	set name = "Change Mob Appearance - Admin"
@@ -676,7 +677,7 @@ var/list/admin_verbs_host = list(
 	if (!H) return
 
 	if (!H.client)
-		usr << "Only mobs with clients can alter their own appearance."
+		to_chat(usr, "Only mobs with clients can alter their own appearance.")
 		return
 
 	switch(WWinput(src, "Do you wish for [H] to be allowed to select whitelisted races?", "Alter Mob Appearance", "No", list("Yes","No","Cancel")))
@@ -707,7 +708,7 @@ var/list/admin_verbs_host = list(
 	var/mob/living/human/M = WWinput(src, "Select a mob.", "Edit Appearance", WWinput_first_choice(human_mob_list), WWinput_list_or_null(human_mob_list))
 
 	if (!istype(M, /mob/living/human))
-		usr << "<span class = 'red'>You can only do this to humans!</span>"
+		to_chat(usr, "<span class = 'red'>You can only do this to humans!</span>")
 		return
 
 	switch(WWinput(src, "Are you sure you wish to edit this mob's appearance?", "Edit Appearance", "Yes", list("Yes","No")))
@@ -773,7 +774,7 @@ var/list/admin_verbs_host = list(
 			if (J.current_positions >= J.total_positions && J.total_positions != -1)
 				jobs += J.title
 		if (!jobs.len)
-			usr << "There are no fully staffed jobs."
+			to_chat(usr, "There are no fully staffed jobs.")
 			return
 		var/job = input("Please select job slot to free", "Free job slot")  as null|anything in jobs
 		if (job)
@@ -810,7 +811,7 @@ var/global/list/global_colour_matrix = null
 		if("special")
 			global_colour_matrix = list()
 			var/global_colour_matrix_temp = list()
-			src << "<span class='notice'>Input num between 0 and 1.</span>"
+			to_chat(src, "<span class='notice'>Input num between 0 and 1.</span>")
 			for(var/i = 0, i <= 9, i++)
 				switch(i)
 					if(1)
@@ -838,10 +839,10 @@ var/global/list/global_colour_matrix = null
 	set category = "Server"
 
 	if (config.useapprovedlist == TRUE)
-		src << "Server is already \"Approved Only\"."
+		to_chat(src, "Server is already \"Approved Only\".")
 		return
 	if (!check_rights(R_ADMIN))
-		src << "<span class = 'danger'>You don't have the permissions.</span>"
+		to_chat(src, "<span class = 'danger'>You don't have the permissions.</span>")
 		return
 
 	var/conf_1 = input("Are you sure you wan't to restrict the server to Approved players?") in list ("Yes", "No")
@@ -855,10 +856,10 @@ var/global/list/global_colour_matrix = null
 	set category = "Server"
 
 	if (config.useapprovedlist == FALSE)
-		src << "Server is already open to everyone."
+		to_chat(src, "Server is already open to everyone.")
 		return
 	if (!check_rights(R_ADMIN))
-		src << "<span class = 'danger'>You don't have the permissions.</span>"
+		to_chat(src, "<span class = 'danger'>You don't have the permissions.</span>")
 		return
 
 	var/conf_1 = input("Are you sure you wan't to open the server to everyone?") in list ("Yes", "No")
@@ -872,10 +873,10 @@ var/global/list/global_colour_matrix = null
 	set category = "Server"
 
 	if (config.use_job_whitelist == TRUE)
-		src << "Whitelisted Jobs are already restricted."
+		to_chat(src, "Whitelisted Jobs are already restricted.")
 		return
 	if (!check_rights(R_ADMIN))
-		src << "<span class = 'danger'>You don't have the permissions.</span>"
+		to_chat(src, "<span class = 'danger'>You don't have the permissions.</span>")
 		return
 
 	var/conf_1 = input("Are you sure you wan't to restrict the whitelisted jobs to whitelisted players?") in list ("Yes", "No")
@@ -890,10 +891,10 @@ var/global/list/global_colour_matrix = null
 	set category = "Server"
 
 	if (config.use_job_whitelist == FALSE)
-		src << "Whitelisted jobs are already open to everyone."
+		to_chat(src, "Whitelisted jobs are already open to everyone.")
 		return
 	if (!check_rights(R_ADMIN))
-		src << "<span class = 'danger'>You don't have the permissions.</span>"
+		to_chat(src, "<span class = 'danger'>You don't have the permissions.</span>")
 		return
 
 	var/conf_1 = input("Are you sure you wan't to open the whitelisted jobs to everyone?") in list ("Yes", "No")
@@ -904,32 +905,49 @@ var/global/list/global_colour_matrix = null
 		config.use_job_whitelist = FALSE
 
 
+/client/proc/disable_campaign_whitelist()
+	set name = "Disable Campaign Whitelist"
+	set category = "Server"
+
+	if (!check_rights(R_ADMIN))
+		to_chat(src, "<span class = 'danger'>You don't have the permissions.</span>")
+		return
+
+	var/new_state = !disable_campaign_whitelist
+	var/conf_1 = input("Are you sure you want to [new_state ? "enable" : "disable"] unrestricted campaign joining?") in list ("Yes", "No")
+	if (conf_1 != "Yes")
+		return
+	else
+		disable_campaign_whitelist = new_state
+		to_chat(world, "<font size=3>Campaign faction whitelist has been <b>[new_state ? "disabled" : "enabled"]</b>. Anyone can now [new_state ? "pick their campaign faction." : "only join as whitelisted factions."]</font>")
+
+
 /client/proc/enable_fov()
 	set name = "Enable FOV"
 	set category = "Special"
 
 	if (config.disable_fov == FALSE)
-		src << "Field of View mechanic is already enabled."
+		to_chat(src, "Field of View mechanic is already enabled.")
 		return
 	if (!check_rights(R_ADMIN))
-		src << "<span class = 'danger'>You don't have the permissions.</span>"
+		to_chat(src, "<span class = 'danger'>You don't have the permissions.</span>")
 		return
 
 	config.disable_fov = FALSE
-	world << "<font size = 3>Fields of view are now <b>enabled</b>.</font>"
+	to_chat(world, "<font size = 3>Fields of view are now <b>enabled</b>.</font>")
 	return
 /client/proc/disable_fov()
 	set name = "Disable FOV"
 	set category = "Special"
 
 	if (config.disable_fov == TRUE)
-		src << "Field of View mechanic is already disabled."
+		to_chat(src, "Field of View mechanic is already disabled.")
 		return
 	if (!check_rights(R_ADMIN))
-		src << "<span class = 'danger'>You don't have the permissions.</span>"
+		to_chat(src, "<span class = 'danger'>You don't have the permissions.</span>")
 		return
 	config.disable_fov = TRUE
-	world << "<font size = 3>Fields of view are now <b>disabled</b>.</font>"
+	to_chat(world, "<font size = 3>Fields of view are now <b>disabled</b>.</font>")
 	return
 
 
@@ -938,7 +956,7 @@ var/global/list/global_colour_matrix = null
 	set category = "Special"
 
 	if (!check_rights(R_ADMIN))
-		src << "<span class = 'danger'>You don't have the permissions.</span>"
+		to_chat(src, "<span class = 'danger'>You don't have the permissions.</span>")
 		return
 	var/count=0
 	for(var/mob/living/human/H in world)
@@ -956,11 +974,11 @@ var/global/list/global_colour_matrix = null
 	if (!check_rights(R_SPAWN))
 		return
 	if (!mob || !mob.loc)
-		src << "<span class = 'warning'>You can't create a radiation emission here.</span>"
+		to_chat(src, "<span class = 'warning'>You can't create a radiation emission here.</span>")
 		return
 
 	if (!processes.explosion || !processes.explosion.fires_at_gamestates.Find(ticker.current_state))
-		src << "<span class = 'warning'>You can't create a radiation emission now.</span>"
+		to_chat(src, "<span class = 'warning'>You can't create a radiation emission now.</span>")
 		return
 
 	var/turf/epicenter = mob.loc
@@ -988,23 +1006,23 @@ var/global/list/global_colour_matrix = null
 	var/warning = input("Do you want to give a 30 second warning before the nuke hits?") in list ("Yes", "No")
 
 	if (!mob || !mob.loc)
-		src << "<span class = 'warning'>You can't create a radiation emission here.</span>"
+		to_chat(src, "<span class = 'warning'>You can't create a radiation emission here.</span>")
 		return
 
 	if (!processes.explosion || !processes.explosion.fires_at_gamestates.Find(ticker.current_state))
-		src << "<span class = 'warning'>You can't create a radiation emission now.</span>"
+		to_chat(src, "<span class = 'warning'>You can't create a radiation emission now.</span>")
 		return
 
 	var/turf/epicenter = mob.loc
 	var/warningtimer = 5
 	if (warning == "Yes")
-		world << "<font size=3 color='red'><center>ATTENTION<br>A nuclear missile is incoming! Take cover!</center></font>"
+		to_chat(world, "<font size=3 color='red'><center>ATTENTION<br>A nuclear missile is incoming! Take cover!</center></font>")
 		var/warning_sound = sound('sound/misc/siren.ogg', repeat = FALSE, wait = TRUE, channel = 777)
 		for (var/mob/M in player_list)
 			M.client << warning_sound
 		warningtimer = 330
 	spawn(warningtimer)
-		world << "<font size=4 color='red'>A nuclear explosion has happened! <br><i>(Game might freeze/lag for a while while processing, please wait)</i></font>"
+		to_chat(world, "<font size=4 color='red'>A nuclear explosion has happened! <br><i>(Game might freeze/lag for a while while processing, please wait)</i></font>")
 		nuke_map(epicenter, 200, 180, 0)
 		message_admins("[key] nuked the map at ([epicenter.x],[epicenter.y],[epicenter.z]) in area [epicenter.loc.name].", key)
 		log_game("[key] nuked the map at ([epicenter.x],[epicenter.y],[epicenter.z]) in area [epicenter.loc.name].")

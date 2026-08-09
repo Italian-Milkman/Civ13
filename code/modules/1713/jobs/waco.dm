@@ -2,10 +2,10 @@
 /datum/job/american/atf_lieutenant
 	title = "ATF Lieutenant"
 	rank_abbreviation = "Lt."
+	allowed_maps = list(MAP_WACO)
 
 	spawn_location = "JoinLateJPCap"
 
-	is_waco = TRUE
 	is_officer = TRUE
 	is_commander = TRUE
 	whitelisted = TRUE
@@ -50,10 +50,10 @@
 /datum/job/american/atf_sergeant
 	title = "ATF Sergeant"
 	rank_abbreviation = "Sgt."
+	allowed_maps = list(MAP_WACO)
 
 	spawn_location = "JoinLateJP"
 
-	is_waco = TRUE
 	is_squad_leader = TRUE
 	uses_squads = TRUE
 	is_radioman = TRUE
@@ -103,10 +103,10 @@
 /datum/job/american/atf_soldier
 	title = "ATF Agent"
 	rank_abbreviation = "Agent"
+	allowed_maps = list(MAP_WACO)
 
 	spawn_location = "JoinLateJP"
 
-	is_waco = TRUE
 
 	uses_squads = TRUE
 	can_be_female = TRUE
@@ -155,62 +155,14 @@
 	H.setStat("machinegun", STAT_MEDIUM_LOW)
 	return TRUE
 
-	/*
-//////////SPECIAL ATF//////////
-/datum/job/american/negotiator
-	title = "ATF Negotiator"
-	rank_abbreviation = "Agent"
-
-	spawn_location = "JoinLateNegotiator"
-
-	is_waco = TRUE
-	whitelisted = TRUE
-	can_be_female = TRUE
-
-	min_positions = 1
-	max_positions = 2
-
-/datum/job/american/negotiator/equip(var/mob/living/human/H)
-	if (!H)	return FALSE
-//shoes
-	H.equip_to_slot_or_del(new /obj/item/clothing/shoes/jackboots(H), slot_shoes)
-
-//clothes
-	H.equip_to_slot_or_del(new /obj/item/clothing/under/modern2(H), slot_w_uniform)
-	H.equip_to_slot_or_del(new /obj/item/clothing/suit/storage/atf(H), slot_wear_suit)
-//head
-	H.equip_to_slot_or_del(new /obj/item/clothing/head/cap/atf(H), slot_head)
-	H.equip_to_slot_or_del(new /obj/item/clothing/glasses/sunglasses(H), slot_eyes)
-
-	H.equip_to_slot_or_del(new /obj/item/weapon/radio/walkietalkie/faction2(H), slot_wear_id)
-	H.equip_to_slot_or_del(new /obj/item/weapon/gun/projectile/pistol/m9beretta(H), slot_l_hand)
-	var/obj/item/clothing/under/uniform = H.w_uniform
-	var/obj/item/clothing/accessory/armor/coldwar/plates/interceptor/armor = new /obj/item/clothing/accessory/armor/coldwar/plates/interceptor(null)
-	uniform.attackby(armor, H)
-	var/obj/item/clothing/accessory/holster/hip/holsterh = new /obj/item/clothing/accessory/holster/hip(null)
-	uniform.attackby(holsterh, H)
-	give_random_name(H)
-	H.civilization = "ATF"
-	H.add_note("Role", "You are a <b>[title]</b>, a ATF Negotiator tasked with calming the branch davidian leader to prevent any deaths.")
-	H.setStat("strength", STAT_NORMAL)
-	H.setStat("crafting", STAT_MEDIUM_LOW)
-	H.setStat("rifle", STAT_MEDIUM_LOW)
-	H.setStat("dexterity", STAT_NORMAL)
-	H.setStat("swords", STAT_MEDIUM_LOW)
-	H.setStat("pistol", STAT_MEDIUM_LOW)
-	H.setStat("bows", STAT_NORMAL)
-	H.setStat("medical", STAT_MEDIUM_LOW)
-	H.setStat("machinegun", STAT_MEDIUM_LOW)
-	return TRUE
-*/
 /datum/job/american/atf_medic
 	title = "ATF Medic"
 	rank_abbreviation = "Medic"
+	allowed_maps = list(MAP_WACO)
 
 	spawn_location = "JoinLateJPDoc"
 
 	is_medic = TRUE
-	is_waco = TRUE
 	can_be_female = TRUE
 
 	min_positions = 2
@@ -258,9 +210,9 @@
 	title = "Messiah"
 	en_meaning = ""
 	rank_abbreviation = "Great Prophet"
+	allowed_maps = list(MAP_WACO)
 
 	spawn_location = "JoinLateRUCap"
-	is_waco = TRUE
 	is_commander = TRUE
 	whitelisted = TRUE
 	can_be_female = FALSE
@@ -323,8 +275,8 @@
 	spawn_location = "JoinLateRU"
 	min_positions = 10
 	max_positions = 150
-	is_waco = TRUE
 	can_be_female = TRUE
+	allowed_maps = list(MAP_WACO)
 
 /datum/job/civilian/believer/equip(var/mob/living/human/H)
 	if (!H)	return FALSE
@@ -395,8 +347,8 @@
 	spawn_location = "JoinLateRU"
 	min_positions = 10
 	max_positions = 150
-	is_waco = TRUE
 	can_be_female = TRUE
+	allowed_maps = list(MAP_WACO)
 
 /datum/job/civilian/disciple/equip(var/mob/living/human/H)
 	if (!H)	return FALSE
@@ -470,11 +422,11 @@
 	title = "Healer"
 	en_meaning = ""
 	rank_abbreviation = "Healer"
+	allowed_maps = list(MAP_WACO)
 
 	spawn_location = "JoinLateRUDoc"
 
 	is_medic = TRUE
-	is_waco = TRUE
 
 	min_positions = 3
 	max_positions = 10

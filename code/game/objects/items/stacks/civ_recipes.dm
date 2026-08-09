@@ -62,7 +62,7 @@
 					current_res = map.civb_research
 			if (user.s_tone <= -175 && map.ID == MAP_NOMADS_AFRICA)
 				faction = "pygmy"
-			generate_recipes_civs(current_res,faction)
+			generate_recipes_civs(current_res, faction, user ? user.civilization : null)
 		else
 			var/list/current_res = list(0,0,0)
 			if (map)
@@ -90,18 +90,38 @@
 					current_res = map.custom_civs[user.civilization]
 			if (map && map.override_global_recipes != "global")
 				faction = map.override_global_recipes
-			generate_recipes_civs(current_res,faction)
+			generate_recipes_civs(current_res, faction, user ? user.civilization : null)
 	return recipes
 
-/material/proc/generate_recipes_civs(var/list/current_res = list(0,0,0), faction = "global")
+/material/proc/generate_recipes_civs(var/list/current_res = list(0,0,0), faction = "global", research_faction = null)
 
 	recipes = list()
 	var/chosen_list = craftlist_lists[faction]
-	if (hardness>=40 && current_res[1] > 8 && (map && map.ID != MAP_GULAG13))
+	if (hardness>=40 && current_res[1] > 8 && (map && map.ID != MAP_GULAG13 && map.ID != MAP_BAGNE13))
 		recipes += new/datum/stack_recipe("[display_name] fork", /obj/item/weapon/material/kitchen/utensil/fork, TRUE, _on_floor = TRUE, _supplied_material = "[name]")
 		recipes += new/datum/stack_recipe("[display_name] spoon", /obj/item/weapon/material/kitchen/utensil/spoon, TRUE, _on_floor = TRUE, _supplied_material = "[name]")
 	for(var/i in chosen_list)
-		if(i[1]== "[type]/" && current_res[1]>=text2num(i[9]) && current_res[2]>=text2num(i[10]) && current_res[3]>=text2num(i[11]) && map && map.ordinal_age <= text2num(i[12]))
+		// The legacy flat-research structures are dead crafts under the default
+		// research-tree mode -- only surface them in the specific game modes that
+		// still use them (Resource-Based Research feeds items to the research desk;
+		// Chad Mode + sacrifices at the altar of chad).
+		if (i[3] == "/obj/structure/researchdesk" && !(map && map.resourceresearch))
+			continue
+		if (i[3] == "/obj/structure/researchdesk/chad" && !(map && map.chad_mode_plus))
+			continue
+		// A recipe mapped to a research node gates on that node being DONE for
+		// the faction; otherwise it keeps the legacy research-threshold check.
+		// Era gating (i[12]) applies in both cases.
+		var/node_req = get_recipe_node_req(i[3])
+		var/research_allowed
+		// is_node_done handles a null/"none" faction fine (baseline-era grants
+		// don't depend on faction), so factionless players get their era's
+		// baseline nodes here instead of falling back to legacy thresholds.
+		if (node_req && map)
+			research_allowed = map.is_node_done(research_faction, node_req)
+		else
+			research_allowed = (current_res[1]>=text2num(i[9]) && current_res[2]>=text2num(i[10]) && current_res[3]>=text2num(i[11]))
+		if(i[1]== "[type]/" && research_allowed && map && map.ordinal_age <= text2num(i[12]))
 			var/supmat = i[13]
 			if (supmat == "null")
 				supmat = null
@@ -132,10 +152,10 @@ datum/admins/proc/print_crafting_recipes()
 			matlist |= matname
 		matlist = sortTim(matlist,/proc/cmp_text_asc,FALSE)
 		for (var/m in matlist)
-			recipe_list <<"## [m]"
-			recipe_list <<"\n"
-			recipe_list <<"| Item | Cost| Material | Category | Research Needed | Available Until |"
-			recipe_list <<"| -------- | ---- | ---------- | -------- | ------------------------- | ------------------------------- |"
+			to_chat(recipe_list, "## [m]")
+			to_chat(recipe_list, "\n")
+			to_chat(recipe_list, "| Item | Cost| Material | Category | Research Needed | Available Until |")
+			to_chat(recipe_list, "| -------- | ---- | ---------- | -------- | ------------------------- | ------------------------------- |")
 			for (var/i in craftlist_lists["global"])
 				var/matname = replacetext(i[1], "/material/", "")
 				matname = replacetext(matname, "/", "")
@@ -181,7 +201,7 @@ datum/admins/proc/print_crafting_recipes()
 						requirements = "[requirements] research points."
 					var/crafting_print_var = "| [i[2]] | [i[4]] | [matname] | [subcategory] | [requirements] | Available until [av_age]. |"
 					recipe_list << crafting_print_var
-			recipe_list <<"\n"
+			to_chat(recipe_list, "\n")
 		world.log << "Finished saving all crafting recipes into \"recipes.txt\" with Wiki format."
 	else
 		for (var/i in craftlist_lists["global"])

@@ -10,6 +10,7 @@
 	title = "Pirate Captain"
 	en_meaning = "Ship Captain"
 	rank_abbreviation = "Captain"
+	allowed_maps = list(MAP_SKULLISLAND, MAP_NAVAL)
 
 	is_1713 = TRUE
 	spawn_location = "JoinLatePirateCap"
@@ -35,7 +36,7 @@
 
 	H.equip_to_slot_or_del(new /obj/item/weapon/attachment/scope/adjustable/binoculars(H), slot_l_store)
 	H.equip_to_slot_or_del(new /obj/item/weapon/material/sword/spadroon(H), slot_belt)
-	world << "<b><big>[H.real_name] is the Captain of the Pirate ship!</big></b>"
+	to_chat(world, "<big><b>[H.real_name] is the Captain of the Pirate ship!</b></big>")
 	H.add_note("Role", "You are a <b>[title]</b>, the highest ranking officer present. Your job is to command the ship.")
 	H.setStat("strength", STAT_MEDIUM_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -59,6 +60,7 @@
 	is_officer = TRUE
 	whitelisted = TRUE
 	can_be_female = TRUE
+	allowed_maps = list(MAP_SKULLISLAND, MAP_NAVAL)
 
 	min_positions = 1
 	max_positions = 1
@@ -75,7 +77,7 @@
 	H.equip_to_slot_or_del(new /obj/item/clothing/head/piratehat(H), slot_head)
 
 	H.equip_to_slot_or_del(new /obj/item/weapon/material/sword/spadroon(H), slot_belt)
-	world << "<b><big>[H.real_name] is the Quartermaster of the Pirate ship!</big></b>"
+	to_chat(world, "<big><b>[H.real_name] is the Quartermaster of the Pirate ship!</b></big>")
 	H.add_note("Role", "You are a <b>[title]</b>, an officer in charge of the ship's supply allocation. You are also the second in command, after the <b>Captain</b>.")
 	H.setStat("strength", STAT_MEDIUM_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -94,6 +96,7 @@
 	en_meaning = "Head of Personnel Officer"
 	rank_abbreviation = "Boatswain"
 	is_1713 = TRUE
+	allowed_maps = list(MAP_SKULLISLAND, MAP_NAVAL)
 
 	spawn_location = "JoinLatePirateBoatswain"
 	whitelisted = TRUE
@@ -118,7 +121,7 @@
 
 	H.equip_to_slot_or_del(new /obj/item/weapon/attachment/scope/adjustable/binoculars(H), slot_l_store)
 	H.equip_to_slot_or_del(new /obj/item/weapon/material/sword/spadroon(H), slot_belt)
-	world << "<b><big>[H.real_name] is the Boatswain of the Pirate ship!</big></b>"
+	to_chat(world, "<big><b>[H.real_name] is the Boatswain of the Pirate ship!</b></big>")
 	H.add_note("Role", "You are a <b>[title]</b>, an officer in charge of the crew and their job allocation. The whole ship relies on you!")
 	H.setStat("strength", STAT_MEDIUM_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -140,6 +143,7 @@
 	spawn_location = "JoinLatePirateMidshipman"
 	is_officer = TRUE
 	can_be_female = TRUE
+	allowed_maps = list(MAP_SKULLISLAND, MAP_NAVAL)
 
 
 	min_positions = 1
@@ -179,6 +183,7 @@
 	is_medic = TRUE
 	min_positions = 1
 	max_positions = 10
+	allowed_maps = list(MAP_SKULLISLAND, MAP_VOYAGE, MAP_NAVAL)
 
 /datum/job/pirates/surgeon/equip(var/mob/living/human/H)
 	if (!H)	return FALSE
@@ -214,6 +219,7 @@
 	is_1713 = TRUE
 	spawn_location = "JoinLatePirateCarpenter"
 	can_be_female = TRUE
+	allowed_maps = list(MAP_SKULLISLAND, MAP_NAVAL)
 
 
 	min_positions = 1
@@ -266,6 +272,7 @@
 	is_1713 = TRUE
 	spawn_location = "JoinLatePirateCook"
 	can_be_female = TRUE
+	allowed_maps = list(MAP_SKULLISLAND, MAP_NAVAL)
 
 
 	min_positions = 1
@@ -322,6 +329,7 @@
 	is_1713 = TRUE
 	spawn_location = "JoinLatePirate"
 	can_be_female = TRUE
+	allowed_maps = list(MAP_SKULLISLAND, MAP_VOYAGE, MAP_NAVAL)
 
 
 	min_positions = 6
@@ -390,6 +398,7 @@
 	title = "Battle Royale Fighter"
 	en_meaning = ""
 	rank_abbreviation = ""
+	allowed_maps = list(MAP_BATTLEROYALE_IMPERIAL)
 
 	spawn_location = "JoinLateDM"
 
@@ -465,7 +474,7 @@
 	title = "Medieval Battle Royale Fighter"
 	en_meaning = ""
 	rank_abbreviation = ""
-
+	allowed_maps = list(MAP_BATTLEROYALE_MEDIEVAL)
 	spawn_location = "JoinLateDM"
 
 	is_deathmatch = TRUE
@@ -524,9 +533,9 @@
 	rank_abbreviation = ""
 
 	spawn_location = "JoinLateDM"
+	allowed_maps = list(MAP_BATTLEROYALE_MODERN)
 
 	is_deathmatch = TRUE
-	is_modernday = TRUE
 
 	can_be_female = TRUE
 	min_positions = 0
@@ -600,8 +609,7 @@
 	spawn_location = "JoinLateDM"
 
 	is_deathmatch = TRUE
-	is_cowboy = TRUE
-
+	allowed_maps = list(MAP_BATTLEROYALE_WILDWEST)
 	can_be_female = TRUE
 	min_positions = 0
 	max_positions = 0
@@ -690,7 +698,7 @@
 
 	spawn_location = "JoinLatePirate"
 
-	is_marooned = TRUE
+	allowed_maps = list(MAP_HUNT)
 	can_be_female = TRUE
 
 	min_positions = 60

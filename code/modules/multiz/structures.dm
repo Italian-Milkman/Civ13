@@ -97,12 +97,12 @@
 /obj/structure/multiz/ladder/attack_hand(var/mob/M)
 
 	if (M.restrained())
-		M << "<span class='warning'>You can't use \the [src] while you're restrained.</span>"
+		to_chat(M, "<span class='warning'>You can't use \the [src] while you're restrained.</span>")
 		return
 
 	if (!target || !istype(target.loc, /turf))
 		if (!istype(src, /obj/structure/multiz/ladder/ww2/tunneltop) && !istype(src, /obj/structure/multiz/ladder/ww2/tunnelbottom) && !istype(src, /obj/structure/multiz/ladder/ww2) && !istype(src, /obj/structure/multiz/ladder/ww2/up) && !istype(src, /obj/structure/multiz/ladder/ww2/stairsdown) && !istype(src, /obj/structure/multiz/ladder/ww2/stairsup))
-			M << "<span class='notice'>\The [src] is incomplete and can't be climbed.</span>"
+			to_chat(M, "<span class='notice'>\The [src] is incomplete and can't be climbed.</span>")
 			return
 
 	M.visible_message(
@@ -112,6 +112,11 @@
 	)
 
 	if (do_after(M, 10, src))
+		M.visible_message(
+			"<span class='notice'>\A [M] climbs [istop ? "down" : "up"] \a [src].</span>",
+			"<span class='notice'>You climb [istop ? "down" : "up"] \the [src].</span>",
+			"You hear the grunting and clanging of a metal ladder being used."
+		)
 		playsound(loc, 'sound/effects/ladder.ogg', 50, TRUE, -1)
 		// pulling/grabbing people with you
 		if (istop)
@@ -136,11 +141,6 @@
 			for (var/obj/item/I in M)
 				I.update_light()
 			return
-		M.visible_message(
-			"<span class='notice'>\A [M] climbs [istop ? "down" : "up"] \a [src].</span>",
-			"<span class='notice'>You climb [istop ? "down" : "up"] \the [src].</span>",
-			"You hear the grunting and clanging of a metal ladder being used."
-		)
 
 /mob/living/human/var/laddervision = null
 
@@ -232,7 +232,7 @@
 	if (istype(M, /mob/living/human))
 		var/mob/living/human/H = M
 		if (H.faction_text != "CHECHEN")
-			H << "You can't figure out the hatch!"
+			to_chat(H, "You can't figure out the hatch!")
 			return
 		else
 			..()
@@ -249,7 +249,7 @@
 	if (istype(M, /mob/living/human))
 		var/mob/living/human/H = M
 		if (H.faction_text != "CHECHEN")
-			H << "You can't figure out the hatch!"
+			to_chat(H, "You can't figure out the hatch!")
 			return
 		else
 			..()
@@ -283,7 +283,7 @@
 	if (istype(M, /mob/living/human))
 		var/mob/living/human/H = M
 		if (H.faction_text != "VIETNAMESE" && H.original_job_title != "USA Commando" && H.faction_text != "JAPANESE")
-			H << "This tunnel is too small for you!"
+			to_chat(H, "This tunnel is too small for you!")
 			return
 		else
 			..()
@@ -298,7 +298,7 @@
 	if (istype(M, /mob/living/human))
 		var/mob/living/human/H = M
 		if (H.faction_text != "CHINESE")
-			H << "This tunnel is too small for you!"
+			to_chat(H, "This tunnel is too small for you!")
 			return
 		else
 			..()
@@ -315,7 +315,7 @@
 	if (istype(M, /mob/living/human))
 		var/mob/living/human/H = M
 		if (H.faction_text != "VIETNAMESE" && H.original_job_title != "USA Commando" && H.faction_text != "JAPANESE")
-			H << "This tunnel is too small for you!"
+			to_chat(H, "This tunnel is too small for you!")
 			return
 		else
 			..()
@@ -326,7 +326,7 @@
 	if (istype(M, /mob/living/human))
 		var/mob/living/human/H = M
 		if (H.faction_text != "CHINESE")
-			H << "This tunnel is too small for you!"
+			to_chat(H, "This tunnel is too small for you!")
 			return
 		else
 			..()
@@ -373,12 +373,12 @@
 /obj/structure/multiz/ladder/ww2/teleporter/attack_hand(var/mob/M)
 
 	if (M.restrained())
-		M << "<span class='warning'>You can't use \the [src] while you're restrained.</span>"
+		to_chat(M, "<span class='warning'>You can't use \the [src] while you're restrained.</span>")
 		return
 
 	if (!target || !istype(target.loc, /turf))
 		if (!istype(src, /obj/structure/multiz/ladder/ww2/tunneltop) && !istype(src, /obj/structure/multiz/ladder/ww2/tunnelbottom) && !istype(src, /obj/structure/multiz/ladder/ww2) && !istype(src, /obj/structure/multiz/ladder/ww2/up) && !istype(src, /obj/structure/multiz/ladder/ww2/stairsdown) && !istype(src, /obj/structure/multiz/ladder/ww2/stairsup))
-			M << "<span class='notice'>\The [src] is incomplete and can't be climbed.</span>"
+			to_chat(M, "<span class='notice'>\The [src] is incomplete and can't be climbed.</span>")
 			return
 
 	M.visible_message(
@@ -393,13 +393,12 @@
 		if (M.pulling != null)
 			M.pulling.loc = target.loc
 		M.loc = target.loc
-		return
-
 		M.visible_message(
 			"<span class='notice'>\A [M] climbs [istop ? "down" : "up"] \a [src].</span>",
 			"<span class='notice'>You climb [istop ? "down" : "up"] \the [src].</span>",
 			"You hear the grunting and clanging of a metal ladder being used."
 		)
+		return
 
 /obj/structure/multiz/ladder/ww2/teleporter/one
 	area_id = "1"

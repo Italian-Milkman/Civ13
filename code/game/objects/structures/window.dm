@@ -16,7 +16,6 @@
 	var/state = 2
 	var/reinf = FALSE
 	var/basestate
-	var/shardtype = /obj/item/weapon/material/shard
 	var/glasstype = null // Set this in subtypes. Null is assumed strange or otherwise impossible to dismantle, such as for shuttle glass.
 	var/silicate = FALSE // number of units of silicate
 	not_movable = FALSE
@@ -27,24 +26,24 @@
 	if (istype(src, /obj/structure/window/barrier))
 		return
 	if (health == maxhealth)
-		user << "<span class='notice'>It looks fully intact.</span>"
+		to_chat(user, "<span class='notice'>It looks fully intact.</span>")
 	else
 		var/perc = health / maxhealth
 		if (perc > 0.75)
-			user << "<span class='notice'>It has a few cracks.</span>"
+			to_chat(user, "<span class='notice'>It has a few cracks.</span>")
 		else if (perc > 0.5)
-			user << "<span class='warning'>It looks slightly damaged.</span>"
+			to_chat(user, "<span class='warning'>It looks slightly damaged.</span>")
 		else if (perc > 0.25)
-			user << "<span class='warning'>It looks moderately damaged.</span>"
+			to_chat(user, "<span class='warning'>It looks moderately damaged.</span>")
 		else
-			user << "<span class='danger'>It looks heavily damaged.</span>"
+			to_chat(user, "<span class='danger'>It looks heavily damaged.</span>")
 	if (silicate)
 		if (silicate < 30)
-			user << "<span class='notice'>It has a thin layer of silicate.</span>"
+			to_chat(user, "<span class='notice'>It has a thin layer of silicate.</span>")
 		else if (silicate < 70)
-			user << "<span class='notice'>It is covered in silicate.</span>"
+			to_chat(user, "<span class='notice'>It is covered in silicate.</span>")
 		else
-			user << "<span class='notice'>There is a thick layer of silicate covering it.</span>"
+			to_chat(user, "<span class='notice'>There is a thick layer of silicate covering it.</span>")
 
 /obj/structure/window/proc/take_damage(var/damage = 0,  var/sound_effect = TRUE)
 	var/initialhealth = health
@@ -278,22 +277,22 @@
 			state = 3 - state
 			update_nearby_icons()
 			playsound(loc, 'sound/items/Screwdriver.ogg', 75, TRUE)
-			user << (state == TRUE ? "<span class='notice'>You have unfastened the window from the frame.</span>" : "<span class='notice'>You have fastened the window to the frame.</span>")
+			to_chat(user, (state == TRUE ? "<span class='notice'>You have unfastened the window from the frame.</span>" : "<span class='notice'>You have fastened the window to the frame.</span>"))
 		else if (reinf && state == FALSE)
 			set_anchored(!anchored)
 			playsound(loc, 'sound/items/Screwdriver.ogg', 75, TRUE)
-			user << (anchored ? "<span class='notice'>You have fastened the frame to the floor.</span>" : "<span class='notice'>You have unfastened the frame from the floor.</span>")
+			to_chat(user, (anchored ? "<span class='notice'>You have fastened the frame to the floor.</span>" : "<span class='notice'>You have unfastened the frame from the floor.</span>"))
 		else if (!reinf)
 			set_anchored(!anchored)
 			playsound(loc, 'sound/items/Screwdriver.ogg', 75, TRUE)
-			user << (anchored ? "<span class='notice'>You have fastened the window to the floor.</span>" : "<span class='notice'>You have unfastened the window.</span>")
+			to_chat(user, (anchored ? "<span class='notice'>You have fastened the window to the floor.</span>" : "<span class='notice'>You have unfastened the window.</span>"))
 	else if (istype(W, /obj/item/weapon/crowbar) && reinf && state <= 1)
 		state = TRUE - state
 		playsound(loc, 'sound/items/Crowbar.ogg', 75, TRUE)
-		user << (state ? "<span class='notice'>You have pried the window into the frame.</span>" : "<span class='notice'>You have pried the window out of the frame.</span>")
+		to_chat(user, (state ? "<span class='notice'>You have pried the window into the frame.</span>" : "<span class='notice'>You have pried the window out of the frame.</span>"))
 	else if (istype(W, /obj/item/weapon/hammer) && !anchored && (!state || !reinf))
 		if (!glasstype)
-			user << "<span class='notice'>You're not sure how to dismantle \the [src] properly.</span>"
+			to_chat(user, "<span class='notice'>You're not sure how to dismantle \the [src] properly.</span>")
 		else
 			playsound(loc, 'sound/items/Ratchet.ogg', 75, TRUE)
 			visible_message("<span class='notice'>[user] dismantles \the [src].</span>")
@@ -331,7 +330,7 @@
 		return FALSE
 
 	if (anchored)
-		usr << "It is fastened to the floor therefore you can't rotate it!"
+		to_chat(usr, "It is fastened to the floor therefore you can't rotate it!")
 		return FALSE
 
 	set_dir(turn(dir, 90))
@@ -347,7 +346,7 @@
 		return FALSE
 
 	if (anchored)
-		usr << "It is fastened to the floor therefore you can't rotate it!"
+		to_chat(usr, "It is fastened to the floor therefore you can't rotate it!")
 		return FALSE
 
 
@@ -450,7 +449,6 @@
 	flammable = TRUE
 	not_movable = FALSE
 	not_disassemblable = FALSE
-	var/windowglass
 	var/stucco_window = TRUE
 	icon = 'icons/obj/windows.dmi'
 /obj/structure/window_frame/abashiri
@@ -703,24 +701,24 @@
 /obj/structure/window_frame/attackby(obj/item/W as obj, mob/user as mob)
 	if (istype(W, /obj/item/weapon/stucco/generic) && (stucco_window))
 		if (!istype(src, /obj/structure/window_frame/stonefull) && !istype(src, /obj/structure/window_frame/stone))
-			user << "You start adding stucco to the wood window frame..."
+			to_chat(user, "You start adding stucco to the wood window frame...")
 			if (do_after(user, 20, src))
-				user << "You finish adding stucco to the wood window frame, rendering over it."
+				to_chat(user, "You finish adding stucco to the wood window frame, rendering over it.")
 				new /obj/structure/window_frame/redearth(loc)
 				qdel(W)
 				qdel(src)
 	if (istype(W, /obj/item/weapon/stucco/roman) && (stucco_window))
 		if (istype(src, /obj/structure/window_frame/stone))
-			user << "You start adding roman stucco to the stone window..."
+			to_chat(user, "You start adding roman stucco to the stone window...")
 			if (do_after(user, 20, src))
-				user << "You finish adding roman stucco to the stone window, rendering over it."
+				to_chat(user, "You finish adding roman stucco to the stone window, rendering over it.")
 				new /obj/structure/window_frame/villa(loc)
 				qdel(W)
 				qdel(src)
 		if (istype(src, /obj/structure/window_frame/stonefull))
-			user << "You start adding roman stucco to the full stone window..."
+			to_chat(user, "You start adding roman stucco to the full stone window...")
 			if (do_after(user, 20, src))
-				user << "You finish adding roman stucco to the full stone window, rendering over it."
+				to_chat(user, "You finish adding roman stucco to the full stone window, rendering over it.")
 				new /obj/structure/window_frame/villafull(loc)
 				qdel(W)
 				qdel(src)
@@ -777,7 +775,7 @@
 				S.use(3)
 				qdel(src)
 		else
-			user << "<span class = 'warning'>You need at least 3 sheets of glass.</span>"
+			to_chat(user, "<span class = 'warning'>You need at least 3 sheets of glass.</span>")
 	else
 		user.setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
 		if (W.damtype == BRUTE || W.damtype == BURN)
@@ -820,8 +818,16 @@
 	maxhealth = 200.0
 	not_movable = TRUE
 	not_disassemblable = TRUE
+	density = TRUE
 /obj/structure/window/clean/reinforced/metal
 	icon_state = "windowmetal"
+
+
+/obj/structure/window/clean/reinforced/metal/indestructible
+	name = "indestructible glass"
+	icon_state = "windowmetal"
+	maxhealth = 6000
+
 /obj/structure/window/clean/reinforced/bank_glass
 	name = "reinforced glass"
 	icon = 'icons/obj/structures.dmi'

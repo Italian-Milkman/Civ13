@@ -2,7 +2,8 @@
 /obj/map_metadata/hostages
 	ID = MAP_HOSTAGES
 	title = "Hostage Rescue"
-	lobby_icon = 'icons/lobby/modern.png'
+	description = "The insurgents are holding American embassy staff hostage! The Special Forces must rescue them within 35 minutes."
+	lobby_icon = "icons/lobby/modern.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall/desert)
 	respawn_delay = 1200
 	no_hardcore = TRUE
@@ -25,7 +26,7 @@
 	faction2 = AMERICAN
 	valid_weather_types = list(WEATHER_NONE, WEATHER_EXTREME)
 	songs = list(
-		"Al-Qussam:1" = 'sound/music/alqassam.ogg',)
+		"Al-Qussam:1" = "sound/music/alqassam.ogg",)
 	artillery_count = 0
 
 	var/total_hostages = 6
@@ -46,16 +47,7 @@
 	spawn(3000)
 		hostage_msg()
 
-obj/map_metadata/hostages/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (istype(J, /datum/job/american))
-		if (J.is_specops && !J.is_modernday)
-			. = TRUE
-	else
-		if (J.is_specops)
-			. = TRUE
-		else
-			. = FALSE
+
 
 /obj/map_metadata/hostages/faction1_can_cross_blocks()
 	return (processes.ticker.playtime_elapsed >= 30000 || admin_ended_all_grace_periods)
@@ -115,13 +107,13 @@ obj/map_metadata/hostages/job_enabled_specialcheck(var/datum/job/J)
 		message = "All hostages have been rescued! The <b>SOF team</b> has won!"
 		current_winner = AMERICAN
 		current_loser = ARAB
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		ticker.finished = TRUE
 		win_condition_spam_check = TRUE
 		return FALSE
 	else if (win_result == "early failure")
 		message = "All hostages are dead! The mission was a failure and <b>both sides are defeated</b>!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		ticker.finished = TRUE
 		win_condition_spam_check = TRUE
 		return FALSE
@@ -130,30 +122,30 @@ obj/map_metadata/hostages/job_enabled_specialcheck(var/datum/job/J)
 			if (win_condition_spam_check)
 				return FALSE
 			message = "The Operation is over!"
-			world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+			to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 			show_global_battle_report(null)
 			win_condition_spam_check = TRUE
 			if (win_result == AMERICAN)
 				current_winner = AMERICAN
 				current_loser = ARAB
 				message = "The <b>SOF team</b> has [faction1_points] victory points and won the round!"
-				world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+				to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 				ticker.finished = TRUE
 				return FALSE
 			else if (win_result == ARAB)
 				current_winner = ARAB
 				current_loser = AMERICAN
 				message = "The <b>Insurgents</b> have [faction2_points] victory points and won the round!"
-				world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+				to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 				ticker.finished = TRUE
 				return FALSE
 			else if (win_result == "failure" || win_result == "draw")
 				message = "Both sides have the same amount of victory points. The round is a draw."
-				world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+				to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 				ticker.finished = TRUE
 			else
 				message = "It is impossible to determine who won."
-				world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+				to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 				ticker.finished = TRUE
 			return FALSE
 
@@ -209,6 +201,6 @@ obj/map_metadata/hostages/job_enabled_specialcheck(var/datum/job/J)
 /obj/map_metadata/hostages/proc/hostage_msg()
 	check_hostages()
 	spawn(1)
-		world << "<font size = 4><span class = 'notice'><b>Current Status:</b></font><br><font size = 3>Hostages Rescued: [rescued_hostages]/[total_hostages]<br>Hostages Held: [held_hostages]/[total_hostages]<br>Hostages Dead: [dead_hostages]/[total_hostages]<br>U.S. SOF Points: [faction1_points] - Insurgent Points: [faction2_points]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'><b>Current Status:</b></font><br><font size = 3>Hostages Rescued: [rescued_hostages]/[total_hostages]<br>Hostages Held: [held_hostages]/[total_hostages]<br>Hostages Dead: [dead_hostages]/[total_hostages]<br>U.S. SOF Points: [faction1_points] - Insurgent Points: [faction2_points]</span></font>")
 	spawn(3000)
 		hostage_msg()

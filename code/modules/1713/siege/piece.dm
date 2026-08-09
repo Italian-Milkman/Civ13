@@ -11,6 +11,7 @@
 	var/high_distance = 0
 	var/high = TRUE
 	var/mob/user = null
+	var/list/aiming_images = list()
 	var/list/obj/item/cannon_ball/loaded = new/list()
 	var/max_loaded = 1
 	bound_height = 64
@@ -40,7 +41,6 @@
 
 	var/azimuth = 180
 	var/distance = 5
-	var/scope_mod = TRUE
 	var/target_x = 0
 	var/target_y = -5
 
@@ -210,6 +210,8 @@
 
 /obj/structure/cannon/Destroy()
 	cannon_piece_list -= src
+	if (user)
+		clear_aiming_line(user)
 	..()
 
 /obj/structure/cannon/ex_act(severity)
@@ -255,7 +257,7 @@
 					M.remove_from_mob(W)
 					W.loc = src
 					loaded += W
-					user << SPAN_NOTICE("You load \the [src].")
+					to_chat(user, SPAN_NOTICE("You load \the [src]."))
 					if (M == user)
 						do_html(M)
 		else if (istype(W,/obj/item/weapon/wrench))
@@ -291,11 +293,11 @@
 	if (user)
 		if (get_dist(src, user) > 1)
 			user = null
-	restart
+	restart:
 	var/found_gunner = FALSE
 	for (var/obj/structure/bed/chair/gunner/G in M.loc)
 		found_gunner = TRUE
-	if (!found_gunner && istype(src, /obj/structure/cannon/modern/tank) && !istype(src, /obj/structure/cannon/modern/tank/voyage))
+	if (!found_gunner && istype(src, /obj/structure/cannon/modern/tank) && !istype(src, /obj/structure/cannon/modern/voyage))
 		to_chat(M, SPAN_WARNING("You need to be at the gunner's position to operate \the [src]."))
 		user = null
 		return
@@ -312,7 +314,7 @@
 	else
 		user = M
 		user.use_cannon(src)
-		draw_aiming_line(user)
+		update_icon()
 		do_html(user)
 
 
@@ -329,7 +331,6 @@
 		to_chat(src, "You stopped using [using_cannon.name].")
 		using_cannon.clear_aiming_line(src)
 		src << browse(null, "window=artillery_window")
-		using_cannon.scope_mod = FALSE
 		using_cannon.user = null
 		using_cannon = null
 
@@ -368,7 +369,7 @@
 		to_chat(user, SPAN_DANGER("You have no hands to use this with."))
 		return FALSE
 
-	if (istype(src, /obj/structure/cannon/modern/tank) && !istype(src, /obj/structure/cannon/modern/tank/voyage))
+	if (istype(src, /obj/structure/cannon/modern/tank) && !istype(src, /obj/structure/cannon/modern/voyage))
 		var/found_gunner = FALSE
 		for (var/obj/structure/bed/chair/gunner/G in user.loc)
 			found_gunner = TRUE
@@ -393,7 +394,7 @@
 					var/found_loader = FALSE
 					for (var/obj/structure/bed/chair/loader/L in user.loc)
 						found_loader = TRUE
-					if (!found_loader && istype(src, /obj/structure/cannon/modern/tank) && !istype(src, /obj/structure/cannon/modern/tank/voyage))
+					if (!found_loader && istype(src, /obj/structure/cannon/modern/tank) && !istype(src, /obj/structure/cannon/modern/voyage))
 						to_chat(user, SPAN_WARNING("You need to be at the loader's position to load \the [src]."))
 						return FALSE
 					var/loadtime = caliber/2
@@ -454,7 +455,7 @@
 					loaded -= M
 					M.loc = get_turf(user)
 					user.put_in_active_hand(M)
-					user << SPAN_NOTICE("You unload \the [src].")
+					to_chat(user, SPAN_NOTICE("You unload \the [src]."))
 					if (istype(src, /obj/structure/cannon/modern/tank))
 						playsound(loc, 'sound/effects/lever.ogg',100, TRUE)
 					return
@@ -508,7 +509,7 @@
 	// 360 = 0 east
 
 	get_target_coords()
-	draw_aiming_line(user)
+	update_icon()
 
 	if(azimuth >= 45 && azimuth < 135)
 		dir = EAST
@@ -685,7 +686,7 @@
 						spawn (rand(1,2))
 							var/turf/t1 = get_turf(src)
 							playsound(t1, "artillery_out", 100, TRUE)
-							playsound(t1, "artillery_out_distant", 100, TRUE)
+							playsound(t1, "artillery_out_distance", 100, TRUE)
 
 						// actual hit somewhere (or not)
 						if (istype(src, /obj/structure/cannon/modern/tank))
@@ -903,7 +904,7 @@
 										if (target_area.location == AREA_INSIDE && !target_area.arty_act(25))
 											for (var/mob/living/L in view(20, target))
 												shake_camera(L, 5, 5)
-												L << "<span class = 'danger'>You hear something violently smash into the ceiling!</span>"
+												to_chat(L, "<span class = 'danger'>You hear something violently smash into the ceiling!</span>")
 										else if (target_area_original_integrity)
 											target.visible_message("<span class = 'danger'>The ceiling collapses!</span>")
 										*/
@@ -946,7 +947,7 @@
 		Increase/Decrease angle: <a href='?src=\ref[src];azimuth_10minus=1'>-10</a> | <a href='?src=\ref[src];azimuth_1minus=1'>-1</a> | <a href='?src=\ref[src];set_azimuth=1'>[azimuth] azimuth</a> | <a href='?src=\ref[src];azimuth_1plus=1'>+1</a> | <a href='?src=\ref[src];azimuth_10plus=1'>+10</a><br><br>
 		<br>
 		<center>
-		<a href='?src=\ref[src];fire=1'><b><big>FIRE!</big></b></a>
+		<a href='?src=\ref[src];fire=1'><big><b>FIRE!</b></big></a>
 		</center>
 		</body>
 		</html>
@@ -965,7 +966,7 @@
 		azimuth = 0
 	dir = new_dir
 	get_target_coords()
-	draw_aiming_line(user)
+	update_icon()
 
 /obj/structure/cannon/proc/get_target_coords()
 	var/actual_azimuth = azimuth - 90
@@ -981,17 +982,17 @@
 		return (-1 * target_x)
 	else
 		return (-1 * target_y)
+/obj/structure/cannon/update_icon()
+	..()
+	if (user)
+		draw_aiming_line(user)
 
 /obj/structure/cannon/proc/clear_aiming_line(var/mob/user)
-	if(!user)
+	if(!user || !user.client)
 		return
-	if(!user.client)
-		return
-	for (var/image/img in user.client.images)
-		if (img.icon_state == "point")
-			user.client.images.Remove(img)
-		if (img.icon_state == "cannon_target")
-			user.client.images.Remove(img)
+	if (aiming_images.len)
+		user.client.images -= aiming_images
+		aiming_images.Cut()
 
 /obj/structure/cannon/proc/draw_aiming_line(var/mob/user)
 	if(!user)
@@ -1008,9 +1009,13 @@
 		point_x = ceil(i * cos(-actual_azimuth))
 		point_y = ceil(i * sin(-actual_azimuth))
 		if (point_x != 0 || point_y != 0)
-			aiming_line = new('icons/effects/Targeted.dmi', loc = src, icon_state="point", pixel_x = point_x, pixel_y = point_y, layer = 14)
+			aiming_line = new('icons/effects/Targeted.dmi', src, "point")
+			aiming_line.pixel_x = point_x
+			aiming_line.pixel_y = point_y
+			aiming_line.layer = 14
 			aiming_line.alpha = 255 - (i / 1.15)
 			user.client.images += aiming_line
+			aiming_images += aiming_line
 
 /obj/structure/cannon/modern/tank/draw_aiming_line(var/mob/user)
 	if(!user)
@@ -1027,11 +1032,19 @@
 		point_x = ceil(i * cos(-actual_azimuth))
 		point_y = ceil(i * sin(-actual_azimuth))
 		if (point_x != 0 || point_y != 0)
-			aiming_line = new('icons/effects/Targeted.dmi', loc = src, icon_state="point", pixel_x = point_x, pixel_y = point_y, layer = 14)
+			aiming_line = new('icons/effects/Targeted.dmi', src, "point")
+			aiming_line.pixel_x = point_x
+			aiming_line.pixel_y = point_y
+			aiming_line.layer = 14
 			aiming_line.alpha = 255 - (i / 4)
 			user.client.images += aiming_line
-	aiming_line = new('icons/effects/Targeted.dmi', loc = src, icon_state="cannon_target", pixel_x = point_x, pixel_y = point_y, layer = 14)
+			aiming_images += aiming_line
+	aiming_line = new('icons/effects/Targeted.dmi', src, "cannon_target")
+	aiming_line.pixel_x = point_x
+	aiming_line.pixel_y = point_y
+	aiming_line.layer = 14
 	user.client.images += aiming_line
+	aiming_images += aiming_line
 
 /obj/structure/cannon/verb/rotate_left()
 	set category = null
@@ -1171,7 +1184,7 @@
 				chair_found.buckled_mob.loc = new_behind
 
 	get_target_coords()
-	draw_aiming_line(user)
+	update_icon()
 	return
 
 /obj/structure/cannon/verb/rotate_right()
@@ -1317,7 +1330,7 @@
 				chair_found.buckled_mob.loc = new_behind
 	
 	get_target_coords()
-	draw_aiming_line(user)
+	update_icon()
 	return
 /obj/structure/cannon/relaymove(var/mob/mob, direction)
 	if (direction)

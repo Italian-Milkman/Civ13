@@ -4,7 +4,7 @@
 	var/priority = FALSE	//steps with higher priority would be attempted first
 	var/req_open = TRUE		// TRUE means the part must be cut open, FALSE means it doesn't
 	// type path referencing tools that can be used for this step, and how well are they suited for it
-	var/list/allowed_tools = list(1 = list("/obj/item/cursedtreasure",100)) //so its not used
+	var/alist/allowed_tools = alist(1 = list("/obj/item/cursedtreasure",100)) //so its not used
 	// type paths referencing races that this step applies to.
 	var/list/allowed_species = null
 	var/list/disallowed_species = null
@@ -21,7 +21,8 @@
 	//returns how well the tool is suited for this step. from 1 to 100 (to be used as a prob of suceeding)
 	proc/tool_quality(obj/item/TT, var/mob/living/human/user)
 		var/quality = FALSE
-		for (var/i = 1, i <= allowed_tools.len, i++)
+		var/alist_len = alist_length(allowed_tools)
+		for (var/i = 1, i <= alist_len, i++)
 			if (istype(TT, text2path(allowed_tools[i][1])))
 				quality = allowed_tools[i][2]
 		if (istype(user, /mob/living/human))
@@ -80,7 +81,7 @@
 /obj/item/proc/can_do_surgery(mob/living/M, mob/living/user)
 	if(!ishuman(M))
 		return TRUE
-		
+
 	var/mob/living/human/H = M
 	var/obj/item/organ/external/affected = H.get_organ(user.targeted_organ)
 	if(affected)
@@ -107,7 +108,7 @@ proc/do_surgery(mob/living/human/M, mob/living/human/user, obj/item/tool)
 	if (user.targeted_organ == "random")
 		zone = pick("l_foot","r_foot","l_leg","r_leg","chest","groin","l_arm","r_arm","l_hand","r_hand","eyes","mouth","head")
 	if (zone in M.op_stage.in_progress) //Can't operate on someone repeatedly.
-		user << "<span class='warning'>You can't operate on this area while surgery is already in progress.</span>"
+		to_chat(user, "<span class='warning'>You can't operate on this area while surgery is already in progress.</span>")
 		return TRUE
 	for (var/datum/surgery_step/S in surgery_steps)
 		//check if tool is right or close enough and if this step is possible
@@ -138,15 +139,15 @@ proc/do_surgery(mob/living/human/M, mob/living/human/user, obj/item/tool)
 						S.fail_step(user, M, zone, tool)		//malpractice
 					else
 						if (!(tool in user.contents))
-							user << "<span class='warning'>You stop the surgery.</span>"
+							to_chat(user, "<span class='warning'>You stop the surgery.</span>")
 							if (prob(5))
 								S.fail_step(user, M, zone, tool)
 						else if (!user.Adjacent(M))
-							user << "<span class='warning'>You must remain close to your patient to conduct surgery.</span>"
+							to_chat(user, "<span class='warning'>You must remain close to your patient to conduct surgery.</span>")
 							if (prob(15))
 								S.fail_step(user, M, zone, tool)
 						else // This failing silently was a pain.
-							user << "<span class='warning'>Your hand slips!</span>"
+							to_chat(user, "<span class='warning'>Your hand slips!</span>")
 							if (prob(8))
 								S.fail_step(user, M, zone, tool)
 					M.op_stage.in_progress -= zone 									// Clear the in-progress flag.
@@ -155,7 +156,7 @@ proc/do_surgery(mob/living/human/M, mob/living/human/user, obj/item/tool)
 						H.update_surgery()
 				return	TRUE	  												//don't want to do weapony things after surgery
 		else if (S.tool_quality(tool, user) > 0 && S.tool_quality(tool, user) <= 50)
-			user << "You are not skilled enough to perform this surgery step with \the [tool]."
+			to_chat(user, "You are not skilled enough to perform this surgery step with \the [tool].")
 			return TRUE
 	return FALSE
 
@@ -178,6 +179,5 @@ proc/sort_surgeries()
 /datum/surgery_status/
 	var/eyes	=	0
 	var/face	=	0
-	var/head_reattach = FALSE
 	var/current_organ = "organ"
 	var/list/in_progress = list()

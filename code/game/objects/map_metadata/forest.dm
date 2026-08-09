@@ -1,7 +1,8 @@
 /obj/map_metadata/forest
 	ID = MAP_FOREST
 	title = "Forest"
-	lobby_icon = 'icons/lobby/ww2.png'
+	description = "The Wehrmacht and Red Army are facing each other in the forests of Ukraine! The russians may cross after 15 minutes! It will start in 7 minutes."
+	lobby_icon = "icons/lobby/ww2.png"
 	no_winner ="The battle for the city is still going on."
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/not_dynamic, /area/caribbean/no_mans_land/invisible_wall/one, /area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 300
@@ -17,7 +18,7 @@
 		)
 	age = "1943"
 	songs = list(
-		"Red Army Choir - Katyusha:1" = 'sound/music/katyusha.ogg',)
+		"Red Army Choir - Katyusha:1" = "sound/music/katyusha.ogg",)
 	ordinal_age = 6
 	faction_distribution_coeffs = list(GERMAN = 0.5, RUSSIAN = 0.5, CIVILIAN = 0.2)
 	battle_name = "Forest"
@@ -25,31 +26,6 @@
 	faction1 = GERMAN
 	faction2 = RUSSIAN
 	var/gracedown1 = TRUE
-/obj/map_metadata/forest/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (istype(J, /datum/job/german/tank_crew) || istype(J, /datum/job/russian/tank_crew))
-		. = TRUE
-	else if (istype(J, /datum/job/german/paratrooper))
-		. = TRUE
-	else if (J.is_ss_panzer == TRUE)
-		. = FALSE
-	else if (J.is_occupation == TRUE)
-		. = FALSE
-	else if (J.is_tanker == TRUE)
-		. = FALSE
-	else if (J.is_ww2 == TRUE && J.is_reichstag == FALSE)
-		. = TRUE
-	else if (J.is_reichstag == TRUE)
-		. = FALSE
-	else if (J.is_upa == TRUE)
-		. = TRUE
-	else
-		. = FALSE
-
-	if (clients.len>20 || civilians_forceEnabled == TRUE)
-		civilians_toggled = TRUE
-	else
-		civilians_toggled = FALSE
 /obj/map_metadata/forest/faction2_can_cross_blocks()
 	return (processes.ticker.playtime_elapsed >= 9000 || admin_ended_all_grace_periods)
 

@@ -14,6 +14,7 @@
 	max_positions = 1
 	is_samurai = TRUE
 	is_eastern = TRUE
+	allowed_maps = list(MAP_SEKIGAHARA)
 
 /datum/job/japanese/eastern_lord/equip(var/mob/living/human/H)
 	if (!H)	return FALSE
@@ -36,7 +37,7 @@
 	uniform.attackby(daishoh, H)
 	H.civilization = "Eastern Army"
 	give_random_name(H)
-	world << "<b><font color='yellow' size=3>[H.real_name] is the Daimyo of the Eastern Army!</font></b>"
+	to_chat(world, "<b><font color='yellow' size=3>[H.real_name] is the Daimyo of the Eastern Army!</font></b>")
 	H.add_note("Role", "You are a <b>[title]</b>, an officer in charge of the Eastern Army and their orders. The whole operation relies on you!")
 	H.setStat("strength", STAT_MEDIUM_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -61,6 +62,7 @@
 	min_positions = 1
 	max_positions = 2
 	is_eastern = TRUE
+	allowed_maps = list(MAP_SEKIGAHARA)
 
 /datum/job/japanese/samurai_eastern/equip(var/mob/living/human/H)
 	if (!H)	return FALSE
@@ -86,7 +88,7 @@
 	uniform.attackby(daishoh, H)
 	H.civilization = "Eastern Army"
 	give_random_name(H)
-	world << "<b><font color='yellow' size=3>[H.real_name] is a Samurai of the Eastern Army!</font></b>"
+	to_chat(world, "<b><font color='yellow' size=3>[H.real_name] is a Samurai of the Eastern Army!</font></b>")
 	H.add_note("Role", "You are a <b>[title]</b>, an officer in charge of the Eastern Army and their troops. The whole operation relies on you!")
 	H.setStat("strength", STAT_MEDIUM_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -98,9 +100,6 @@
 	H.setStat("medical", STAT_MEDIUM_LOW)
 	return TRUE
 
-
-	return TRUE
-
 /datum/job/japanese/ashigaru_ranged
 	title = "Tobu Enkyori Ashigaru"
 	en_meaning = "Ranged Eastern Infantryman"
@@ -110,6 +109,7 @@
 	max_positions = 24
 	is_samurai = TRUE
 	is_eastern = TRUE
+	allowed_maps = list(MAP_SEKIGAHARA)
 /datum/job/japanese/ashigaru_ranged/equip(var/mob/living/human/H)
 	if (!H)	return FALSE
 //shoes
@@ -155,6 +155,7 @@
 	max_positions = 48
 	is_samurai = TRUE
 	is_eastern = TRUE
+	allowed_maps = list(MAP_SEKIGAHARA)
 /datum/job/japanese/ashigaru/equip(var/mob/living/human/H)
 	if (!H)	return FALSE
 //shoes
@@ -203,6 +204,8 @@
 	max_positions = 1
 	is_samurai = TRUE
 	is_western = TRUE
+	allowed_maps = list(MAP_SEKIGAHARA)
+	
 
 /datum/job/japanese/western_lord/equip(var/mob/living/human/H)
 	if (!H)	return FALSE
@@ -227,7 +230,7 @@
 	uniform.attackby(daishoh, H)
 	H.civilization = "Western Army"
 	give_random_name(H)
-	world << "<b><font color='yellow' size=3>[H.real_name] is the Daimyo of the Western Army!</font></b>"
+	to_chat(world, "<b><font color='yellow' size=3>[H.real_name] is the Daimyo of the Western Army!</font></b>")
 	H.add_note("Role", "You are a <b>[title]</b>, an officer in charge of the Western Army and their orders. The whole operation relies on you!")
 	H.setStat("strength", STAT_MEDIUM_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -252,6 +255,7 @@
 	min_positions = 1
 	max_positions = 2
 	is_western = TRUE
+	allowed_maps = list(MAP_SEKIGAHARA)
 
 /datum/job/japanese/samurai_western/equip(var/mob/living/human/H)
 	if (!H)	return FALSE
@@ -276,7 +280,7 @@
 	uniform.attackby(daishoh, H)
 	H.civilization = "Western Army"
 	give_random_name(H)
-	world << "<b><font color='yellow' size=3>[H.real_name] is a Samurai of the Western Army!</font></b>"
+	to_chat(world, "<b><font color='yellow' size=3>[H.real_name] is a Samurai of the Western Army!</font></b>")
 	H.add_note("Role", "You are a <b>[title]</b>, an officer in charge of the Western Army and their troops. The whole operation relies on you!")
 	H.setStat("strength", STAT_MEDIUM_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -297,6 +301,7 @@
 	max_positions = 24
 	is_samurai = TRUE
 	is_western = TRUE
+	allowed_maps = list(MAP_SEKIGAHARA)
 /datum/job/japanese/ashigaru_ranged_western/equip(var/mob/living/human/H)
 	if (!H)	return FALSE
 //shoes
@@ -341,6 +346,7 @@
 	max_positions = 48
 	is_samurai = TRUE
 	is_western = TRUE
+	allowed_maps = list(MAP_SEKIGAHARA)
 /datum/job/japanese/ashigaru_western/equip(var/mob/living/human/H)
 	if (!H)	return FALSE
 //shoes

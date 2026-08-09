@@ -9,6 +9,7 @@
 	title = "Capitao"
 	en_meaning = "Ship Captain"
 	rank_abbreviation = "Capitao"
+	allowed_maps = list(MAP_ROBUSTA)
 
 
 	spawn_location = "JoinLatePTCap"
@@ -35,7 +36,7 @@
 
 	H.equip_to_slot_or_del(new /obj/item/weapon/attachment/scope/adjustable/binoculars(H), slot_l_store)
 	H.equip_to_slot_or_del(new /obj/item/weapon/material/sword/spadroon(H), slot_belt)
-	world << "<b><big>[H.real_name] is the Captain of the Portuguese Navy ship!</big></b>"
+	to_chat(world, "<big><b>[H.real_name] is the Captain of the Portuguese Navy ship!</b></big>")
 	H.add_note("Role", "You are a <b>[title]</b>, the highest ranking officer present. Your job is to command the ship.")
 	H.setStat("strength", STAT_MEDIUM_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -53,13 +54,11 @@
 	title = "Imediato"
 	en_meaning = "2IC / Supplies Officer"
 	rank_abbreviation = "Imediato"
-
 	spawn_location = "JoinLatePTQM"
 	is_commander = TRUE
 	is_officer = TRUE
 	whitelisted = TRUE
-
-
+	allowed_maps = list(MAP_ROBUSTA)
 
 	min_positions = 1
 	max_positions = 1
@@ -77,7 +76,7 @@
 	H.equip_to_slot_or_del(new /obj/item/clothing/head/tricorne_portuguese(H), slot_head)
 
 	H.equip_to_slot_or_del(new /obj/item/weapon/material/sword/spadroon(H), slot_belt)
-	world << "<b><big>[H.real_name] is the Quartermaster of the Portuguese Navy ship!</big></b>"
+	to_chat(world, "<big><b>[H.real_name] is the Quartermaster of the Portuguese Navy ship!</b></big>")
 	H.add_note("Role", "You are a <b>[title]</b>, an officer in charge of the ship's supply allocation. You are also the second in command, after the <b>Capitao</b>.")
 	H.setStat("strength", STAT_MEDIUM_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -95,10 +94,9 @@
 	title = "Contramestre"
 	en_meaning = "Head of Personnel Officer"
 	rank_abbreviation = "Contramestre"
-
-
 	spawn_location = "JoinLatePTBoatswain"
 	whitelisted = TRUE
+	allowed_maps = list(MAP_ROBUSTA)
 
 	is_commander = TRUE
 	is_officer = TRUE
@@ -121,7 +119,7 @@
 
 	H.equip_to_slot_or_del(new /obj/item/weapon/attachment/scope/adjustable/binoculars(H), slot_l_store)
 	H.equip_to_slot_or_del(new /obj/item/weapon/material/sword/spadroon(H), slot_belt)
-	world << "<b><big>[H.real_name] is the Boatswain of the Portuguese Navy ship!</big></b>"
+	to_chat(world, "<big><b>[H.real_name] is the Boatswain of the Portuguese Navy ship!</b></big>")
 	H.add_note("Role", "You are a <b>[title]</b>, an officer in charge of the crew and their job allocation. The whole ship relies on you!")
 	H.setStat("strength", STAT_MEDIUM_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -139,11 +137,9 @@
 	title = "Aspirante"
 	en_meaning = "Petty Officer"
 	rank_abbreviation = "Aspirante"
-
+	allowed_maps = list(MAP_ROBUSTA)
 	spawn_location = "JoinLatePTMidshipman"
 	is_officer = TRUE
-
-
 
 	min_positions = 1
 	max_positions = 10
@@ -177,10 +173,8 @@
 	title = "Medico Naval"
 	en_meaning = "Medic"
 	rank_abbreviation = "Medico"
-
 	spawn_location = "JoinLatePTSurgeon"
-
-
+	allowed_maps = list(MAP_ROBUSTA)
 	is_medic = TRUE
 
 	min_positions = 1
@@ -216,10 +210,8 @@
 	title = "Carpinteiro Naval"
 	en_meaning = "Carpenter"
 	rank_abbreviation = "Carpinteiro"
-
+	allowed_maps = list(MAP_ROBUSTA)
 	spawn_location = "JoinLatePTCarpenter"
-
-
 
 	min_positions = 1
 	max_positions = 10
@@ -260,10 +252,8 @@
 	title = "Cozinheiro"
 	en_meaning = "Cook"
 	rank_abbreviation = "Cozinheiro"
-
+	allowed_maps = list(MAP_ROBUSTA)
 	spawn_location = "JoinLatePTCook"
-
-
 
 	min_positions = 1
 	max_positions = 10
@@ -309,10 +299,8 @@
 	title = "Marinheiro"
 	en_meaning = "Seaman"
 	rank_abbreviation = ""
-
 	spawn_location = "JoinLatePT"
-
-
+	allowed_maps = list(MAP_ROBUSTA)
 
 	min_positions = 6
 	max_positions = 200
@@ -367,6 +355,7 @@
 	is_commander = TRUE
 
 	is_army = TRUE
+	allowed_maps = list(MAP_RECIFE)
 
 
 	min_positions = 1
@@ -410,6 +399,7 @@
 	is_officer = TRUE
 
 	is_army = TRUE
+	allowed_maps = list(MAP_RECIFE)
 
 
 	min_positions = 2
@@ -450,6 +440,7 @@
 
 	is_medic = TRUE
 	is_army = TRUE
+	allowed_maps = list(MAP_RECIFE)
 
 
 	min_positions = 1
@@ -487,6 +478,7 @@
 	rank_abbreviation = ""
 
 	spawn_location = "JoinLatePT"
+	allowed_maps = list(MAP_RECIFE)
 
 	is_army = TRUE
 
@@ -527,6 +519,7 @@
 	rank_abbreviation = "Cac."
 
 	spawn_location = "JoinLatePT"
+	allowed_maps = list(MAP_RECIFE)
 
 	is_army = TRUE
 

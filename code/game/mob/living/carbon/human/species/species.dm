@@ -7,7 +7,6 @@
 	// Descriptors and strings.
 	var/name											 // Species name.
 	var/name_plural									  // Pluralized name (since "[name]s" is not always valid)
-	var/blurb = "A completely nondescript species."	  // A brief lore summary for use in the chargen screen.
 
 	// Icon/appearance vars.
 	var/icobase = 'icons/mob/human_races/r_human.dmi'	// Normal icon set.
@@ -24,14 +23,11 @@
 	var/flesh_color = "#FFC896"						  // Pink.
 	var/base_color									   // Used by changelings. Should also be used for icon previes..
 	var/tail											 // Name of tail state in species effects icon file.
-	var/tail_animation								   // If set, the icon to obtain tail animation states from.
 	var/race_key = FALSE	   								 // Used for mob icon cache string.
 	var/icon/icon_template							   // Used for mob icon generation for non-32x32 species.
 	var/mob_size	= MOB_MEDIUM
 	var/show_ssd = "fast asleep"
-	var/virus_immune
 	var/blood_volume = 560							   // Initial blood volume.
-	var/hunger_factor = DEFAULT_HUNGER_FACTOR			// Multiplier for hunger.
 	var/taste_sensitivity = TASTE_NORMAL				 // How sensitive the species is to minute tastes.
 
 	var/teeth_type = /obj/item/stack/teeth/generic 		 //What sort of teeth do the species have
@@ -45,7 +41,6 @@
 	var/list/secondary_langs = list()			// The names of secondary languages that are available to this species.
 	var/list/speech_sounds				   		// A list of sounds to potentially play when speaking.
 	var/list/speech_chance				   		// The likelihood of a speech sound playing.
-	var/num_alternate_languages = FALSE		  	// How many secondary languages are available to select at character creation
 	var/name_language = "Galactic Common"		// The language to use when determining names for this species, or null to use the first name/last name generator
 
 	// Combat vars.
@@ -59,21 +54,14 @@
 	var/burn_mod = 1.0							// Burn damage multiplier.
 	var/oxy_mod = 1.0							// Oxyloss modifier
 	var/toxins_mod = 1.0						// Toxloss modifier
-	var/radiation_mod = 1.0						// Radiation modifier
-	var/flash_mod =	1.0							// Stun from blindness modifier.
 	var/vision_flags = SEE_SELF					// Same flags as glasses.
 
 	// Death vars.
 	var/meat_type = /obj/item/weapon/reagent_containers/food/snacks/meat/human
-	var/gibber_type = /obj/effect/gibspawner/human
 	var/single_gib_type = /obj/effect/decal/cleanable/blood/gibs
 	var/gibbed_anim = "gibbed-h"
-	var/dusted_anim = "dust-h"
 	var/death_sound
-	var/death_message = "" // "seizes up and falls limp, their eyes dead and lifeless..."
 	var/knockout_message = "has been knocked unconscious!"
-	var/halloss_message = "slumps to the ground, too weak to continue fighting."
-	var/halloss_message_self = "You're in too much pain to keep going..."
 
 	// Environment tolerance/life processes vars.
 	var/reagent_tag								   //Used for metabolizing reagents.
@@ -87,7 +75,6 @@
 	var/heat_level_1 = 315							// Heat damage level TRUE above this point.
 	var/heat_level_2 = 323							// Heat damage level 2 above this point.
 	var/heat_level_3 = 333						   // Heat damage level 3 above this point.
-	var/passive_temp_gain = FALSE						  // Species will gain this much temperature every second
 //	var/hazard_high_pressure = HAZARD_HIGH_PRESSURE   // Dangerously high pressure.
 //	var/warning_high_pressure = WARNING_HIGH_PRESSURE // High pressure warning.
 //	var/warning_low_pressure = WARNING_LOW_PRESSURE   // Low pressure warning.
@@ -121,12 +108,8 @@
 	var/appearance_flags = FALSE	  // Appearance/display related features.
 	var/spawn_flags = FALSE		   // Flags that specify who can spawn as this species
 	var/slowdown = FALSE			  // Passive movement speed malus (or boost, if negative)
-	var/primitive_form			// Lesser form, if any (ie. monkey for humans)
-	var/greater_form			  // Greater form, if any, ie. human for monkeys.
 	var/holder_type
 	var/gluttonous				// Can eat some mobs. Values can be GLUT_TINY, GLUT_SMALLER, GLUT_ANYTHING.
-	var/rarity_value = TRUE		  // Relative rarity/collector value for this species.
-								  // Determines the organs that the species spawns with and
 	var/list/has_organ = list(	// which required-organ checks are conducted.
 		"heart" =	/obj/item/organ/heart,
 		"lungs" =	/obj/item/organ/lungs,
@@ -196,7 +179,7 @@
 		if (A.climate == "desert" && A.location == AREA_OUTSIDE)
 			if (!H.shoes)
 				if (prob(25))
-					H << SPAN_DANGER("The hot ground burns your feet!")
+					to_chat(H, SPAN_DANGER("The hot ground burns your feet!"))
 					H.adjustBurnLossByPart(0.3*dmod, pick("l_foot", "r_foot"))
 
 		//Check protected bodyparts
@@ -229,11 +212,11 @@
 			H.adjustBurnLossByPart(0.2*dmod, i)
 
 		if (prob(12))
-			H << SPAN_DANGER("[pick(heat_discomfort_strings)]")
+			to_chat(H, SPAN_DANGER("[pick(heat_discomfort_strings)]"))
 
 		if (A.weather == WEATHER_EXTREME && findtext(A,"sandstorm"))
 			if (prob(15))
-				H << SPAN_DANGER("The dust abrades your exposed flesh!")
+				to_chat(H, SPAN_DANGER("The dust abrades your exposed flesh!"))
 			for (var/i in exposed_bp)
 				H.adjustBurnLossByPart(1*dmod, i)
 
@@ -257,7 +240,7 @@
 		if (istype(T) && T.icon == 'icons/turf/snow.dmi' && H.shoes)
 			if (H.shoes.cold_protection != FEET)
 				if (prob(25 - (H.shoes ? 15 : 0)))
-					H << SPAN_DANGER("Your feet are freezing!")
+					to_chat(H, SPAN_DANGER("Your feet are freezing!"))
 					H.adjustBurnLossByPart(1*dmod, pick("l_foot", "r_foot"))
 
 		//Check protected bodyparts
@@ -290,21 +273,21 @@
 			H.adjustBurnLossByPart(0.5*dmod, i)
 
 		if (prob(12))
-			H << SPAN_DANGER("[pick(cold_discomfort_strings)]")
+			to_chat(H, SPAN_DANGER("[pick(cold_discomfort_strings)]"))
 
 		if (A.icon_state == "snow_storm" && A.location == AREA_OUTSIDE)
 			if (prob(12))
-				H << SPAN_DANGER("The blizzard chills you to the bone!")
+				to_chat(H, SPAN_DANGER("The blizzard chills you to the bone!"))
 			H.adjustBurnLoss(0.8*dmod)
 /*
 		var/area/A = get_area(H)
 		if (A.weather == WEATHER_WET && findtext(A,"rain"))
 			if (prob(15))
-				H << SPAN_DANGER("The cold rain chills you to the bone.")
+				to_chat(H, SPAN_DANGER("The cold rain chills you to the bone."))
 			H.adjustBurnLoss(3) // wet is bad
 		else if (A.weather == WEATHER_WET && findtext(A,"snow"))
 			if (prob(15))
-				H << SPAN_DANGER("The freezing snowfall chills you to the bone.")
+				to_chat(H, SPAN_DANGER("The freezing snowfall chills you to the bone."))
 			H.adjustBurnLoss(2)
 */
 /datum/species/proc/sanitize_name(var/name)
@@ -378,6 +361,20 @@
 			return capitalize(pick(first_names_female_russian)) + " " + capitalize(pick(last_names_russian) + "a")
 		else
 			return capitalize(pick(first_names_male_russian)) + " " + capitalize(pick(last_names_russian))
+
+/datum/species/proc/get_random_kazakh_name(var/gender)
+	if (!name_language)
+		if (gender == FEMALE)
+			return capitalize(pick(first_names_female_kazakh)) + " " + capitalize(pick(last_names_kazakh) + "a")
+		else
+			return capitalize(pick(first_names_male_kazakh)) + " " + capitalize(pick(last_names_kazakh))
+
+/datum/species/proc/get_random_tajik_name(var/gender)
+	if (!name_language)
+		if (gender == FEMALE)
+			return capitalize(pick(first_names_female_tajik)) + " " + capitalize(pick(last_names_tajik) + "a")
+		else
+			return capitalize(pick(first_names_male_tajik)) + " " + capitalize(pick(last_names_tajik))
 
 /datum/species/proc/get_random_ukrainian_name(var/gender)
 	if (!name_language)
@@ -590,60 +587,54 @@
 			return capitalize(pick(first_names_male_iroquois))
 
 /datum/species/proc/get_random_sioux_name(var/gender)
-    if (!name_language)
-        if (gender == FEMALE)
-            return capitalize(pick(first_names_female_sioux))
-        else
-            return capitalize(pick(first_names_male_sioux))
+	if (!name_language)
+		if (gender == FEMALE)
+			return capitalize(pick(first_names_female_sioux))
+		else
+			return capitalize(pick(first_names_male_sioux))
 
 /datum/species/proc/get_random_apache_name(var/gender)
-    if (!name_language)
-        if (gender == FEMALE)
-            return capitalize(pick(first_names_female_apache))
-        else
-            return capitalize(pick(first_names_male_apache))
+	if (!name_language)
+		return capitalize(pick(first_names_male_apache))
 
 /datum/species/proc/get_random_navajo_name(var/gender)
-    if (!name_language)
-        if (gender == FEMALE)
-            return capitalize(pick(first_names_female_navajo))
-        else
-            return capitalize(pick(first_names_male_navajo))
+	if (!name_language)
+		if (gender == FEMALE)
+			return capitalize(pick(first_names_female_navajo))
+		else
+			return capitalize(pick(first_names_male_navajo))
 
 /datum/species/proc/get_random_chinook_name(var/gender)
-    if (!name_language)
-        if (gender == FEMALE)
-            return capitalize(pick(first_names_female_chinook))
-        else
-            return capitalize(pick(first_names_male_chinook))
+	if (!name_language)
+		if (gender == FEMALE)
+			return capitalize(pick(first_names_female_chinook))
+		else
+			return capitalize(pick(first_names_male_chinook))
 
 /datum/species/proc/get_random_comanche_name(var/gender)
-    if (!name_language)
-        if (gender == FEMALE)
-            return capitalize(pick(first_names_female_comanche))
-        else
-            return capitalize(pick(first_names_male_comanche))
+	if (!name_language)
+		if (gender == FEMALE)
+			return capitalize(pick(first_names_female_comanche))
+		else
+			return capitalize(pick(first_names_male_comanche))
 
 /datum/species/proc/get_random_mayan_name(var/gender)
-    if (!name_language)
-        if (gender == FEMALE)
-            return capitalize(pick(first_names_female_mayan))
-        else
-            return capitalize(pick(first_names_male_mayan))
+	if (!name_language)
+		if (gender == FEMALE)
+			return capitalize(pick(first_names_female_mayan))
+		else
+			return capitalize(pick(first_names_male_mayan))
 
 /datum/species/proc/get_random_aztec_name(var/gender)
-    if (!name_language)
-        if (gender == FEMALE)
-            return capitalize(pick(first_names_female_aztec))
-        else
-            return capitalize(pick(first_names_male_aztec))
+	if (!name_language)
+		if (gender == FEMALE)
+			return capitalize(pick(first_names_female_aztec))
+		else
+			return capitalize(pick(first_names_male_aztec))
 
 /datum/species/proc/get_random_hawaiian_name(var/gender)
-    if (!name_language)
-        if (gender == FEMALE)
-            return capitalize(pick(first_names_female_hawaiian))
-        else
-            return capitalize(pick(first_names_male_hawaiian))
+	if (!name_language)
+		return capitalize(pick(first_names_male_hawaiian))
 
 /datum/species/proc/get_random_korean_name(var/gender)
 	if (!name_language)
@@ -818,9 +809,6 @@
 
 	if (!H.client)//no client, no screen to update
 		return TRUE
-
-	for (var/overlay in H.equipment_overlays)
-		H.client.screen |= overlay
 
 	return TRUE
 

@@ -15,6 +15,7 @@
 	var/consume_itself = FALSE
 	var/looping = FALSE //for campfires
 	var/cooking_time = 50
+
 /obj/structure/oven/update_icon()
 	if (on)
 		icon_state = "[base_state]_on"
@@ -27,7 +28,7 @@
 
 	if (istype(I, /obj/item/weapon/reagent_containers/glass/small_pot))
 		var/obj/item/weapon/reagent_containers/glass/small_pot/POT = I
-		H << "You place the [POT] on top of the [src]."
+		to_chat(H, "You place the [POT] on top of the [src].")
 		H.remove_from_mob(POT)
 		POT.loc = src.loc
 		POT.on_stove = TRUE
@@ -35,37 +36,37 @@
 
 	if (istype(I, /obj/item/stack/material/wood))	//FUEL NORMAL (without * multiplication or + addition, only input)
 		fuel += I.amount
-		H << "You place \the [I] in \the [src], refueling it."
+		to_chat(H, "You place \the [I] in \the [src], refueling it.")
 		qdel(I)
 		return
 	else if (istype(I, /obj/item/stack/material/bamboo))
 		fuel += I.amount
-		H << "You place \the [I] in \the [src], refueling it."
+		to_chat(H, "You place \the [I] in \the [src], refueling it.")
 		qdel(I)
 		return
 	else if (istype(I, /obj/item/weapon/branch))	// FUEL +0.5 (adds a flat numerical addition ontop of the input reagent's baseline fuel, recommended for non stack objects)
 		fuel += I.amount+0.5
-		H << "You place \the [I] in \the [src], refueling it."
+		to_chat(H, "You place \the [I] in \the [src], refueling it.")
 		qdel(I)
 		return
 	else if (istype(I, /obj/item/stack/material/leaf))
 		fuel += I.amount+0.5
-		H << "You place \the [I] in \the [src], refueling it."
+		to_chat(H, "You place \the [I] in \the [src], refueling it.")
 		qdel(I)
 		return
 	else if (istype(I, /obj/item/stack/dung))	// FUEL +1
 		fuel += I.amount+1
-		H << "You place \the [I] in \the [src], refueling it."
+		to_chat(H, "You place \the [I] in \the [src], refueling it.")
 		qdel(I)
 		return
 	else if (istype(I, /obj/item/stack/ore/charcoal))	//FUEL *2.5 (multiplies it by 2 and a half)
 		fuel += I.amount*2.5
-		H << "You place \the [I] in \the [src], refueling it."
+		to_chat(H, "You place \the [I] in \the [src], refueling it.")
 		qdel(I)
 		return
 	else if (istype(I, /obj/item/stack/ore/coal))	//FUEL *3
 		fuel += I.amount*3
-		H << "You place \the [I] in \the [src], refueling it."
+		to_chat(H, "You place \the [I] in \the [src], refueling it.")
 		qdel(I)
 		return
 
@@ -90,7 +91,7 @@
 	for (var/obj/item/II in contents)
 		space -= II.w_class
 	if (space <= 0 || space - I.w_class < 0)
-		H << "<span class = 'warning'>The [name] is full.</span>"
+		to_chat(H, "<span class = 'warning'>The [name] is full.</span>")
 		return
 	H.remove_from_mob(I)
 	I.loc = src
@@ -103,13 +104,13 @@
 		on = TRUE
 		fire_loop()
 	else
-		H << "<span class = 'warning'>The [name] doesn't have enough fuel! Fill it with wood or coal.</span>"
+		to_chat(H, "<span class = 'warning'>The [name] doesn't have enough fuel! Fill it with wood or coal.</span>")
 
 /obj/structure/oven/proc/fire_loop()
 	if (on && fuel > 0)
 		fuel -=1
 		update_icon()
-		if (name == "campfire")
+		if (name == "campfire" || name == "furnace")
 			set_light(5)
 		else if (name == "wood stove")
 			set_light(2)
@@ -301,7 +302,7 @@
 
 /obj/structure/oven/fireplace/attackby(var/obj/item/I, var/mob/living/human/H)
 	if (on && (istype(I, /obj/item/stack/material/leather) || istype(I, /obj/item/stack/material/cloth)))
-		H << "You produce some smoke signals."
+		to_chat(H, "You produce some smoke signals.")
 		smoke_signals()
 	else
 		..()
@@ -412,3 +413,55 @@
 	on = FALSE
 	max_space = 4
 	fuel = 0
+
+//for the survival objective in antarctica
+/obj/structure/oven/big
+	name = "furnace"
+	desc = "Your survival hangs on this - keep the furnace on!"
+	icon = 'icons/obj/kitchen_big.dmi'
+	not_movable = TRUE
+	not_disassemblable = TRUE
+	looping = TRUE
+
+/obj/structure/oven/big/New()
+	..()
+	fuel = 10 // 10 mins
+	on = TRUE
+	set_light(5)
+	keep_fire_on()
+	keep_sound_on()
+	spawn(50)
+		if (map && map.ID == MAP_ANTARCTICA)
+			var/obj/map_metadata/antarctica/ANT = map
+			ANT.furnace = src
+
+/obj/structure/oven/big/proc/keep_sound_on()
+	if (on && looping && fuel > 0)
+		playsound(get_turf(src), "sound/effects/fireplace-[rand(1, 6)].ogg", 75, TRUE, -1)
+		spawn(50) // 6 seconds
+			keep_sound_on()
+
+/obj/structure/oven/big/proc/keep_fire_on()
+	if (on && looping && fuel > 0)
+		set_light(5)
+		update_icon()
+		fire_loop()
+		spawn(600) // 1 minute
+			keep_fire_on()
+	else
+		on = FALSE
+		set_light(0)
+		return
+
+/obj/structure/oven/big/attack_hand(var/mob/living/human/H)
+	if (!on && fuel > 0)
+		H.visible_message(SPAN_NOTICE("[H] lights \the [name]."), SPAN_NOTICE("You light \the [name]."))
+		on = TRUE
+		keep_fire_on()
+		keep_sound_on()
+	//no manual turning off
+	H.setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
+
+/obj/structure/oven/big/examine(mob/user)
+	..()
+	to_chat(user, "It has <b>[fuel] minutes</b> of fuel remaining.")

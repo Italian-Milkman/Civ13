@@ -29,15 +29,15 @@ var/global/datum/external_relations/external_relations = new()
 	ordinal_age = 7
 	civilizations = TRUE
 	nomads = TRUE
-	var/tribes_nr = 1
+
 	faction_distribution_coeffs = list(CIVILIAN = 1)
 	battle_name = "the civilizations"
 	mission_start_message = "<big><b>Following a limited thermonuclear exchange which saw most central authorities in the northern hemisphere collapse, it appears Pepelsibirsk was left mostly untouched. You must bring the city to prosperity!</b></big>"
-	ambience = list('sound/ambience/desert.ogg')
+	ambience = list("sound/ambience/desert.ogg")
 	faction1 = CIVILIAN
 	availablefactions = list("Nomad")
 	songs = list(
-		"Molchat Doma - Toska:1" = 'sound/music/toska.ogg',)
+		"Molchat Doma - Toska:1" = "sound/music/toska.ogg",)
 	gamemode = "Cold War"
 	age1_done = TRUE
 	age2_done = TRUE
@@ -48,6 +48,7 @@ var/global/datum/external_relations/external_relations = new()
 	age7_done = TRUE
 	default_research = 180
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET, WEATHER_EXTREME)
+	gamemode_vote = FALSE
 	var/real_season = "FALL"
 	var/quarter = 1
 	var/year = 1976
@@ -63,6 +64,7 @@ var/global/datum/external_relations/external_relations = new()
 /obj/map_metadata/pepelsibirsk/New()
 	..()
 	relations_subsystem()
+	invasion_subsystem()
 	send_traders()
 	enemy_attacks()
 	recover_relations()
@@ -233,22 +235,43 @@ var/global/datum/external_relations/external_relations = new()
 /obj/map_metadata/pepelsibirsk/faction1_can_cross_blocks()
 	return (processes.ticker.playtime_elapsed >= 4800 || admin_ended_all_grace_periods)
 
-/obj/map_metadata/pepelsibirsk/job_enabled_specialcheck(var/datum/job/J)
-	if (J.is_nomad == TRUE)
-		. = TRUE
-	else
-		. = FALSE
-
-////// DIPLOMATIC RELATIONS MANAGEMENT //////
-
 /obj/map_metadata/pepelsibirsk/proc/relations_subsystem()
 	spawn(3 SECONDS)
 		for(var/relation in external_relations.npc_faction_relations)
-			if (external_relations.npc_faction_relations > 100)
+			if (external_relations.npc_faction_relations[relation] > 100)
 				external_relations.npc_faction_relations[relation] = 100
 			else if (external_relations.npc_faction_relations[relation] < 0)
 				external_relations.npc_faction_relations[relation] = 0
 		relations_subsystem()
+	return
+
+/obj/map_metadata/pepelsibirsk/proc/invasion_subsystem()
+	spawn(36000)
+		if (MIL_RELATIONS <= 25)
+			var/list/turf/invasion_routes = latejoin_turfs["InvasionRoute"]
+			var/list/turf/city_centers = latejoin_turfs["CityCenter"]
+			var/turf/city_center = null
+			
+			if (city_centers && city_centers.len)
+				city_center = pick(city_centers)
+			
+			if (invasion_routes && invasion_routes.len && city_center)
+				var/num_to_spawn = rand(1, 10)
+				for(var/i = 1 to num_to_spawn)
+					var/turf/spawn_loc = pick(invasion_routes)
+					var/mob/living/simple_animal/hostile/human/ww2_soviet/S
+					
+					if (i == 1 && num_to_spawn >= 2)
+						S = new /mob/living/simple_animal/hostile/human/ww2_soviet/medic(spawn_loc)
+					else if (i == 2 && num_to_spawn >= 3)
+						S = new /mob/living/simple_animal/hostile/human/ww2_soviet/mg(spawn_loc)
+					else if (i == 3 && num_to_spawn > 7)
+						S = new /mob/living/simple_animal/hostile/human/ww2_soviet/squad_leader(spawn_loc)
+					else
+						S = new /mob/living/simple_animal/hostile/human/ww2_soviet(spawn_loc)
+					S.pathfind_target = city_center
+				to_chat(world, "<br><font size =3><span class='user'>An invasion from Pepelsibirsk-1 has started!</font></span>")
+		invasion_subsystem()
 	return
 
 /obj/map_metadata/pepelsibirsk/proc/check_relations_msg()
@@ -291,268 +314,15 @@ var/global/datum/external_relations/external_relations = new()
 		time_update()
 	return
 
-////// PEPELSIBIRSK TRAVELING MERCHANTS //////
-/obj/structure/vending/sales/pepelsibirsk
-	var/faction_relations
-
-/obj/structure/vending/sales/pepelsibirsk/proc/dropwares()
-	return
-
-/obj/structure/vending/sales/pepelsibirsk/ex_act(severity)
-	dropwares()
-	qdel(src)
-	return
-
-/obj/structure/vending/sales/pepelsibirsk/bullet_act()
-	dropwares()
-	qdel(src)
-	return
-
-/obj/structure/vending/sales/pepelsibirsk/pacific_trader
-	name = "U.S.P Trader"
-	desc = "The United States of the Pacific has come to trade."
-	icon = 'icons/mob/npcs.dmi'
-	icon_state = "afghcia"
-	faction_relations = "faction_3_relations"
-	products = list(
-		//Weapons
-		/obj/item/weapon/gun/projectile/submachinegun/m16/commando = 2,
-		/obj/item/weapon/gun/projectile/submachinegun/m16/m16a2 = 5,
-		/obj/item/weapon/gun/launcher/grenade/standalone/m79 = 2,
-		/obj/item/weapon/gun/launcher/rocket/bazooka = 2,
-		/obj/item/weapon/gun/projectile/submachinegun/m14/sniper = 1,
-		/obj/item/weapon/attachment/scope/adjustable/advanced/holographic = 2,
-		/obj/item/weapon/attachment/scope/adjustable/sniper_scope/acog = 2,
-		/obj/item/weapon/attachment/scope/adjustable/advanced/reddot = 2,
-		/obj/item/weapon/attachment/scope/adjustable/sniper_scope = 2,
-		/obj/item/weapon/attachment/under/foregrip = 2,
-		/obj/item/weapon/attachment/silencer/pistol = 2,
-		/obj/item/weapon/attachment/silencer/rifle = 2,
-		/obj/item/weapon/attachment/silencer/shotgun = 2,
-		/obj/item/weapon/attachment/silencer/smg = 2,
-		/obj/item/weapon/foldable/atgm/bgm_tow = 1,
-
-		//Ammunition
-		/obj/item/ammo_magazine/m16 = 8,
-		/obj/item/ammo_magazine/m14 = 3,
-		/obj/item/ammo_casing/rocket/bazooka = 4,
-		/obj/item/weapon/grenade/frag/ugl/shell40mm = 3,
-		/obj/item/weapon/plastique/c4 = 2,
-		/obj/item/ammo_casing/rocket/atgm = 4,
-		/obj/item/ammo_casing/rocket/atgm/he = 4,
-
-		//Clothing
-		/obj/item/clothing/under/us_uni/us_camo_woodland = 8,
-		/obj/item/clothing/accessory/storage/webbing/us_vest = 8,
-		/obj/item/clothing/suit/storage/coat/ww2/us_coat = 8,
-		/obj/item/clothing/shoes/jackboots/modern = 8,
-		/obj/item/clothing/accessory/armor/coldwar/pasgt = 2,
-		/obj/item/clothing/head/helmet/modern/pasgt = 2,
-
-		//Food and Drink
-		/obj/item/weapon/reagent_containers/food/snacks/burger = 4,
-		/obj/item/weapon/reagent_containers/food/snacks/cheeseburger = 4,
-		/obj/item/weapon/reagent_containers/food/snacks/hotdog = 4,
-		/obj/item/weapon/reagent_containers/food/snacks/MRE/generic/american = 3,
-		/obj/item/weapon/reagent_containers/food/snacks/sliceable/pumpkinpie = 1,
-		/obj/item/weapon/reagent_containers/food/snacks/applepie = 1,
-
-		//Miscellaneous
-		/obj/item/weapon/telephone/mobile = 2,
-		/obj/structure/anti_air_crate = 1,
-	)
-	prices = list(
-		//Weapons
-		/obj/item/weapon/gun/projectile/submachinegun/m16/commando = 200,
-		/obj/item/weapon/gun/projectile/submachinegun/m16/m16a2 = 160,
-		/obj/item/weapon/gun/launcher/grenade/standalone/m79 = 150,
-		/obj/item/weapon/gun/launcher/rocket/bazooka = 150,
-		/obj/item/weapon/gun/projectile/submachinegun/m14/sniper = 200,
-		/obj/item/weapon/attachment/scope/adjustable/advanced/holographic = 100,
-		/obj/item/weapon/attachment/scope/adjustable/sniper_scope/acog = 100,
-		/obj/item/weapon/attachment/scope/adjustable/advanced/reddot = 100,
-		/obj/item/weapon/attachment/scope/adjustable/sniper_scope = 100,
-		/obj/item/weapon/attachment/under/foregrip = 100,
-		/obj/item/weapon/attachment/silencer/pistol = 100,
-		/obj/item/weapon/attachment/silencer/rifle = 100,
-		/obj/item/weapon/attachment/silencer/shotgun = 100,
-		/obj/item/weapon/attachment/silencer/smg = 100,
-		/obj/item/weapon/foldable/atgm/bgm_tow = 1000,
-
-		//Ammunition
-		/obj/item/ammo_magazine/m16 = 20,
-		/obj/item/ammo_magazine/m14 = 30,
-		/obj/item/ammo_casing/rocket/bazooka = 200,
-		/obj/item/weapon/grenade/frag/ugl/shell40mm = 80,
-		/obj/item/weapon/plastique/c4 = 100,
-		/obj/item/ammo_casing/rocket/atgm = 150,
-		/obj/item/ammo_casing/rocket/atgm/he = 150,
-
-		//Clothing
-		/obj/item/clothing/under/us_uni/us_camo_woodland = 20,
-		/obj/item/clothing/accessory/storage/webbing/us_vest = 20,
-		/obj/item/clothing/suit/storage/coat/ww2/us_coat = 30,
-		/obj/item/clothing/shoes/jackboots/modern = 20,
-		/obj/item/clothing/accessory/armor/coldwar/pasgt = 100,
-		/obj/item/clothing/head/helmet/modern/pasgt = 100,
-
-		//Food and Drink
-		/obj/item/weapon/reagent_containers/food/snacks/burger = 5,
-		/obj/item/weapon/reagent_containers/food/snacks/cheeseburger = 5,
-		/obj/item/weapon/reagent_containers/food/snacks/hotdog = 5,
-		/obj/item/weapon/reagent_containers/food/snacks/MRE/generic/american = 10,
-		/obj/item/weapon/reagent_containers/food/snacks/sliceable/pumpkinpie = 20,
-		/obj/item/weapon/reagent_containers/food/snacks/applepie = 20,
-
-		//Miscellaneous
-		/obj/item/weapon/telephone/mobile = 500,
-		/obj/structure/anti_air_crate = 1000,
-	)
-
-/obj/structure/vending/sales/pepelsibirsk/pacific_trader/dropwares()
-	for(var/product_key in products)
-		for(var/i in 1 to products[product_key])
-			if (prob(25))
-				new product_key(get_turf(src))
-	new /mob/living/human/corpse(get_turf(src))
-	PACIFIC_RELATIONS -= rand(10, 25)
-	to_chat(world, "<font size = 3><span class = 'notice'><b>A Pacifician trader has died. Relations with the United States of the Pacific have dropped to [PACIFIC_RELATIONS]!</b></font></span>")
-
-/obj/structure/vending/sales/pepelsibirsk/chinese_trader
-	name = "PRC Trader"
-	desc = "现在我有冰淇淋我很喜欢冰淇淋."
-	icon = 'icons/mob/npcs.dmi'
-	icon_state = "chinese_trader"
-	faction_relations = "faction_1_relations"
-	products = list(
-		//Weapons
-		/obj/item/weapon/gun/projectile/submachinegun/ak47/chinese = 3,
-		/obj/item/weapon/gun/projectile/semiautomatic/sks/chinese = 3,
-		/obj/item/weapon/gun/projectile/submachinegun/ppsh/chinese = 3,
-
-		//Clothing
-		/obj/item/clothing/suit/storage/coat/chinese/officer = 2,
-		/obj/item/clothing/suit/storage/coat/chinese = 8,
-		/obj/item/clothing/under/chinaguard = 8,
-		/obj/item/clothing/head/chinaguardcap = 8,
-		/obj/item/clothing/head/chinese_ushanka = 8,
-		/obj/item/clothing/head/helmet/modern/chi_korea_helmet/modernized = 8,
-
-		//Food and Drink
-		/obj/item/weapon/reagent_containers/food/snacks/ssicle/osicle = 8,
-	)
-	prices = list(
-		//Weapons
-		/obj/item/weapon/gun/projectile/submachinegun/ak47/chinese = 50,
-		/obj/item/weapon/gun/projectile/semiautomatic/sks/chinese = 30,
-		/obj/item/weapon/gun/projectile/submachinegun/ppsh/chinese = 30,
-
-		//Clothing
-		/obj/item/clothing/suit/storage/coat/chinese/officer = 30,
-		/obj/item/clothing/suit/storage/coat/chinese = 25,
-		/obj/item/clothing/under/chinaguard = 25,
-		/obj/item/clothing/head/chinaguardcap = 15,
-		/obj/item/clothing/head/chinese_ushanka = 15,
-		/obj/item/clothing/head/helmet/modern/chi_korea_helmet/modernized = 35,
-
-		//Food and Drink
-		/obj/item/weapon/reagent_containers/food/snacks/ssicle/osicle = 5,
-	)
-
-/obj/structure/vending/sales/pepelsibirsk/chinese_trader/dropwares()
-	for(var/product_key in products)
-		for(var/i in 1 to products[product_key])
-			new product_key(get_turf(src))
-	new /mob/living/human/corpse(get_turf(src))
-	CHINA_RELATIONS -= rand(10, 25)
-	to_chat(world, "<font size = 3><span class = 'notice'><b>A Chinese trader has died. Relations with the People's Republic of China have dropped to [CHINA_RELATIONS]!</b></font></span>")
-
-/obj/structure/vending/sales/pepelsibirsk/soviet_trader
-	name = "Soviet Trader"
-	desc = "Вы неправильно используете это программное обеспечение для перевода. Пожалуйста, проконсультируйтесь с руководством по программному обеспечению."
-	icon = 'icons/mob/npcs.dmi'
-	icon_state = "soviet_trader"
-	faction_relations = "faction_2_relations"
-	products = list(
-		//Weapons
-		/obj/item/weapon/gun/projectile/submachinegun/ak74/aks74/aks74u/aks74uso = 1,
-		/obj/item/weapon/gun/projectile/shotgun/pump/ks23 = 1,
-		/obj/item/weapon/gun/launcher/rocket/single_shot/rpg22 = 2,
-		/obj/item/weapon/gun/launcher/grenade/underslung/gp25 = 2,
-		/obj/item/weapon/gun/launcher/rocket/rpg7 = 1,
-
-		//Ammunition
-		/obj/item/weapon/grenade/frag/ugl/shell40mm = 3,
-		/obj/item/ammo_casing/rocket/pg7v = 2,
-		/obj/item/ammo_casing/rocket/og7v = 2,
-		/obj/item/weapon/grenade/frag/ugl/shell40mm = 3,
-		/obj/item/weapon/plastique/russian = 1,
-
-		//Food and Drink
-		/obj/item/weapon/reagent_containers/food/snacks/MRE/generic/russian = 5,
-		/obj/item/weapon/reagent_containers/food/snacks/sliceable/cheesewheel = 5,
-		/obj/item/weapon/reagent_containers/food/drinks/bottle/vodka = 5,
-		/obj/item/weapon/reagent_containers/food/drinks/flask/barflask = 3,
-		/obj/item/weapon/reagent_containers/food/drinks/flask/officer = 3,
-		/obj/item/weapon/reagent_containers/food/drinks/teapot/filled = 3,
-		/obj/item/weapon/reagent_containers/food/drinks/golden_cup = 1,
-
-		//Medicines
-		/obj/item/weapon/storage/pill_bottle/tramadol = 4,
-		/obj/item/weapon/storage/pill_bottle/penicillin = 4,
-		/obj/item/weapon/storage/pill_bottle/paracetamol = 4,
-		/obj/item/weapon/storage/pill_bottle/citalopram = 4,
-		/obj/item/weapon/storage/pill_bottle/potassium_iodide = 4,
-	)
-	prices = list(
-		//Weapons
-		/obj/item/weapon/gun/projectile/submachinegun/ak74/aks74/aks74u/aks74uso = 200,
-		/obj/item/weapon/gun/projectile/shotgun/pump/ks23 = 150,
-		/obj/item/weapon/gun/launcher/rocket/single_shot/rpg22 = 250,
-		/obj/item/weapon/gun/launcher/grenade/underslung/gp25 = 100,
-		/obj/item/weapon/gun/launcher/rocket/rpg7 = 100,
-
-		//Ammunition
-		/obj/item/weapon/grenade/frag/ugl/shell40mm = 40,
-		/obj/item/ammo_casing/rocket/pg7v = 100,
-		/obj/item/ammo_casing/rocket/og7v = 100,
-		/obj/item/weapon/grenade/frag/ugl/shell40mm = 40,
-		/obj/item/weapon/plastique/russian = 30,
-
-		//Food and Drink
-		/obj/item/weapon/reagent_containers/food/snacks/MRE/generic/russian = 10,
-		/obj/item/weapon/reagent_containers/food/snacks/sliceable/cheesewheel = 10,
-		/obj/item/weapon/reagent_containers/food/drinks/bottle/vodka = 10,
-		/obj/item/weapon/reagent_containers/food/drinks/flask/barflask = 25,
-		/obj/item/weapon/reagent_containers/food/drinks/flask/officer = 50,
-		/obj/item/weapon/reagent_containers/food/drinks/teapot/filled = 25,
-		/obj/item/weapon/reagent_containers/food/drinks/golden_cup = 500,
-
-		//Medicines
-		/obj/item/weapon/storage/pill_bottle/tramadol = 150,
-		/obj/item/weapon/storage/pill_bottle/penicillin = 150,
-		/obj/item/weapon/storage/pill_bottle/paracetamol = 150,
-		/obj/item/weapon/storage/pill_bottle/citalopram = 150,
-		/obj/item/weapon/storage/pill_bottle/potassium_iodide = 150,
-	)
-
-/obj/structure/vending/sales/pepelsibirsk/soviet_trader/dropwares()
-	for(var/product_key in products)
-		for(var/i in 1 to products[product_key])
-			new product_key(get_turf(src))
-	new /mob/living/human/corpse(get_turf(src))
-	SOVIET_RELATIONS -= rand(10, 25)
-	to_chat(world, "<font size = 3><span class = 'notice'><b>A Soviet trader has died. Relations with the Union of Soviet Socialist Republics have dropped to [MIL_RELATIONS]!</b></font></span>")
-
 ////// TRAVELING MERCHANTS MANAGEMENT //////
-/obj/map_metadata/pepelsibirsk/proc/send_traders() //Picks a turf from trader_spawnpoint and sends traders there if relations are high enough.
+/obj/map_metadata/pepelsibirsk/proc/send_traders()
 	world.log << "send_traders has been triggered"
 	var/list/turfs = list()
 	var/spawnpoint
 	spawn(1)
 		turfs = latejoin_turfs[trader_spawnpoint]
 		if (CHINA_RELATIONS >= 26)
-			var/traderpath = /obj/structure/vending/sales/pepelsibirsk/chinese_trader
+			var/traderpath = /mob/living/simple_animal/pepelsibirsk_trader/chinese_trader
 			spawnpoint = pick(turfs)
 			var/trader = new traderpath(get_turf(spawnpoint))
 			world.log << "[trader] has been spawned at with get_turf, example: [get_turf(spawnpoint)]."
@@ -560,7 +330,7 @@ var/global/datum/external_relations/external_relations = new()
 				world.log << "[trader] has been deleted."
 				qdel(trader)
 		if (SOVIET_RELATIONS >= 26)
-			var/traderpath = /obj/structure/vending/sales/pepelsibirsk/soviet_trader
+			var/traderpath = /mob/living/simple_animal/pepelsibirsk_trader/soviet_trader
 			spawnpoint = pick(turfs)
 			var/trader = new traderpath(get_turf(spawnpoint))
 			world.log << "[trader] has been spawned with get_turf, example: [get_turf(spawnpoint)]."
@@ -568,7 +338,7 @@ var/global/datum/external_relations/external_relations = new()
 				world.log << "[trader] has been deleted."
 				qdel(trader)
 		if (PACIFIC_RELATIONS >= 26)
-			var/traderpath = /obj/structure/vending/sales/pepelsibirsk/pacific_trader
+			var/traderpath = /mob/living/simple_animal/pepelsibirsk_trader/pacific_trader
 			spawnpoint = pick(turfs)
 			var/trader = new traderpath(get_turf(spawnpoint))
 			world.log << "[trader] has been spawned with get_turf, example: [get_turf(spawnpoint)]."
@@ -692,6 +462,7 @@ var/global/datum/external_relations/external_relations = new()
 	var/faction_treasury = "TreasuryRN"
 	not_movable = TRUE
 	not_disassemblable = TRUE
+	var/can_scam = TRUE
 	var/list/civ_catalogue = list( //type name, path, price
 		list("wood crate", /obj/structure/closet/crate/wood,50),
 		list("iron crate", /obj/structure/closet/crate/iron,50),
@@ -736,6 +507,7 @@ var/global/datum/external_relations/external_relations = new()
 /obj/structure/pepelsibirsk_radio/supply_radio/no_scam
 	name = "long range high-sensitivity supply radio"
 	desc = "Use this to request supplies to be delivered to the city. It appears like the microphone on it is set to much too high sensitivity for you to safely arrange a scam."
+	can_scam = FALSE
 
 /obj/structure/pepelsibirsk_radio/supply_radio/proc/update_cost(final_list, final_cost, choice, user, scam)
 	if (choice == "Pepelsibirsk 1 (MIL)" && scam != "Yes, scam them!")
@@ -779,7 +551,7 @@ var/global/datum/external_relations/external_relations = new()
 		display += "[i[1]], [i[3]] rubles"
 		display += "Cancel Purchase"
 	var/choice2 = WWinput(user, "Current Rubles: [money]", "Order a crate", "Cancel Purchase", display)
-	if(istype(src, /obj/structure/pepelsibirsk_radio/supply_radio/no_scam))
+	if(can_scam == FALSE)
 		scam = "No, we're honest."
 	else
 		scam = WWinput(user, "Current Rubles: [money]", "Shall we scam them?", "No, we're honest.", scamornot)
@@ -906,6 +678,8 @@ var/global/datum/external_relations/external_relations = new()
 ////// ENEMY AIR BOMBING //////
 
 /obj/map_metadata/pepelsibirsk/proc/bombing(var/turf/T, direction, aircraft_name)
+	if (!T)
+		return
 	var/strikenum = rand(1, 10)
 	var/xoffset = 0
 	var/yoffset = 0
@@ -934,11 +708,11 @@ var/global/datum/external_relations/external_relations = new()
 					xoffset = rand(0,1)
 					yoffset = rand(-2,2)
 			spawn(i*8)
-				explosion(locate((T.x + xoffset + direction_xoffset),(T.y + yoffset + direction_yoffset),T.z),0,1,5,3,sound='sound/weapons/Explosives/FragGrenade.ogg')
+				explosion(locate((T.x + xoffset + direction_xoffset),(T.y + yoffset + direction_yoffset),T.z),0,1,5,3,sound="sound/weapons/Explosives/FragGrenade.ogg")
 
 /obj/map_metadata/pepelsibirsk/proc/try_shoot_down_aircraft(var/turf/T, direction, aircraft_name)
 	spawn(8 SECONDS)
-		var/sound/sam_sound = sound('sound/effects/aircraft/sa6_sam_site.ogg', repeat = FALSE, wait = FALSE, channel = 777)
+		var/sound/sam_sound = sound("sound/effects/aircraft/sa6_sam_site.ogg", repeat = FALSE, wait = FALSE, channel = 777)
 		sam_sound.priority = 250
 		for (var/mob/M in player_list)
 			if (!new_player_mob_list.Find(M))
@@ -946,7 +720,7 @@ var/global/datum/external_relations/external_relations = new()
 				M.client << sam_sound
 		spawn(5 SECONDS)
 			if (prob(95)) // Shoot down the jet
-				var/sound/uploaded_sound = sound((pick('sound/effects/aircraft/effects/metal1.ogg','sound/effects/aircraft/effects/metal2.ogg')), repeat = FALSE, wait = FALSE, channel = 777)
+				var/sound/uploaded_sound = sound((pick("sound/effects/aircraft/effects/metal1.ogg","sound/effects/aircraft/effects/metal2.ogg")), repeat = FALSE, wait = FALSE, channel = 777)
 				uploaded_sound.priority = 250
 				for (var/mob/M in player_list)
 					if (!new_player_mob_list.Find(M))
@@ -956,7 +730,7 @@ var/global/datum/external_relations/external_relations = new()
 				log_game("Aircraft [aircraft_name] has been shot down.")
 				return
 			else // Evade the Anti-Air
-				var/sound/uploaded_sound = sound((pick('sound/effects/aircraft/effects/missile1.ogg','sound/effects/aircraft/effects/missile2.ogg')), repeat = FALSE, wait = FALSE, channel = 777)
+				var/sound/uploaded_sound = sound((pick("sound/effects/aircraft/effects/missile1.ogg","sound/effects/aircraft/effects/missile2.ogg")), repeat = FALSE, wait = FALSE, channel = 777)
 				uploaded_sound.priority = 250
 				for (var/mob/M in player_list)
 					if (!new_player_mob_list.Find(M))
@@ -987,7 +761,15 @@ var/global/datum/external_relations/external_relations = new()
 
 /obj/map_metadata/pepelsibirsk/proc/bombing_location(faction)
 	var/direction = rand(1, 4)
-	var/turf/T = locate(rand(1, 255),rand(1, 255),2)
+	var/turf/T
+	// Keep trying until we get a valid turf
+	var/attempts = 0
+	while(T==null && attempts < 100)
+		T = locate(rand(1, 255), rand(1, 255), 2)
+		attempts++
+	if (!T)
+		world.log << "bombing_location(): failed to find a valid turf after [attempts] attempts."
+		return
 	try_bombing(T, direction, faction)
 
 /obj/map_metadata/pepelsibirsk/proc/enemy_attacks()
@@ -1072,13 +854,28 @@ var/global/datum/external_relations/external_relations = new()
 	anchored = TRUE
 
 	attack_hand(mob/living/human/H)
-		var/list/supplies = get_supplies()
-		var/dat = "<center><h2>Warehouse Contents</h2></center>"
-		var/i2 = 1
-		for(var/i in supplies)
-			dat += "<b>[supplies[i2]]:</b> [supplies[i]]<br>" //example: Cloth: 50
-			i2++
-		H << browse(dat, "window=Warehouse Contents")
+		ui_interact(H)
+
+/obj/structure/warehouse_book/ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = TRUE)
+	user.set_using_object(src)
+
+	var/list/data = list()
+	var/list/supplies = get_supplies()
+	
+	// Convert supplies into proper format for NanoUI
+	var/list/item_list = list()
+	for(var/item_name in supplies)
+		item_list.Add(list(list(
+			"name" = item_name,
+			"amount" = supplies[item_name])))
+	
+	data["items"] = item_list
+
+	ui = GLOB.nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
+	if (!ui)
+		ui = new(user, src, ui_key, "warehouse_book.tmpl", name, 400, 500)
+		ui.set_initial_data(data)
+		ui.open()
 
 /obj/structure/warehouse_book/proc/get_supplies()
 	var/list/supplies = list()

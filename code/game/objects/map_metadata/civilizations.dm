@@ -16,18 +16,19 @@
 	civilizations = TRUE
 	faction_distribution_coeffs = list(CIVILIAN = 1)
 	battle_name = "the kingdoms"
-	mission_start_message = "<big>Two medieval kingdoms rule this land. They have <b>24 hours</b> to fortify and build a military. Who will win?</big><br><b>Wiki Guide: http://civ13.github.io/civ13-wiki/Civilizations_and_Nomads</b>"
-	ambience = list('sound/ambience/jungle1.ogg')
+	mission_start_message = "<big>Two medieval kingdoms rule this land. They have <b>24 hours</b> to fortify and build a military. Who will win?</big><br><b>Wiki Guide: https://civ13.github.io/civ13-wiki/gamemodes/Civilizations_and_Nomads</b>"
+	ambience = list("sound/ambience/jungle1.ogg")
 	faction1 = CIVILIAN
 	availablefactions_run = TRUE
 	songs = list(
-		"Words Through the Sky:1" = 'sound/music/words_through_the_sky.ogg',)
+		"Words Through the Sky:1" = "sound/music/words_through_the_sky.ogg",)
 	default_research = 48
 	gamemode = "Two Kingdoms"
 	ordinal_age = 2
 	age1_done = TRUE
 	age2_done = TRUE
 	research_active = FALSE
+	gamemode_vote = FALSE
 
 /obj/map_metadata/civilizations/New()
 	var/newnamea = list("West Kingdom" = list(default_research,default_research,default_research,null,0,"saltire","#D4AF37","#660000"))
@@ -45,13 +46,13 @@
 /obj/map_metadata/civilizations/proc/walldown()
 	for (var/turf/wall/rockwall/RW)
 		RW.ChangeTurf(/turf/floor/dirt/jungledirt)
-	world << "<font color=#CECE00><big><b>THE WALL HAS GONE DOWN!</b></big></font>"
+	to_chat(world, "<font color=#CECE00><big><b>THE WALL HAS GONE DOWN!</b></big></font>")
 	admin_ended_all_grace_periods = TRUE
 	return
 /obj/map_metadata/civilizations/proc/wallup()
 	for (var/turf/floor/dirt/jungledirt/JD)
 		JD.ChangeTurf(/turf/wall/rockwall)
-	world <<"<font color=#CECE00><big><b>THE WALL HAS GONE UP!</b></big></font>"
+	to_chat(world, "<font color=#CECE00><big><b>THE WALL HAS GONE UP!</b></big></font>")
 	admin_ended_all_grace_periods = FALSE
 	return
 

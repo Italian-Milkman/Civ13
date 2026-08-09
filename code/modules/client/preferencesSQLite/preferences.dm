@@ -6,7 +6,6 @@ var/list/preferences_datums = list()
 /datum/preferences
 
 	//non-preference stuff
-	var/warns = FALSE
 	var/muted = FALSE
 	var/last_ip
 	var/last_id
@@ -64,7 +63,6 @@ var/list/preferences_datums = list()
 
 	var/client/client = null
 	var/client_ckey = null
-	var/client_isguest = FALSE
 
 	var/datum/category_collection/player_setup_collection/player_setup
 
@@ -81,8 +79,6 @@ var/list/preferences_datums = list()
 	if (istype(C))
 		client = C
 		client_ckey = C.ckey
-		if (IsGuestKey(client_ckey))
-			client_isguest = TRUE
 
 		var/F = file("SQL/charprefs.txt")
 		var/list/charprefs = splittext(file2text(F), "|||\n")
@@ -103,7 +99,7 @@ var/list/preferences_datums = list()
 	if (!user || !user.client)	return
 
 	if (!get_mob_by_key(client_ckey))
-		user << "<span class='danger'>No mob exists for the given client!</span>"
+		to_chat(user, "<span class='danger'>No mob exists for the given client!</span>")
 		return
 
 	var/dat = {"
@@ -115,7 +111,7 @@ var/list/preferences_datums = list()
 	<body><center><big><b>PREFERENCES<br><br>
 	"}
 	dat += player_setup.header()
-	dat += "</big></b><br><HR></center>"
+	dat += "</b></big><br><HR></center>"
 	dat += player_setup.content(user)
 
 	var/datlist = splittext(dat, "<br>")
@@ -190,8 +186,7 @@ var/list/preferences_datums = list()
 		character.f_growth = facial_hair_styles_list[f_style].growth
 
 	character.traits = traits
-
-	character.all_underwear.Cut()
+	character.traits_dirty = TRUE
 
 
 	//Debugging report to track down a bug, which randomly assigned the plural gender to people.
@@ -199,11 +194,6 @@ var/list/preferences_datums = list()
 		if (isliving(src)) //Ghosts get neuter by default
 			message_admins("[character] ([character.ckey]) has spawned with their gender as plural or neuter. Please notify coders.", character.ckey)
 			character.gender = MALE
-
-/proc/globalprefsanitize(str)
-	if (islist(str))
-		return ""
-	return str
 
 /client/proc/is_preference_enabled(var/preference)
 

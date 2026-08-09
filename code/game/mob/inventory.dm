@@ -47,7 +47,7 @@
 			qdel(W)
 		else
 			if (!disable_warning)
-				src << "<span class = 'red'>You are unable to equip that.</span>" //Only print if del_on_fail is false
+				to_chat(src, "<span class = 'red'>You are unable to equip that.</span>") //Only print if del_on_fail is false)
 		return FALSE
 
 	equip_to_slot(W, slot, redraw_mob) //This proc should not ever fail.
@@ -122,13 +122,15 @@ var/list/slot_equipment_priority = list( \
 
 //Returns the thing in our active hand
 /mob/proc/get_active_hand()
-	if (hand)	return l_hand
-	else		return r_hand
+	if (hand)
+		return l_hand
+	return r_hand
 
 //Returns the thing in our inactive hand
 /mob/proc/get_inactive_hand()
-	if (hand)	return r_hand
-	else		return l_hand
+	if (hand)
+		return r_hand
+	return l_hand
 
 //Puts the item into your l_hand if possible and calls all necessary triggers/updates. returns TRUE on success.
 /mob/proc/put_in_l_hand(var/obj/item/W)
@@ -193,7 +195,7 @@ var/list/slot_equipment_priority = list( \
 					MD.origin.engine.power_off_connections()
 					MD.origin.engine.currentspeed = 0
 					MD.origin.engine.currentpower = 0
-					src << "You turn off the engine."
+					to_chat(src, "You turn off the engine.")
 					MD.origin.set_light(0)
 					playsound(loc, MD.origin.engine.ending_snd, 65, FALSE, 2)
 					MD.origin.attackby(MD,src)

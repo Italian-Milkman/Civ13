@@ -373,7 +373,7 @@
 					give_languages()
 		update_character_appearance(possible_e_list, possible_h_list, possible_s_range)
 
-	else if (map && (map.ID == MAP_NOMADS_CONTINENTAL || map.ID == MAP_NOMADS_PANGEA))
+	else if (map && (map.ID == MAP_NOMADS_CONTINENTAL || map.ID == MAP_NOMADS_PANGEA || map.ID == MAP_NOMADS_GAIA))
 		switch (mob_area.climate)
 			if ("tundra","taiga")
 				add_language("Old Norse",TRUE)
@@ -992,6 +992,20 @@
 			possible_h_list = list("Orange","Light Brown","Red","Brown")
 			possible_e_list = list("Green","Blue")
 			possible_s_range = list(-15,-30)
+		update_character_appearance(possible_e_list, possible_h_list, possible_s_range)
+
+	else if (map.ID == MAP_COLONIA)
+		add_language("Latin",TRUE)
+		remove_language("English")
+		remove_note("Known Languages","English")
+		for (var/datum/language/latin/A in languages)
+			default_language = A
+		name = species.get_random_roman_name(gender)
+		real_name = name
+		add_note("Known Languages", "Latin")
+		possible_h_list = list("Light Brown","Dark Brown")
+		possible_e_list = list("Green","Brown","Black")
+		possible_s_range = list(-35,-60)
 		update_character_appearance(possible_e_list, possible_h_list, possible_s_range)
 
 	else if (map.ID == MAP_NATIONSRP_TRIPLE)

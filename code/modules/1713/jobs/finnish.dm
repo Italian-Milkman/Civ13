@@ -9,6 +9,7 @@
 	title = "Kapteeni"
 	en_meaning = "Captain"
 	rank_abbreviation = "Kap."
+	allowed_maps = list(MAP_KARELIA)
 
 
 	spawn_location = "JoinLateGECap"
@@ -37,7 +38,7 @@
 	var/obj/item/clothing/accessory/holster/hip/holsterh = new /obj/item/clothing/accessory/holster/hip(null)
 	uniform.attackby(holsterh, H)
 	give_random_name(H)
-	world << "<b><big>[H.real_name] is the commander of the Finnish Forces!</big></b>"
+	to_chat(world, "<big><b>[H.real_name] is the commander of the Finnish Forces!</b></big>")
 	H.add_note("Role", "You are a <b>[title]</b>, the highest ranking officer present. Your job is to command the german troops and organize them to victory.")
 	H.setStat("strength", STAT_MEDIUM_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -55,6 +56,7 @@
 	title = " Luutnantti"
 	en_meaning = "First Lieutenant"
 	rank_abbreviation = "Luut."
+	allowed_maps = list(MAP_KARELIA)
 
 
 	spawn_location = "JoinLateGECap"
@@ -100,6 +102,7 @@
 	title = "Vanrikki"
 	en_meaning = "Second Lieutenant"
 	rank_abbreviation = "Lt."
+	allowed_maps = list(MAP_KARELIA)
 
 
 	spawn_location = "JoinLateGECap"
@@ -148,6 +151,7 @@
 	title = "Kersantti"
 	en_meaning = "Squad Leader"
 	rank_abbreviation = "Ker."
+	allowed_maps = list(MAP_KARELIA)
 
 	spawn_location = "JoinLateGE"
 	is_squad_leader = TRUE
@@ -192,6 +196,7 @@
 	title = "Sotamies"
 	en_meaning = "Soldier"
 	rank_abbreviation = ""
+	allowed_maps = list(MAP_KARELIA)
 
 	spawn_location = "JoinLateGE"
 
@@ -241,6 +246,7 @@
 	title = "Ampuja"
 	en_meaning = "Sniper"
 	rank_abbreviation = ""
+	allowed_maps = list(MAP_KARELIA)
 
 	spawn_location = "JoinLateGE"
 
@@ -290,6 +296,7 @@
 	title = "Taistelulaakari"
 	en_meaning = "Combat Medic"
 	rank_abbreviation = "Dr."
+	allowed_maps = list(MAP_KARELIA)
 
 	spawn_location = "JoinLateGEDoc"
 
@@ -339,6 +346,7 @@
 	title = "Pioneeri"
 	en_meaning = "Sapper"
 	rank_abbreviation = ""
+	allowed_maps = list(MAP_KARELIA)
 
 	spawn_location = "JoinLateGESap"
 	is_karelia = TRUE

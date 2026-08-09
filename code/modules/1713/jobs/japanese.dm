@@ -21,6 +21,7 @@
 	en_meaning = "Army Captain"
 	rank_abbreviation = "Ri-Tai"
 	is_russojapwar = TRUE
+	allowed_maps = list(MAP_HILL_203, MAP_PORT_ARTHUR)
 
 	spawn_location = "JoinLateJPCap"
 	is_officer = TRUE
@@ -54,7 +55,7 @@
 	H.s_tone = rand(-32,-24)
 	if (H.f_style != "Shaved" && H.f_style != "Short Facial Hair" && H.f_style != "Goatee")
 		H.f_style = pick("Shaved","Short Facial Hair","Goatee")
-	world << "<b><big>[H.real_name] is the Captain of the Japanese Forces!</big></b>"
+	to_chat(world, "<big><b>[H.real_name] is the Captain of the Japanese Forces!</b></big>")
 	H.add_note("Role", "You are a <b>[title]</b>, the highest ranking officer present. Your job is to command the company.")
 	H.setStat("strength", STAT_MEDIUM_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -71,6 +72,7 @@
 	en_meaning = "1st Lieutenant"
 	rank_abbreviation = "1lt."
 	is_russojapwar = TRUE
+	allowed_maps = list(MAP_HILL_203, MAP_PORT_ARTHUR)
 
 	spawn_location = "JoinLateJPCap"
 	whitelisted = TRUE
@@ -105,7 +107,7 @@
 	H.s_tone = rand(-32,-24)
 	if (H.f_style != "Shaved" && H.f_style != "Short Facial Hair" && H.f_style != "Goatee")
 		H.f_style = pick("Shaved","Short Facial Hair","Goatee")
-	world << "<b><big>[H.real_name] is the 1st Lieutenant of the Japanese forces!</big></b>"
+	to_chat(world, "<big><b>[H.real_name] is the 1st Lieutenant of the Japanese forces!</b></big>")
 	H.add_note("Role", "You are a <b>[title]</b>, an officer in charge of the troops and their orders. The whole operation relies on you!")
 	H.setStat("strength", STAT_MEDIUM_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -122,6 +124,7 @@
 	en_meaning = "2nd Lieutenant"
 	rank_abbreviation = "2lt."
 	is_russojapwar = TRUE
+	allowed_maps = list(MAP_HILL_203, MAP_PORT_ARTHUR)
 
 	spawn_location = "JoinLateJPCap"
 	whitelisted = TRUE
@@ -156,7 +159,7 @@
 	H.s_tone = rand(-32,-24)
 	if (H.f_style != "Shaved" && H.f_style != "Short Facial Hair" && H.f_style != "Goatee")
 		H.f_style = pick("Shaved","Short Facial Hair","Goatee")
-	world << "<b><big>[H.real_name] is the 2nd Lieutenant of the Japanese forces!</big></b>"
+	to_chat(world, "<big><b>[H.real_name] is the 2nd Lieutenant of the Japanese forces!</b></big>")
 	H.add_note("Role", "You are a <b>[title]</b>, an officer in charge of the troops and their orders. Second to 1st Lieutenant. The whole operation relies on you and your orders!")
 	H.setStat("strength", STAT_MEDIUM_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -176,6 +179,7 @@
 	spawn_location = "JoinLateJP"
 	is_squad_leader = TRUE
 	uses_squads = TRUE
+	allowed_maps = list(MAP_HILL_203, MAP_PORT_ARTHUR)
 
 	min_positions = 1
 	max_positions = 10
@@ -221,6 +225,7 @@
 	rank_abbreviation = "Gun-i"
 	is_russojapwar = TRUE
 	spawn_location = "JoinLateJPDoc"
+	allowed_maps = list(MAP_HILL_203, MAP_PORT_ARTHUR)
 
 	is_medic = TRUE
 
@@ -255,93 +260,8 @@
 	H.setStat("bows", STAT_NORMAL)
 	H.setStat("medical", STAT_VERY_HIGH)
 	return TRUE
-/*
-/datum/job/japanese/cook
-	title = "Shefu"
-	en_meaning = "Chef"
-	rank_abbreviation = "Shefu"
-
-	spawn_location = "JoinLateJP"
 
 
-
-	min_positions = 1
-	max_positions = 10
-
-/datum/job/japanese/cook/equip(var/mob/living/human/H)
-	if (!H)	return FALSE
-//jacket
-	H.equip_to_slot_or_del(new /obj/item/clothing/suit/storage/coat/japcoat(H), slot_wear_suit)
-
-//shoes
-	H.equip_to_slot_or_del(new /obj/item/clothing/shoes/japboots(H), slot_shoes)
-//head//
-	H.equip_to_slot_or_del(new /obj/item/clothing/head/japcap(H), slot_head)
-//clothes
-	H.equip_to_slot_or_del(new /obj/item/clothing/under/japuni(H), slot_w_uniform)
-//back
-	H.equip_to_slot_or_del(new /obj/item/weapon/gun/projectile/boltaction/arisaka30(H), slot_shoulder)
-
-	H.equip_to_slot_or_del(new /obj/item/weapon/storage/belt/jap(H), slot_belt)
-
-	H.add_note("Role", "You are the cook of the company. Feed the whole company according to the <b>Leiutenant's</b> orders!")
-	H.setStat("strength", STAT_NORMAL)
-	H.setStat("crafting", STAT_MEDIUM_LOW)
-	H.setStat("rifle", STAT_MEDIUM_LOW)
-	H.setStat("dexterity", STAT_NORMAL)
-	H.setStat("swords", STAT_MEDIUM_LOW)
-	H.setStat("pistol", STAT_MEDIUM_LOW)
-	H.setStat("bows", STAT_NORMAL)
-	H.setStat("medical", STAT_MEDIUM_LOW)
-
-*/
-
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-/datum/job/japanese/infantry
-	title = "Nitohei"
-	en_meaning = "Soldier Second-class"
-	rank_abbreviation = "Ni."
-
-	spawn_location = "JoinLateJP"
-
-
-
-	min_positions = 6
-	max_positions = 200
-
-/datum/job/japanese/infantry/equip(var/mob/living/human/H)
-	if (!H)	return FALSE
-//shoes
-	H.equip_to_slot_or_del(new /obj/item/clothing/shoes/japboots(H), slot_shoes)
-
-//clothes
-	H.equip_to_slot_or_del(new /obj/item/clothing/under/japuni(H), slot_w_uniform)
-
-//head
-	H.equip_to_slot_or_del(new /obj/item/clothing/head/japcap(H), slot_head)
-//jacket
-	H.equip_to_slot_or_del(new /obj/item/clothing/suit/storage/coat/japcoat(H), slot_wear_suit)
-//back
-	H.equip_to_slot_or_del(new /obj/item/weapon/gun/projectile/boltaction/arisaka30(H), slot_shoulder)
-
-	H.equip_to_slot_or_del(new 	/obj/item/weapon/storage/belt/jap/soldier(H), slot_belt)
-
-	H.add_note("Role", "You are a <b>[title]</b>, a simple soldier second-class  employed by the Imperial Japanese Army. Follow your <b>Officer's</b> orders!")
-	H.setStat("strength", STAT_MEDIUM_HIGH)
-	H.setStat("crafting", STAT_MEDIUM_LOW)
-	H.setStat("rifle", STAT_MEDIUM_HIGH)
-	H.setStat("dexterity", STAT_NORMAL)
-	H.setStat("swords", STAT_NORMAL)
-	H.setStat("pistol", STAT_NORMAL)
-	H.setStat("bows", STAT_NORMAL)
-	H.setStat("medical", STAT_MEDIUM_LOW)
-
-
-	return TRUE
-*/
 /datum/job/japanese/sniper
 	title = " Ittohei"
 	en_meaning = "Soldier First-class"
@@ -349,6 +269,7 @@
 	is_russojapwar = TRUE
 	spawn_location = "JoinLateJP"
 	uses_squads = TRUE
+	allowed_maps = list(MAP_HILL_203, MAP_PORT_ARTHUR)
 
 
 	min_positions = 3
@@ -394,6 +315,7 @@
 	is_russojapwar = TRUE
 	spawn_location = "JoinLateJP"
 	uses_squads = TRUE
+	allowed_maps = list(MAP_HILL_203, MAP_PORT_ARTHUR)
 
 
 	min_positions = 6
@@ -439,6 +361,7 @@
 	title = "IJA Rikugun-Tai-i"
 	en_meaning = "Army Captain"
 	rank_abbreviation = "Ri-Tai"
+	allowed_maps = list(MAP_INTRAMUROS, MAP_IWO_JIMA, MAP_KHALKHYN_GOL, MAP_MARCO_POLO_BRIDGE, MAP_NANJING, MAP_NANKOU, MAP_RIZAL_STADIUM)
 
 
 	spawn_location = "JoinLateJPCap"
@@ -478,7 +401,7 @@
 	H.s_tone = rand(-32,-24)
 	if (H.f_style != "Shaved" && H.f_style != "Short Facial Hair" && H.f_style != "Goatee")
 		H.f_style = pick("Shaved","Short Facial Hair","Goatee")
-	world << "<b><big>[H.real_name] is the Captain of the Japanese Forces!</big></b>"
+	to_chat(world, "<big><b>[H.real_name] is the Captain of the Japanese Forces!</b></big>")
 	H.add_note("Role", "You are a <b>[title]</b>, the highest ranking officer present. Your job is to command the company.")
 	H.setStat("strength", STAT_MEDIUM_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -496,6 +419,7 @@
 	title = "IJA Rikugun-Chui"
 	en_meaning = "1st Lieutenant"
 	rank_abbreviation = "1lt."
+	allowed_maps = list(MAP_INTRAMUROS, MAP_IWO_JIMA, MAP_KHALKHYN_GOL, MAP_MARCO_POLO_BRIDGE, MAP_NANJING, MAP_NANKOU, MAP_RIZAL_STADIUM)
 
 
 	spawn_location = "JoinLateJPCap"
@@ -535,7 +459,7 @@
 	H.s_tone = rand(-32,-24)
 	if (H.f_style != "Shaved" && H.f_style != "Short Facial Hair" && H.f_style != "Goatee")
 		H.f_style = pick("Shaved","Short Facial Hair","Goatee")
-	world << "<b><big>[H.real_name] is the 1st Lieutenant of the Japanese forces!</big></b>"
+	to_chat(world, "<big><b>[H.real_name] is the 1st Lieutenant of the Japanese forces!</b></big>")
 	H.add_note("Role", "You are a <b>[title]</b>, an officer in charge of the troops and their orders. The whole operation relies on you!")
 	H.setStat("strength", STAT_MEDIUM_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -553,6 +477,7 @@
 	title = "IJA Rikugun-Shoi"
 	en_meaning = "2nd Lieutenant"
 	rank_abbreviation = "2lt."
+	allowed_maps = list(MAP_INTRAMUROS, MAP_IWO_JIMA, MAP_KHALKHYN_GOL, MAP_MARCO_POLO_BRIDGE, MAP_NANJING, MAP_NANKOU, MAP_RIZAL_STADIUM)
 
 
 	spawn_location = "JoinLateJPCap"
@@ -592,7 +517,7 @@
 	H.s_tone = rand(-32,-24)
 	if (H.f_style != "Shaved" && H.f_style != "Short Facial Hair" && H.f_style != "Goatee")
 		H.f_style = pick("Shaved","Short Facial Hair","Goatee")
-	world << "<b><big>[H.real_name] is the 2nd Lieutenant of the Japanese forces!</big></b>"
+	to_chat(world, "<big><b>[H.real_name] is the 2nd Lieutenant of the Japanese forces!</b></big>")
 	H.add_note("Role", "You are a <b>[title]</b>, an officer in charge of the troops and their orders. Second to 1st Lieutenant. The whole operation relies on you and your orders!")
 	H.setStat("strength", STAT_MEDIUM_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -610,6 +535,7 @@
 	title = "IJA Gunso"
 	en_meaning = "Sergeant"
 	rank_abbreviation = "Gu."
+	allowed_maps = list(MAP_INTRAMUROS, MAP_IWO_JIMA, MAP_KHALKHYN_GOL, MAP_MARCO_POLO_BRIDGE, MAP_NANJING, MAP_NANKOU, MAP_RIZAL_STADIUM)
 
 	spawn_location = "JoinLateJP"
 	uses_squads = TRUE
@@ -670,6 +596,7 @@
 	title = "IJA Gun-i"
 	en_meaning = "Doctor"
 	rank_abbreviation = "Gun-i"
+	allowed_maps = list(MAP_INTRAMUROS, MAP_IWO_JIMA, MAP_KHALKHYN_GOL, MAP_MARCO_POLO_BRIDGE, MAP_NANJING, MAP_NANKOU, MAP_RIZAL_STADIUM)
 
 	spawn_location = "JoinLateJPDoc"
 
@@ -723,6 +650,7 @@
 	title = "Sento-i"
 	en_meaning = "Medic"
 	rank_abbreviation = "Sen-i"
+	allowed_maps = list(MAP_INTRAMUROS, MAP_IWO_JIMA, MAP_KHALKHYN_GOL, MAP_MARCO_POLO_BRIDGE, MAP_NANJING, MAP_NANKOU, MAP_RIZAL_STADIUM)
 
 	spawn_location = "JoinLateJPDoc"
 	uses_squads = TRUE
@@ -784,6 +712,7 @@
 	title = "Ittohei"
 	en_meaning = "Soldier First-class"
 	rank_abbreviation = "Itto."
+	allowed_maps = list(MAP_INTRAMUROS, MAP_IWO_JIMA, MAP_KHALKHYN_GOL, MAP_MARCO_POLO_BRIDGE, MAP_NANJING, MAP_NANKOU, MAP_RIZAL_STADIUM)
 
 	spawn_location = "JoinLateJP"
 	uses_squads = TRUE
@@ -870,6 +799,7 @@
 	title = "Nitohei Taisensha"
 	en_meaning = "Anti Tank Unit"
 	rank_abbreviation = "Ni."
+	allowed_maps = list(MAP_IWO_JIMA, MAP_KENOBI, MAP_KHALKHYN_GOL, MAP_RIZAL_STADIUM)
 
 	spawn_location = "JoinLateJP"
 	is_ww2 = TRUE
@@ -921,6 +851,7 @@
 	title = "Taiho"
 	en_meaning = "Machinegunner"
 	rank_abbreviation = "Itto."
+	allowed_maps = list(MAP_INTRAMUROS, MAP_IWO_JIMA, MAP_KHALKHYN_GOL, MAP_MARCO_POLO_BRIDGE, MAP_NANJING, MAP_NANKOU, MAP_RIZAL_STADIUM)
 
 	spawn_location = "JoinLateJP"
 	uses_squads = TRUE
@@ -992,6 +923,7 @@
 	title = " Fuku Taiho"
 	en_meaning = "Assistant Machinegunner"
 	rank_abbreviation = ""
+	allowed_maps = list(MAP_INTRAMUROS, MAP_IWO_JIMA, MAP_KHALKHYN_GOL, MAP_MARCO_POLO_BRIDGE, MAP_NANJING, MAP_NANKOU, MAP_RIZAL_STADIUM)
 
 	spawn_location = "JoinLateJP"
 	uses_squads = TRUE
@@ -1061,6 +993,7 @@
 	title = "Senmeina no Hito"
 	en_meaning = "Sniper"
 	rank_abbreviation = "Jo."
+	allowed_maps = list(MAP_INTRAMUROS, MAP_IWO_JIMA, MAP_KHALKHYN_GOL, MAP_MARCO_POLO_BRIDGE, MAP_NANJING, MAP_NANKOU, MAP_RIZAL_STADIUM)
 
 	spawn_location = "JoinLateJP"
 	uses_squads = TRUE
@@ -1126,6 +1059,7 @@
 	title = "Sensha Gunso"
 	en_meaning = "Tank Sergeant"
 	rank_abbreviation = "Gu."
+	allowed_maps = list(MAP_IWO_JIMA, MAP_KENOBI, MAP_NANJING, MAP_RIZAL_STADIUM)
 
 	spawn_location = "JoinLateJP"
 	is_officer = TRUE
@@ -1187,6 +1121,7 @@
 	title = "Senshahei"
 	en_meaning = "Tanker"
 	rank_abbreviation = ""
+	allowed_maps = list(MAP_IWO_JIMA, MAP_KENOBI, MAP_NANJING, MAP_RIZAL_STADIUM)
 
 	spawn_location = "JoinLateJP"
 	is_tanker = TRUE
@@ -1242,6 +1177,7 @@
 	title = "Horyoshuyojo-Cho"
 	en_meaning = "POW Camp Director"
 	rank_abbreviation = "Cho."
+	allowed_maps = list(MAP_RIVER_KWAI)
 
 
 	spawn_location = "JoinLateJPCap"
@@ -1281,7 +1217,7 @@
 	KC.attackby(G2,H)
 	H.equip_to_slot_or_del(KC, slot_wear_id)
 	give_random_name(H)
-	world << "<b><big>[H.real_name] is the Camp Director of the Japanese Forces!</big></b>"
+	to_chat(world, "<big><b>[H.real_name] is the Camp Director of the Japanese Forces!</b></big>")
 	H.add_note("Role", "You are a <b>[title]</b>, the highest ranking officer present. Your job is to command the guards and organize the POWs.")
 	H.setStat("strength", STAT_MAX)
 	H.setStat("crafting", STAT_NORMAL)
@@ -1299,6 +1235,7 @@
 	title = "Horyoshuyojo Gunso"
 	en_meaning = "POW Camp Sergeant"
 	rank_abbreviation = "Gu."
+	allowed_maps = list(MAP_RIVER_KWAI)
 
 	spawn_location = "JoinLateJP"
 	is_officer = TRUE
@@ -1352,6 +1289,7 @@
 	title = "Horyoshuyojo Sento-i"
 	en_meaning = "Camp Medic"
 	rank_abbreviation = "Sen-i"
+	allowed_maps = list(MAP_RIVER_KWAI)
 
 	spawn_location = "JoinLateJPDoc"
 
@@ -1400,6 +1338,7 @@
 	title = "Horyoshuyojo Anchisukiru"
 	en_meaning = "POW Camp Guard"
 	rank_abbreviation = ""
+	allowed_maps = list(MAP_RIVER_KWAI)
 
 	spawn_location = "JoinLateJP"
 
@@ -1451,6 +1390,7 @@
 	title = "Kaigun-Dai-i"
 	en_meaning = "Navy Lieutenant"
 	rank_abbreviation = "Ka-Dai"
+	allowed_maps = list(MAP_IWO_JIMA, MAP_RIZAL_STADIUM, MAP_WAKE_ISLAND)
 
 
 	spawn_location = "JoinLateJPCap"
@@ -1490,7 +1430,7 @@
 	H.s_tone = rand(-32,-24)
 	if (H.f_style != "Shaved" && H.f_style != "Short Facial Hair" && H.f_style != "Goatee")
 		H.f_style = pick("Shaved","Short Facial Hair","Goatee")
-	world << "<b><big>[H.real_name] is the Lieutenant of the Japanese Forces!</big></b>"
+	to_chat(world, "<big><b>[H.real_name] is the Lieutenant of the Japanese Forces!</b></big>")
 	H.add_note("Role", "You are a <b>[title]</b>, the highest ranking officer present. Your job is to command the ship or company.")
 	H.setStat("strength", STAT_MEDIUM_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -1508,6 +1448,7 @@
 	title = "Kaigun-Chui"
 	en_meaning = "Sub-Lieutenant"
 	rank_abbreviation = "Slt."
+	allowed_maps = list(MAP_IWO_JIMA, MAP_RIZAL_STADIUM, MAP_WAKE_ISLAND)
 
 
 	spawn_location = "JoinLateJPCap"
@@ -1547,7 +1488,7 @@
 	H.s_tone = rand(-32,-24)
 	if (H.f_style != "Shaved" && H.f_style != "Short Facial Hair" && H.f_style != "Goatee")
 		H.f_style = pick("Shaved","Short Facial Hair","Goatee")
-	world << "<b><big>[H.real_name] is the Sub-Lieutenant of the Japanese Forces!</big></b>"
+	to_chat(world, "<big><b>[H.real_name] is the Sub-Lieutenant of the Japanese Forces!</b></big>")
 	H.add_note("Role", "You are a <b>[title]</b>, the 2nd highest ranking officer present. Your job is to command half of the forces.")
 	H.setStat("strength", STAT_MEDIUM_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -1565,6 +1506,7 @@
 	title = "Kaigun-Shoi"
 	en_meaning = "Ensign"
 	rank_abbreviation = "En."
+	allowed_maps = list(MAP_IWO_JIMA, MAP_RIZAL_STADIUM, MAP_WAKE_ISLAND)
 
 
 	spawn_location = "JoinLateJPCap"
@@ -1604,7 +1546,7 @@
 	H.s_tone = rand(-32,-24)
 	if (H.f_style != "Shaved" && H.f_style != "Short Facial Hair" && H.f_style != "Goatee")
 		H.f_style = pick("Shaved","Short Facial Hair","Goatee")
-	world << "<b><big>[H.real_name] is the Ensign of the Japanese Forces!</big></b>"
+	to_chat(world, "<big><b>[H.real_name] is the Ensign of the Japanese Forces!</b></big>")
 	H.add_note("Role", "You are a <b>[title]</b>, the 3rd highest ranking officer present. Your job is to command half of the forces.")
 	H.setStat("strength", STAT_MEDIUM_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -1622,6 +1564,7 @@
 	title = "Kaigun Nitoheiso"
 	en_meaning = "Petty Officer 2nd Class"
 	rank_abbreviation = "Niso."
+	allowed_maps = list(MAP_IWO_JIMA, MAP_RIZAL_STADIUM, MAP_WAKE_ISLAND)
 
 	spawn_location = "JoinLateJP"
 	uses_squads = TRUE
@@ -1675,6 +1618,7 @@
 	title = "Kaigun Gun-i"
 	en_meaning = "Doctor"
 	rank_abbreviation = "Gun-i"
+	allowed_maps = list(MAP_IWO_JIMA, MAP_RIZAL_STADIUM, MAP_WAKE_ISLAND)
 
 	spawn_location = "JoinLateJPDoc"
 
@@ -1723,6 +1667,7 @@
 	title = "Kaigun Sento-i"
 	en_meaning = "Medic"
 	rank_abbreviation = "Sen-i"
+	allowed_maps = list(MAP_IWO_JIMA, MAP_RIZAL_STADIUM, MAP_WAKE_ISLAND)
 
 	spawn_location = "JoinLateJPDoc"
 	uses_squads = TRUE
@@ -1777,6 +1722,7 @@
 	title = "Santosuihei"
 	en_meaning = "Seaman First Class"
 	rank_abbreviation = "San."
+	allowed_maps = list(MAP_IWO_JIMA, MAP_RIZAL_STADIUM, MAP_WAKE_ISLAND)
 
 	spawn_location = "JoinLateJP"
 	uses_squads = TRUE
@@ -1831,6 +1777,7 @@
 	title = "Hoshu"
 	en_meaning = "Machinegunner"
 	rank_abbreviation = "Nisu."
+	allowed_maps = list(MAP_IWO_JIMA, MAP_RIZAL_STADIUM, MAP_WAKE_ISLAND)
 
 	spawn_location = "JoinLateJP"
 	uses_squads = TRUE
@@ -1883,6 +1830,7 @@
 	title = " Danyaku Mochinushi"
 	en_meaning = " Ammo Bearer"
 	rank_abbreviation = "Nisu."
+	allowed_maps = list(MAP_IWO_JIMA, MAP_RIZAL_STADIUM, MAP_WAKE_ISLAND)
 
 	spawn_location = "JoinLateJP"
 	uses_squads = TRUE
@@ -1936,6 +1884,7 @@
 	title = "Kaigun Senmeina no Hito"
 	en_meaning = "Sniper"
 	rank_abbreviation = "Nisu."
+	allowed_maps = list(MAP_IWO_JIMA, MAP_RIZAL_STADIUM, MAP_WAKE_ISLAND)
 
 	spawn_location = "JoinLateJP"
 	uses_squads = TRUE

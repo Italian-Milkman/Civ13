@@ -1,26 +1,5 @@
 //Sound environment defines. Reverb preset for sounds played in an area, see sound datum reference for more.
-#define GENERIC FALSE
-#define PADDED_CELL TRUE
-#define ROOM 2
-#define BATHROOM 3
-#define LIVINGROOM 4
-#define STONEROOM 5
-#define AUDITORIUM 6
-#define CONCERT_HALL 7
-#define CAVE 8
-#define ARENA 9
-#define HANGAR 10
-#define CARPETED_HALLWAY 11
-#define HALLWAY 12
-#define STONE_CORRIDOR 13
-#define ALLEY 14
 #define FOREST 15
-#define CITY 16
-#define MOUNTAINS 17
-#define QUARRY 18
-#define PLAIN 19
-#define PARKING_LOT 20
-#define SEWER_PIPE 21
 #define UNDERWATER 22
 #define DRUGGED 23
 #define DIZZY 24
@@ -394,6 +373,10 @@ var/list/charge_sounds_generic_female = list(
 	var/frequency = get_rand_frequency() // Same frequency for everybody
 	var/turf/turf_source = get_turf(source)
 
+	if (turf_source)
+		for (var/mob/living/simple_animal/hostile/echofiend/EF in range(15, turf_source))
+			EF.hear_sound(turf_source)
+
 	var/list/players_who_heard = list()
  	// Looping through the player list has the added bonus of working for mobs inside containers
 	for (var/P in player_list)
@@ -420,9 +403,21 @@ var/list/charge_sounds_generic_female = list(
 var/const/FALLOFF_SOUNDS = 0.5
 
 /mob/proc/playsound_local(var/turf/turf_source, soundin, vol as num, vary, frequency, falloff, is_global)
-	if (!client || ear_deaf > 0)	return
+	if (!client || ear_deaf > 0)
+		return
+	if (!vol || vol <= 0)
+		return
 	soundin = get_sfx(soundin)
+	#ifdef OPENDREAM
+	if (!soundin || soundin == "/sound")
+		return	// Invalid sound, don't play anything
 
+	// In OpenDream, sound() requires a file ref, not a plain string path.
+	// Passing a raw string produces a malformed /sound with name="/sound".
+	if (!isfile(soundin))
+		world.log << "Tried to play invalid sound: [soundin]"
+		return
+	#endif
 	var/distance = -1
 
 	var/sound/S = sound(soundin)
@@ -495,6 +490,8 @@ var/const/FALLOFF_SOUNDS = 0.5
 	return rand(32000, 55000) //Frequency stuff only works with 45kbps oggs.
 
 /proc/get_sfx(soundin)
+	if (islist(soundin))
+		soundin = pick(soundin)
 	if (istext(soundin))
 		switch(soundin)
 			if ("shatter") soundin = pick(shatter_sound)

@@ -150,8 +150,8 @@ bullet_act
 	var/mob/living/human/last_harmed = null
 
 /mob/living/human/bullet_act(var/obj/item/projectile/P, var/def_zone)
-	if (P.damage == 0)
-		return // fix for strange bug
+	if (P.damage == 0 && !istype(P, /obj/item/projectile/magic))
+		return // fix for strange bug, but allow magic projectiles
 	if (P.firer && ishuman(P.firer))
 		if (map.ID == MAP_THE_ART_OF_THE_DEAL)// To be optimized in the future
 			var/mob/living/human/Huser = P.firer
@@ -237,10 +237,11 @@ bullet_act
 				G.prime()
 
 	// if we hit a client who's not on our team, increase our stats
-	if (client && stat == CONSCIOUS && P.firer && ishuman(P.firer) && P.firedfrom)
+	if (client && stat == CONSCIOUS && P.firer && ishuman(P.firer) && istype(P.firedfrom, /obj/item/weapon/gun))
 		var/mob/living/human/H = P.firer
 		if (!H.original_job || !original_job || H.original_job.base_type_flag() != original_job.base_type_flag())
-			switch (P.firedfrom.gun_type)
+			var/obj/item/weapon/gun/G = P.firedfrom
+			switch (G.gun_type)
 				if (GUN_TYPE_RIFLE)
 					H.adaptStat("rifle", 1)
 				if (GUN_TYPE_PISTOL)
@@ -327,6 +328,7 @@ bullet_act
 				else
 					visible_message("<span class = 'warning'>The bolt shatters!</span>")
 	if (shield_check)
+		P.blockedhit = TRUE
 		if (shield_check < 0)
 			return shield_check
 		else
@@ -568,15 +570,7 @@ bullet_act
 			C.update_clothing_icon()
 	return TRUE
 
-/mob/living/human/proc/check_head_coverage()
-	var/list/body_parts = list(head, wear_mask, wear_suit, w_uniform)
-	for (var/bp in body_parts)
-		if (!bp)	continue
-		if (bp && istype(bp ,/obj/item/clothing))
-			var/obj/item/clothing/C = bp
-			if (C.body_parts_covered & HEAD)
-				return TRUE
-	return FALSE
+
 
 //Used to check if they can be fed food/drinks/pills
 /mob/living/human/proc/check_mouth_coverage()
@@ -586,7 +580,28 @@ bullet_act
 			return gear
 	return null
 
-/mob/living/human/proc/check_shields(var/damage = FALSE, var/atom/damage_source = null, var/mob/attacker = null, var/def_zone = null, var/attack_text = "the attack")
+/mob/living/proc/apply_magic_shield(duration)
+	magic_shield++
+	var/image/I = image('icons/obj/magic_overlay.dmi', src, "protection", MOB_LAYER + 1)
+	I.color = "#00ffff"
+	I.alpha = 110
+	src.overlays += I
+	spawn(duration)
+		if (src)
+			magic_shield = max(0, magic_shield - 1)
+			src.overlays -= I
+			if (!magic_shield)
+				to_chat(src, SPAN_NOTICE("Your shimmering bubble of denial fades away."))
+				
+/mob/living/proc/check_shields(var/damage = FALSE, var/atom/damage_source = null, var/mob/attacker = null, var/def_zone = null, var/attack_text = "the attack")
+	if (magic_shield)
+		visible_message("<span class='warning'>The shimmering bubble of denial around [src] blocks [attack_text]!</span>")
+		return TRUE
+	return FALSE
+
+/mob/living/human/check_shields(var/damage = FALSE, var/atom/damage_source = null, var/mob/attacker = null, var/def_zone = null, var/attack_text = "the attack")
+	if (..())
+		return TRUE
 	for (var/obj/item/shield in list(l_hand, r_hand, wear_suit))
 		if (!shield) continue
 		. = shield.handle_shield(src, damage, damage_source, attacker, def_zone, attack_text)
@@ -737,7 +752,6 @@ bullet_act
 					for(var/mob/living/human/NB in view(6,src))
 						if (!NB.orc)
 							NB.mood -= 10
-							//NB.ptsd += 1
 	var/obj/item/organ/external/head/O = locate(/obj/item/organ/external/head) in src.organs
 
 	if(I.damtype == BRUTE && !I.edge && prob(I.force * (hit_zone == "mouth" ? 6 : 0)) && O)//Knocking out teeth.
@@ -813,24 +827,7 @@ bullet_act
 		var/obj/O = AM
 		if (istype(O, /obj/item/football))
 			var/obj/item/football/FB = O
-			if (!src.football)
-				if (gloves && istype(gloves, /obj/item/clothing/gloves/goalkeeper))
-					var/area/A = get_area(src.loc)
-					if (istype(A, /area/caribbean/football/blue/goalkeeper) || istype(A, /area/caribbean/football/red/goalkeeper))
-						visible_message("<font color='yellow'>[src] blocks and picks up the ball!</font>")
-						src.put_in_active_hand(FB)
-						if (FB.owner)
-							FB.owner.football = null
-							FB.owner = null
-						FB.last_owner = src
-						FB.pickup(src)
-						return
-						src.do_attack_animation(get_step(loc,src.dir))
-				else
-					src.football = FB
-					FB.owner = src
-					FB.last_owner = src
-					FB.update_movement()
+			football_hitby(FB)
 		if (in_throw_mode && !get_active_hand() && speed <= THROWFORCE_SPEED_DIVISOR && prob(round(75/O.w_class)))	//empty active hand and we're in throw mode
 			if (canmove && !restrained())
 				if (isturf(O.loc))
@@ -996,7 +993,6 @@ bullet_act
 /mob/living/human/proc/bloody_hands(var/mob/living/source, var/amount = 2)
 	if (gloves)
 		gloves.add_blood(source)
-		gloves:transfer_blood = amount
 		gloves:bloody_hands_mob = source
 	else
 		add_blood(source)

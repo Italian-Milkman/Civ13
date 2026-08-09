@@ -1,7 +1,8 @@
 /obj/map_metadata/camp
 	ID = MAP_CAMP
 	title = "Camp"
-	lobby_icon = 'icons/lobby/medieval.png'
+	description = "A medieval King of the Hill battle between the French and English armies over a central castle."
+	lobby_icon = "icons/lobby/medieval.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/one,/area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 0
 	victory_time = 15000
@@ -20,23 +21,14 @@
 	ordinal_age = 2
 	faction_distribution_coeffs = list(BRITISH = 0.5, FRENCH = 0.5)
 	songs = list(
-		"Crusaders:1" = 'sound/music/crusaders.ogg')
+		"Crusaders:1" = "sound/music/crusaders.ogg")
 	battle_name = "battle of Normandy"
 	mission_start_message = "<font size=4>The <b>French</b> and <b>English</b> armies are facing each other in Northern France! There is a <b>Castle</b> in the middle of the map, that must be captured and held for 8 minutes! The battle will start in <b>4 minutes</b>.</font>"
 	faction1 = BRITISH
 	faction2 = FRENCH
-	ambience = list('sound/ambience/jungle1.ogg')
+	ambience = list("sound/ambience/jungle1.ogg")
 	gamemode = "King of the Hill"
 	grace_wall_timer = 2400
-/obj/map_metadata/camp/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_medieval && !J.is_deathmatch)
-		. = TRUE
-	else
-		. = FALSE
-	if (J.is_crusader)
-		. = FALSE
-
 /obj/map_metadata/camp/short_win_time(faction)
 	if (!(alive_n_of_side(faction1)) || !(alive_n_of_side(faction2)))
 		return 600
@@ -94,7 +86,7 @@
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The [battle_name ? battle_name : "battle"] has ended in a stalemate!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
@@ -105,7 +97,7 @@
 		var/message = "The [battle_name ? battle_name : "battle"] has ended in a stalemate!"
 		if (current_winner && current_loser)
 			message = "The battle is over! The [current_winner] was victorious over the [current_loser][battle_name ? " in the [battle_name]" : ""]!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		win_condition_spam_check = TRUE
 		return FALSE
 	// German major
@@ -147,7 +139,7 @@
 
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The [current_winner] has lost control of the Castle!</font>"
+			to_chat(world, "<font size = 3>The [current_winner] has lost control of the Castle!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1

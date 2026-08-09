@@ -22,6 +22,8 @@
 	var/list/emote_see = list()		//Unlike speak_emote, the list of things in this variable only show by themselves with no spoken text. IE: Ian barks, Ian yaps
 
 	var/turns_since_move = FALSE
+	var/stuck_ticks = 0
+	var/turf/last_loc = null
 	universal_speak = FALSE		//No, just no.
 	var/meat_amount = FALSE
 	var/meat_type
@@ -31,6 +33,16 @@
 	var/stop_automated_movement = FALSE //Use this to temporarely stop random movement or to if you write special movement code for animals.
 	var/wander = TRUE	// Does the mob wander around when idle?
 	var/stop_automated_movement_when_pulled = TRUE //When set to TRUE this stops the animal from moving when someone is pulling it.
+	var/flying = FALSE
+	var/targeting = FALSE // If TRUE, uses A* waypoint navigation toward pathfind_target. Only for specific mob types.
+
+	// Pathfinding vars (used by do_movement / get_path in code/pathfinding.dm)
+	var/moving = FALSE
+	var/atom/target_obj = null
+	var/list/found_path = list()
+	var/atom/pathfind_target = null
+	var/last_pathfound = 0
+	var/move_gen = 0
 
 	//Interaction
 	var/response_help   = "tries to help"
@@ -76,9 +88,15 @@
 	var/list/friends = list()
 	var/break_stuff_probability = 10
 	var/destroy_surroundings = TRUE
-	var/enroute = FALSE
 	var/stance_step = FALSE
 	var/can_bite_limbs_off = FALSE
+	var/ai_tick_delay = 0 // Throttle AI logic in Life()
+	var/ai_tick_delay_max = 3 // Idle ticks between AI logic runs
+
+	var/vision_range = 7 //How big of an area to search for targets in, a vision of 7 attempts to find targets as soon as they walk into screen view
+	var/aggro_vision_range = 7 //If a mob is aggro, we search in this radius.
+	var/idle_vision_range = 7 //If a mob is just idling around, it's vision range is limited to this.
+
 	//SoundFX
 	var/hostilesounds = list()
 	var/wandersounds = list()
@@ -144,30 +162,15 @@
 		if (get_dist(src, following_mob) > 2)
 			turns_since_move++
 			if (turns_since_move >= move_to_delay)
-				walk_to(src, following_mob,1, 6)
-				turns_since_move = FALSE
+				if (get_dist(src, following_mob) > 1)
+					walk_to(src, following_mob, 1, 6)
+					turns_since_move = FALSE
 		if (get_dist(src, following_mob) > 6)
 			following_mob = null
 			stop_automated_movement = FALSE
 
-	//Movement
-	if (!client && !stop_automated_movement && wander && !anchored && clients.len > 0)
-		if (isturf(loc) && !resting && !buckled && canmove)		//This is so it only moves if it's not inside a closet, gentics machine, etc.
-			turns_since_move++
-			if (turns_since_move >= move_to_delay)
-				if (!(stop_automated_movement_when_pulled && pulledby)) //Soma animals don't move when pulled
-
-					if (istype(src, /mob/living/simple_animal/hostile/human/skeleton/attacker))
-						if (prob(20) && get_dist(src, locate(/obj/effect/landmark/npctarget)) > 11)
-							walk_towards(src, locate(/obj/effect/landmark/npctarget),6)
-					if (istype(src, /mob/living/simple_animal/hostile/human/skeleton/attacker_gods))
-						var/mob/living/simple_animal/hostile/human/skeleton/attacker_gods/A = src
-						if (prob(20) && get_dist(src, A.target_loc) > 11)
-							walk_towards(src, A.target_loc,6)
-					if (((stance==HOSTILE_STANCE_IDLE || stance==HOSTILE_STANCE_TIRED) && (prob(20) && (herbivore || carnivore || predatory_carnivore || granivore || scavenger) && simplehunger < 220)) || simplehunger < 180)
-						check_food() // animals will search for crops, grass, and so on
-					else
-						do_behaviour(behaviour)
+	// AI and Movement logic
+	handle_ai()
 
 	//Speaking
 	if (!client && speak_chance)
@@ -214,124 +217,6 @@
 	else
 		fire_alert = FALSE
 
-/mob/living/simple_animal/proc/do_behaviour(var/t_behaviour = null)
-	if (stat == DEAD || stat == UNCONSCIOUS)
-		return FALSE
-	if (!t_behaviour)
-		t_behaviour = behaviour
-	if (t_behaviour == "scared")
-		for (var/mob/living/human/H in range(7, src))
-			walk_away(src, H, 7, 2)
-			spawn(50)
-				walk(src,0)
-			return "scared"
-
-	else if (t_behaviour == "wander")
-		var/moving_to = FALSE // otherwise it always picks 4, fuck if I know.   Did I mention fuck BYOND
-		moving_to = pick(cardinal)
-		set_dir(moving_to)
-		Move(get_step(src,moving_to))
-		turns_since_move = FALSE
-		return "wander"
-	else if (t_behaviour == "hunt" || (t_behaviour == "defends" && target_mob))
-		a_intent = I_HARM
-		if(prob(50))
-			if(!isemptylist(hostilesounds))
-				playsound(src, pick(hostilesounds), 60)
-		if (isturf(loc) && !resting && !buckled && canmove)		//This is so it only moves if it's not inside a closet, gentics machine, etc.
-			turns_since_move++
-			if (turns_since_move >= move_to_delay && stance==HOSTILE_STANCE_IDLE)
-				if (!(stop_automated_movement_when_pulled && pulledby)) //Soma animals don't move when pulled
-					if (istype(src, /mob/living/simple_animal/hostile/human/skeleton/attacker))
-						if (prob(20) && get_dist(src, locate(/obj/effect/landmark/npctarget)) > 11)
-							walk_to(src, locate(/obj/effect/landmark/npctarget),TRUE,move_to_delay)
-					var/moving_to = FALSE // otherwise it always picks 4, fuck if I know.   Did I mention fuck BYOND
-					moving_to = pick(cardinal)
-					set_dir(moving_to)			//How about we turn them the direction they are moving, yay.
-					Move(get_step(src,moving_to))
-					turns_since_move = FALSE
-		switch(stance)
-			if (HOSTILE_STANCE_IDLE)
-				if (!target_mob || !(target_mob in ListTargets(7)) || target_mob.stat != CONSCIOUS)
-					target_mob = FindTarget()
-					stance_step = 0
-			if (HOSTILE_STANCE_TIRED)
-				stance_step++
-				if (stance_step >= 5) //rests for 5 ticks
-					if (target_mob && target_mob in ListTargets(7))
-						stance = HOSTILE_STANCE_ATTACK //If the mob he was chasing is still nearby, resume the attack, otherwise go idle.
-					else
-						stance = HOSTILE_STANCE_IDLE
-
-			if (HOSTILE_STANCE_ALERT)
-				var/found_mob = FALSE
-				if (target_mob && target_mob in ListTargets(7))
-					if ((SA_attackable(target_mob)))
-						stance_step = max(0, stance_step) //If we have not seen a mob in a while, the stance_step will be negative, we need to reset it to FALSE as soon as we see a mob again.
-						stance_step++
-						found_mob = TRUE
-						set_dir(get_dir(src,target_mob))	//Keep staring at the mob
-
-						if (stance_step in list(0,3,5)) //every 3 ticks
-							var/action = pick( list( "stares alertly at [target_mob].", "closely watches [target_mob]." ) )
-							if (action)
-								custom_emote(1,action)
-								if(!isemptylist(hostilesounds))
-									playsound(src, pick(hostilesounds), 60)
-				if (!found_mob)
-					stance_step--
-
-				if (stance_step <= -10) //If we have not found a mob for 20-ish ticks, revert to idle mode
-					stance = HOSTILE_STANCE_IDLE
-				if (stance_step >= 1 || (behaviour == "hostile"))   //If we have been staring at a mob for 1 ticks,
-					stance = HOSTILE_STANCE_ATTACK
-					AttackTarget()
-
-			if (HOSTILE_STANCE_ATTACK)
-				if (destroy_surroundings)
-					DestroySurroundings()
-				AttackTarget()
-				if (stance_step >= 20)	//attacks for 20 ticks, then it gets tired and needs to rest
-					custom_emote(1, "is worn out and needs to rest." )
-					stance = HOSTILE_STANCE_TIRED
-					stance_step = FALSE
-					walk(src, FALSE) //This stops the bear's walking
-	else if (t_behaviour == "hostile")
-		a_intent = I_HARM
-
-		if (isturf(loc) && !resting && !buckled && canmove)		//This is so it only moves if it's not inside a closet, gentics machine, etc.
-			turns_since_move++
-			if (turns_since_move >= move_to_delay && stance==HOSTILE_STANCE_IDLE)
-				var/moving_to = FALSE // otherwise it always picks 4, fuck if I know.   Did I mention fuck BYOND
-				moving_to = pick(cardinal)
-				var/turf/move_to_turf = get_step(src,moving_to)
-				if (!(istype(loc, /turf/floor/trench) && !istype(move_to_turf, /turf/floor/trench)))
-					set_dir(moving_to)			//How about we turn them the direction they are moving, yay.
-					Move(move_to_turf)
-				turns_since_move = FALSE
-		switch(stance)
-			if (HOSTILE_STANCE_IDLE)
-				if (!target_mob || !(target_mob in ListTargets(10)) || target_mob.stat != CONSCIOUS)
-					target_mob = FindTarget()
-					if (target_mob)
-						stance = HOSTILE_STANCE_ATTACK
-						if (target_mob && get_dist(target_mob,src)>1)
-							AttackTarget()
-			if (HOSTILE_STANCE_TIRED,HOSTILE_STANCE_ALERT)
-				if (target_mob && target_mob in ListTargets(10))
-					if ((SA_attackable(target_mob)))
-						set_dir(get_dir(src,target_mob))	//Keep staring at the mob
-						stance = HOSTILE_STANCE_ATTACK
-						AttackTarget()
-					else
-						target_mob = FindTarget()
-				else
-					target_mob = FindTarget()
-			if (HOSTILE_STANCE_ATTACK)
-				if (destroy_surroundings)
-					DestroySurroundings()
-				AttackTarget()
-		return t_behaviour
 /mob/living/simple_animal/gib()
 	..(icon_gib,1)
 
@@ -355,29 +240,52 @@
 			return //we can't hit the animals we are riding
 		var/mob/living/human/H = proj.firer
 		if (prob(40) && proj.firedfrom)
-			switch (proj.firedfrom.gun_type)
-				if (GUN_TYPE_RIFLE)
-					H.adaptStat("rifle", 1)
-				if (GUN_TYPE_PISTOL)
-					H.adaptStat("pistol", 1)
-				if (GUN_TYPE_BOW)
-					H.adaptStat("bows", 1)
+			if (istype(proj.firedfrom, /obj/item/weapon/gun))
+				var/obj/item/weapon/gun/G = proj.firedfrom
+				switch (G.gun_type)
+					if (GUN_TYPE_RIFLE)
+						H.adaptStat("rifle", 1)
+					if (GUN_TYPE_PISTOL)
+						H.adaptStat("pistol", 1)
+					if (GUN_TYPE_BOW)
+						H.adaptStat("bows", 1)
 
-	adjustBruteLoss(proj.damage)
-	return FALSE
+	var/shield_check = check_shields(proj.damage*5, proj, null, null, "the [proj.name]")
+	if (shield_check)
+		proj.blockedhit = TRUE
+		if (shield_check < 0)
+			return shield_check
+		else
+			proj.on_hit(src, 2)
+			return 2
 
 	if (!proj || proj.nodamage)
-		return
+		if (proj)
+			proj.on_hit(src, FALSE)
+		return FALSE
+
+	if (proj.firer)
+		lastattacker = proj.firer
+
+	adjustBruteLoss(proj.damage)
+	proj.on_hit(src, FALSE)
+	return FALSE
 
 /mob/living/simple_animal/attack_hand(mob/living/human/M as mob)
 	..()
+	if (M)
+		lastattacker = M
 	if (istype(src, /mob/living/simple_animal/hostile/human/voyage/pirate/friendly))
 		faction = CIVILIAN
 		behaviour = "hostile"
-	if (behaviour == "hunt")
+	if (behaviour == "hunt" || behaviour == "hostile")
+		if (stance == HOSTILE_STANCE_ATTACK && target_mob && target_mob != M)
+			if (prob(75))
+				target_mob = M
+		else
+			target_mob = M
 		stance = HOSTILE_STANCE_ATTACK
 		stance_step = 6
-		target_mob = M
 	else if (behaviour == "scared")
 		do_behaviour("scared")
 
@@ -385,7 +293,7 @@
 
 		if (I_HELP)
 			if (health > 0)
-				if (istype(src, /mob/living/simple_animal/dog))
+				if (istype(src, /mob/living/simple_animal/pet/dog))
 					if (prob(30))
 						M.visible_message("<span class = 'notice'>[M] tells \the [src] that he is a good boy!</span>")
 					else
@@ -395,9 +303,13 @@
 
 		if (I_DISARM)
 			if (behaviour == "defends")
+				if (stance == HOSTILE_STANCE_ATTACK && target_mob && target_mob != M)
+					if (prob(75))
+						target_mob = M
+				else
+					target_mob = M
 				stance = HOSTILE_STANCE_ATTACK
 				stance_step = 6
-				target_mob = M
 			M.visible_message("<span class = 'notice'>[M] [response_disarm] \the [src].</span>")
 			M.do_attack_animation(src)
 			playsound(get_turf(M), 'sound/weapons/punchmiss.ogg', 50, TRUE, -1)
@@ -405,9 +317,13 @@
 
 		if (I_GRAB)
 			if (behaviour == "defends")
+				if (stance == HOSTILE_STANCE_ATTACK && target_mob && target_mob != M)
+					if (prob(75))
+						target_mob = M
+				else
+					target_mob = M
 				stance = HOSTILE_STANCE_ATTACK
 				stance_step = 6
-				target_mob = M
 			if (M == src)
 				return
 			if (!(status_flags & CANPUSH))
@@ -426,9 +342,13 @@
 
 		if (I_HARM)
 			if (behaviour == "defends")
+				if (stance == HOSTILE_STANCE_ATTACK && target_mob && target_mob != M)
+					if (prob(75))
+						target_mob = M
+				else
+					target_mob = M
 				stance = HOSTILE_STANCE_ATTACK
 				stance_step = 6
-				target_mob = M
 			adjustBruteLoss(harm_intent_damage*M.getStatCoeff("strength"))
 			M.visible_message("<span class = 'red'>[M] [response_harm] \the [src].</span>")
 			M.do_attack_animation(src)
@@ -466,6 +386,94 @@
 			user.visible_message(SPAN_NOTICE("[user] feeds [src] \the [G].</span>"))
 			qdel(G)
 	return
+
+/mob/living/simple_animal/pet
+	var/turns_since_scan = FALSE
+	var/mob/living/simple_animal/mouse/movement_target
+	var/mob/flee_target
+	var/flee_message = "HSSSSS"
+
+/mob/living/simple_animal/pet/proc/handle_movement_target()
+	if ((movement_target) && !(isturf(movement_target.loc) || ishuman(movement_target.loc)))
+		movement_target = null
+		stop_automated_movement = FALSE
+	if (!movement_target || !(movement_target.loc in oview(src, 4)))
+		movement_target = null
+		stop_automated_movement = FALSE
+		for (var/mob/living/simple_animal/mouse/snack in oview(src))
+			if (isturf(snack.loc) && !snack.stat)
+				movement_target = snack
+				break
+	if (movement_target)
+		stop_automated_movement = TRUE
+		walk_to(src, movement_target, 0, 3)
+
+/mob/living/simple_animal/pet/proc/handle_flee_target()
+	if (flee_target && !(flee_target.loc in view(src)))
+		flee_target = null
+		stop_automated_movement = FALSE
+	if (flee_target)
+		if (prob(25)) say(flee_message)
+		stop_automated_movement = TRUE
+		walk_away_od(src, flee_target, 7, 2)
+
+/mob/living/simple_animal/pet/proc/set_flee_target(atom/A)
+	if (A)
+		flee_target = A
+		turns_since_scan = 5
+
+/mob/living/simple_animal/pet/attackby(var/obj/item/O, var/mob/user)
+	. = ..()
+	if (O.force)
+		set_flee_target(user ? user : loc)
+
+/mob/living/simple_animal/pet/attack_hand(mob/living/human/M as mob)
+	. = ..()
+	if (M.a_intent == I_HARM)
+		set_flee_target(M)
+
+/mob/living/simple_animal/pet/ex_act()
+	. = ..()
+	set_flee_target(loc)
+
+/mob/living/simple_animal/pet/bullet_act(var/obj/item/projectile/proj)
+	. = ..()
+	set_flee_target(proj.firer ? proj.firer : loc)
+
+/mob/living/simple_animal/pet/hitby(atom/movable/AM)
+	. = ..()
+	set_flee_target(AM.thrower ? AM.thrower : loc)
+
+/mob/living/simple_animal/proc/try_infect(var/mob/living/human/target, base_chance, disease_name, check_strong_immune = TRUE)
+	if (!target || !istype(target))
+		return FALSE
+	var/dmod = 1
+	if (target.find_trait("Weak Immune System"))
+		dmod = 2
+	if (check_strong_immune && target.find_trait("Strong Immune System"))
+		dmod = 0.2
+	if (prob(base_chance * dmod))
+		target.disease = TRUE
+		target.disease_type = disease_name
+		return TRUE
+	return FALSE
+
+/mob/living/simple_animal/proc/butcher_yield(var/mob/living/simple_animal/target)
+	var/mob_size_to_check = target ? target.mob_size : src.mob_size
+	switch(mob_size_to_check)
+		if (MOB_MINISCULE)
+			return 1
+		if (MOB_TINY)
+			return 2
+		if (MOB_SMALL)
+			return 3
+		if (MOB_MEDIUM)
+			return 4
+		if (MOB_LARGE)
+			return 5
+		if (MOB_HUGE)
+			return 8
+	return 1
 
 /mob/living/simple_animal/attackby(var/obj/item/O, var/mob/user)
 	if (ishuman(user))
@@ -534,19 +542,7 @@
 				user.visible_message("<span class = 'notice'>[user] starts to butcher [src].</span>")
 				if (do_after(user, 30, src))
 					user.visible_message("<span class = 'notice'>[user] butchers [src].</span>")
-					var/amt = 0
-					if (mob_size == MOB_MINISCULE)
-						amt = 1
-					if (mob_size == MOB_TINY)
-						amt = 2
-					if (mob_size == MOB_SMALL)
-						amt = 3
-					if (mob_size == MOB_MEDIUM)
-						amt = 4
-					if (mob_size == MOB_LARGE)
-						amt = 5
-					if (mob_size == MOB_HUGE)
-						amt = 8
+					var/amt = butcher_yield()
 					var/namt = amt-2
 					if (namt <= 0)
 						namt = 1
@@ -602,6 +598,8 @@
 								var/obj/item/weapon/reagent_containers/food/snacks/meat/meat = new/obj/item/weapon/reagent_containers/food/snacks/meat(get_turf(src))
 								meat.name = "[name] meat"
 								meat.radiation = radiation/2
+						if (map && map.ID == MAP_WIZARD_BOY && istype(src, /mob/living/simple_animal/pigeon))
+							new /obj/item/wand_part/pigeon_feather(loc)
 					else
 						for (var/i=0, i<=namt, i++)
 							var/obj/item/weapon/reagent_containers/food/snacks/rawcrab/meat = new/obj/item/weapon/reagent_containers/food/snacks/rawcrab(get_turf(src))
@@ -624,19 +622,7 @@
 			user.visible_message("<span class = 'notice'>[user] starts to skin and butcher [src].</span>")
 			if (do_after(user, 100, src))
 				user.visible_message("<span class = 'notice'>[user] skins and butchers [src].</span>")
-				var/amt = 0
-				if (mob_size == MOB_MINISCULE)
-					amt = 1
-				if (mob_size == MOB_TINY)
-					amt = 2
-				if (mob_size == MOB_SMALL)
-					amt = 3
-				if (mob_size == MOB_MEDIUM)
-					amt = 4
-				if (mob_size == MOB_LARGE)
-					amt = 5
-				if (mob_size == MOB_HUGE)
-					amt = 8
+				var/amt = butcher_yield()
 				var/namt = amt-2
 				if (namt <= 0)
 					namt = 1
@@ -696,7 +682,7 @@
 				else if (istype(src, /mob/living/simple_animal/hostile/fox))
 					var/obj/item/stack/material/pelt/foxpelt/NP = new/obj/item/stack/material/pelt/foxpelt(get_turf(src))
 					NP.amount = 3
-				else if (istype(src, /mob/living/simple_animal/cat))
+				else if (istype(src, /mob/living/simple_animal/pet/cat))
 					var/obj/item/stack/material/pelt/catpelt/NP = new/obj/item/stack/material/pelt/catpelt(get_turf(src))
 					NP.amount = 2
 				else if (istype(src, /mob/living/simple_animal/hostile/panther) && !istype(src, /mob/living/simple_animal/hostile/panther/jaguar))
@@ -756,9 +742,13 @@
 				tgt = pick("l_foot","r_foot","l_leg","r_leg","chest","groin","l_arm","r_arm","l_hand","r_hand","eyes","mouth","head")
 			O.attack(src, user, tgt)
 	if (behaviour == "defends" || behaviour == "hunt" || behaviour == "hostile")
+		if (stance == HOSTILE_STANCE_ATTACK && target_mob && target_mob != user)
+			if (prob(75))
+				target_mob = user
+		else
+			target_mob = user
 		stance = HOSTILE_STANCE_ATTACK
 		stance_step = 6
-		target_mob = user
 		..()
 	else
 		if (behaviour == "scared" || (behaviour == "wander" && mob_size < user.mob_size))
@@ -768,6 +758,9 @@
 		..()
 
 /mob/living/simple_animal/hit_with_weapon(obj/item/O, mob/living/user, var/effective_force, var/hit_zone)
+
+	if (check_shields(effective_force, O, user, hit_zone, "the [O.name]"))
+		return 0
 
 	visible_message("<span class='danger'>\The [src] has been attacked with \the [O] by [user].</span>")
 
@@ -793,8 +786,27 @@
 /mob/living/simple_animal/Stat()
 	..()
 
-	if (statpanel("Status") && show_stat_health)
-		stat(null, "Health: [round((health / maxHealth) * 100)]%")
+	if ((client.add_stat_tab("Status") || client.statpanel_tab == "Status") && show_stat_health)
+		client.add_stat(null, "Health: [round((health / maxHealth) * 100)]%")
+
+/mob/living/simple_animal/proc/get_valid_move_dirs()
+	var/list/valid = list()
+	for (var/d in cardinal)
+		var/turf/T = get_step(src, d)
+		if (!T || T.density)
+			continue
+		if (istype(T, /turf/floor/beach/water/deep) && !T.iscovered() && !flying)
+			continue
+		if (istype(T, /turf/floor/broken_floor) && !T.iscovered())
+			continue
+		valid += d
+	return valid
+
+/mob/living/simple_animal/proc/smart_step_towards(atom/target)
+	var/turf/next = get_step_towards2(src, target)
+	if (isturf(next) && next != loc)
+		return step(src, get_dir(src, next))
+	return FALSE
 
 /mob/living/simple_animal/proc/unregisterSpawner()
 	if (origin != null)
@@ -822,6 +834,16 @@
 	walk(src,0) // stops movement
 	unregisterSpawner()
 	delayed_decay(src,3000)
+
+	if (istype(src, /mob/living/simple_animal/hostile) && lastattacker && ishuman(lastattacker))
+		var/mob/living/human/H = lastattacker
+		if (H.client && map && istype(map, /obj/map_metadata/wizard_boy))
+			var/obj/map_metadata/wizard_boy/WB = map
+			WB.record_npc_kill(H.client.ckey, src.name)
+			if (WB.check_level(H.client.ckey) == "3")
+				WB.change_level(H.client.ckey, "4")
+				to_chat(world, "<font size=3 class='wizard'><b>[H.real_name]</b> ([H.key]) has progressed to qualification level 4 (<b>B.A.S.E.D.</b>) by slaying \a [src]!</font>")
+
 	return ..(gibbed,deathmessage)
 
 /mob/living/simple_animal/ex_act(severity)
@@ -840,13 +862,6 @@
 
 		if (3.0)
 			adjustBruteLoss(30)
-
-/mob/living/simple_animal/proc/SA_attackable(target_mob)
-	if (isliving(target_mob))
-		var/mob/living/L = target_mob
-		if (L.stat != DEAD)
-			return TRUE
-	return FALSE
 
 /mob/living/simple_animal/say(var/message, var/datum/language/language = null)
 	var/verb = "says"
@@ -884,247 +899,21 @@
 	set src in view(1)
 
 	if (following_mob == null)
-		usr << "This animal is not leashed."
+		to_chat(usr, "This animal is not leashed.")
 		return
 	else if (istype(following_mob, /obj/structure/grille/fence) || istype(following_mob, /obj/structure/barricade/wood_pole))
 		following_mob = null
 		new/obj/item/weapon/leash(src.loc)
-		usr << "You free the [src]."
+		to_chat(usr, "You free the [src].")
 		stop_automated_movement = FALSE
 
 		return
 	else
 		following_mob = null
 		new/obj/item/weapon/leash(src.loc)
-		usr << "You free the [src]."
+		to_chat(usr, "You free the [src].")
 		stop_automated_movement = FALSE
 
-		return
-
-/mob/living/simple_animal/proc/check_food()
-
-	var/totalcount = herbivore+granivore+carnivore+predatory_carnivore+scavenger
-	if (totalcount <= 0)
-		return
-	if (herbivore)
-		if (prob(100/totalcount))
-			for(var/turf/floor/grass/GT in range(2,src))
-				walk_towards(src,0)
-				eat()
-				return
-			for(var/obj/item/weapon/reagent_containers/food/snacks/grown/wheat/WT in range(2,src))
-				walk_towards(src,0)
-				eat()
-				return
-			for(var/turf/floor/grass/GT in range(6,src))
-				walk_towards(src, GT, move_to_delay)
-				return
-		else
-			return
-
-	if (granivore)
-		if (prob(100/totalcount))
-			for(var/obj/item/stack/farming/seeds/WT in range(2,src))
-				walk_towards(src,0)
-				eat()
-				return
-			for(var/obj/structure/farming/plant/PL in range(2,src))
-				walk_towards(src,0)
-				eat()
-				return
-			for(var/obj/structure/farming/plant/PL in range(8,src))
-				walk_towards(src, PL, move_to_delay)
-				return
-
-	if (carnivore)
-		if (prob(100/totalcount))
-			for(var/mob/living/ML in range(2,src))
-				walk_towards(src,0)
-				eat()
-				return
-			for(var/mob/living/ML in range(9,src))
-				if (ML.stat == DEAD)
-					walk_towards(src, ML, move_to_delay)
-					return
-
-	if (predatory_carnivore)
-		if (prob(100/totalcount))
-			for(var/mob/living/ML in range(2,src))
-				if (((ML.mob_size <= mob_size && istype(ML, /mob/living/simple_animal/hostile)) || !istype(ML, /mob/living/simple_animal/hostile)) && !istype(ML, type) && !istype(src, ML.type))
-					walk_towards(src,0)
-					eat()
-					return
-			for(var/mob/living/ML in range(9,src))
-				if (((ML.mob_size <= mob_size && istype(ML, /mob/living/simple_animal/hostile)) || !istype(ML, /mob/living/simple_animal/hostile)) && !istype(ML, type) && !istype(src, ML.type))
-					walk_towards(src, ML, move_to_delay)
-					return
-
-	if (scavenger)
-		if (prob(100/totalcount))
-			for(var/obj/item/weapon/reagent_containers/food/snacks/FD in range(2,src))
-				if(!istype(FD, /obj/item/weapon/reagent_containers/food/snacks/poo))
-					walk_towards(src,0)
-					eat()
-					return
-			for(var/obj/item/weapon/reagent_containers/food/snacks/FD in range(8,src))
-				if(!istype(FD, /obj/item/weapon/reagent_containers/food/snacks/poo))
-					walk_towards(src, FD, move_to_delay)
-					return
-
-/mob/living/simple_animal/proc/eat()
-	var/totalcount = herbivore+granivore+carnivore+predatory_carnivore+scavenger
-	if (totalcount <= 0)
-		return
-
-	if (herbivore)
-		if (prob(33))
-			var/fed = FALSE
-			for(var/turf/floor/grass/GT in range(1,src))
-				GT.grassamt -= 1
-				if (GT.grassamt <= 0)
-					if (istype(GT, (/turf/floor/grass/jungle)))
-						GT.ChangeTurf(/turf/floor/dirt/jungledirt)
-					else
-						GT.ChangeTurf(/turf/floor/dirt)
-				fed = TRUE
-			if (fed == TRUE)
-				visible_message("\The [src] eats some grass.")
-				if (mob_size >= MOB_MEDIUM)
-					new/obj/item/weapon/reagent_containers/food/snacks/poo/animal(src.loc)
-				simplehunger += 550
-				adjustBruteLoss(-4)
-				return
-
-		for(var/obj/item/weapon/reagent_containers/food/snacks/grown/wheat/WT in range(2,src))
-			if (prob(30))
-				visible_message("\The [src] eats some of the wheat.")
-				if (mob_size >= MOB_MEDIUM)
-					new/obj/item/weapon/reagent_containers/food/snacks/poo/animal(src.loc)
-				simplehunger += 550
-				adjustBruteLoss(-4)
-				qdel(WT)
-				return
-
-
-	if (granivore)
-		for(var/obj/item/stack/farming/seeds/SD in range(2,src))
-			if (prob(35))
-				visible_message("<span class='notice'>\The [src] eats \the [SD]!</span>")
-				if (mob_size >= MOB_MEDIUM)
-					new/obj/item/weapon/reagent_containers/food/snacks/poo/animal(src.loc)
-				simplehunger += 500
-				adjustBruteLoss(-4)
-				if(SD.amount >= 2)
-					SD.amount -= 1
-				else
-					qdel(SD)
-				return
-		for(var/obj/structure/farming/plant/PL in range(2,src))
-			if (prob(15))
-				visible_message("<span class='notice'>\The [src] eats \the [PL]!</span>")
-				if (mob_size >= MOB_MEDIUM)
-					new/obj/item/weapon/reagent_containers/food/snacks/poo/animal(src.loc)
-				simplehunger += 400
-				adjustBruteLoss(-4)
-				qdel(PL)
-				return
-			else
-				return
-
-
-	if (carnivore)
-		for(var/mob/living/ML in range(2,src))
-			if (ML.stat == DEAD)
-				if (prob(33))
-					if (mob_size >= MOB_MEDIUM)
-						new/obj/item/weapon/reagent_containers/food/snacks/poo/animal(src.loc)
-					visible_message("\The [src] bites some meat of \the [ML].")
-					simplehunger += 400
-					adjustBruteLoss(-4)
-					if (istype(ML, /mob/living/simple_animal))
-						var/mob/living/simple_animal/MLL = ML
-						if (MLL.mob_size <= 9)
-							qdel(ML)
-						else
-							if (prob(30))
-								qdel(ML)
-						return
-		for(var/obj/item/weapon/reagent_containers/food/snacks/meat/M in range(2,src))
-			if (prob(33))
-				visible_message("\The [src] bites some of \the [M].")
-				if (mob_size >= MOB_MEDIUM)
-					new/obj/item/weapon/reagent_containers/food/snacks/poo/animal(src.loc)
-				simplehunger += 400
-				adjustBruteLoss(-4)
-				qdel(M)
-				return
-
-	if (scavenger)
-		for(var/obj/item/weapon/reagent_containers/food/snacks/FD in range(2,src))
-			if (prob(33) && !istype(FD, /obj/item/weapon/reagent_containers/food/snacks/poo))
-				visible_message("\The [src] bites some of \the [FD].")
-				if (mob_size >= MOB_MEDIUM)
-					new/obj/item/weapon/reagent_containers/food/snacks/poo/animal(src.loc)
-				simplehunger += 400
-				adjustBruteLoss(-4)
-				if (prob(60))
-					qdel(FD)
-					return
-
-
-	if (predatory_carnivore)
-		for(var/mob/living/ML in range(2,src))
-			if (((ML.mob_size <= mob_size && istype(ML, /mob/living/simple_animal/hostile)) || !istype(ML, /mob/living/simple_animal/hostile)) && !istype(ML, type) && !istype(src, ML.type) && istype(src, /mob/living/simple_animal/hostile))
-				var/mob/living/simple_animal/hostile/HS = src
-				HS.target_mob = ML
-				HS.stance = HOSTILE_STANCE_ATTACK
-				if (ML.stat == DEAD)
-					var/amt = 0
-					if (ML.mob_size == MOB_MINISCULE)
-						amt = 1
-					if (ML.mob_size == MOB_TINY)
-						amt = 2
-					if (ML.mob_size == MOB_SMALL)
-						amt = 3
-					if (ML.mob_size == MOB_MEDIUM)
-						amt = 4
-					if (ML.mob_size == MOB_LARGE)
-						amt = 5
-					if (ML.mob_size == MOB_HUGE)
-						amt = 8
-					var/namt = amt-2
-					if (namt <= 0)
-						namt = 1
-					visible_message("<span class='notice'>\The [src] rips \the [ML] apart!</span>")
-					simplehunger += 400
-					if (!istype(ML, /mob/living/simple_animal/crab))
-						if (istype(ML, /mob/living/simple_animal/hostile/human/zombie))
-							for (var/i=0, i<=namt, i++)
-								var/obj/item/weapon/reagent_containers/food/snacks/meat/meat = new/obj/item/weapon/reagent_containers/food/snacks/meat(get_turf(src))
-								meat.name = "rotten zombie meat"
-								meat.radiation = radiation/2
-								meat.icon_state = "rottenmeat"
-								if (meat.reagents)
-									meat.reagents.remove_reagent("protein", 2)
-									meat.reagents.add_reagent("food_poisoning", 1)
-								meat.rotten = TRUE
-								meat.satisfaction = -30
-						else
-							for (var/i=0, i<=namt, i++)
-								var/obj/item/weapon/reagent_containers/food/snacks/meat/meat = new/obj/item/weapon/reagent_containers/food/snacks/meat(get_turf(src))
-								meat.name = "[name] meat"
-								meat.radiation = radiation/2
-					else
-						for (var/i=0, i<=namt, i++)
-							var/obj/item/weapon/reagent_containers/food/snacks/rawcrab/meat = new/obj/item/weapon/reagent_containers/food/snacks/rawcrab(get_turf(src))
-							meat.radiation = radiation/2
-
-					if ((amt-2) >= 1)
-						var/obj/item/stack/material/bone/bone = new/obj/item/stack/material/bone(get_turf(src))
-						bone.name = "[name] bone"
-						bone.amount = (amt-2)
-					ML.crush()
-					qdel(ML)
 		return
 
 /mob/living/simple_animal/handle_mutations_and_radiation()

@@ -27,8 +27,6 @@
 //	scoped_accuracy = 2
 	gun_type = GUN_TYPE_RIFLE
 	attachment_slots = ATTACH_IRONSIGHTS|ATTACH_SCOPE|ATTACH_BARREL
-	accuracy_increase_mod = 2.00
-	accuracy_decrease_mod = 6.00
 	KD_chance = KD_CHANCE_HIGH
 	stat = "rifle"
 	fire_delay = 2
@@ -37,7 +35,6 @@
 	maxhealth = 20
 	gtype = "rifle"
 	load_delay = 4
-	aim_miss_chance_divider = 3.00
 	accuracy = 1
 
 	barrel_x_offset = 16
@@ -47,7 +44,6 @@
 	var/check_bolt = FALSE //Keeps the bolt from being interfered with
 	var/check_bolt_lock = FALSE //For locking the bolt. Didn't put this in with check_bolt to avoid issues
 	var/bolt_safety = FALSE //If true, locks the bolt when gun is empty
-	var/next_reload = -1
 	var/jammed_until = -1
 	var/jamcheck = 0
 	var/last_fire = -1
@@ -60,14 +56,14 @@
 			return
 	else return
 	if (check_bolt_lock)
-		user << "<span class='notice'>The bolt won't move, the gun is empty!</span>"
+		to_chat(user, "<span class='notice'>The bolt won't move, the gun is empty!</span>")
 		check_bolt--
 		return
 	bolt_open = !bolt_open
 	if (bolt_open)
 		if (chambered)
 			playsound(loc, bolt_open_sound, 50, TRUE)
-			user << "<span class='notice'>You work the bolt open, ejecting [chambered]!</span>"
+			to_chat(user, "<span class='notice'>You work the bolt open, ejecting [chambered]!</span>")
 			chambered.loc = get_turf(src)
 			chambered.randomrotation()
 			loaded -= chambered
@@ -75,13 +71,13 @@
 			if (bolt_safety)
 				if (!loaded.len)
 					check_bolt_lock++
-					user << "<span class='notice'>The bolt is locked!</span>"
+					to_chat(user, "<span class='notice'>The bolt is locked!</span>")
 		else
 			playsound(loc, bolt_open_sound, 50, TRUE)
-			user << "<span class='notice'>You work the bolt open.</span>"
+			to_chat(user, "<span class='notice'>You work the bolt open.</span>")
 	else
 		playsound(loc, bolt_close_sound, 50, TRUE)
-		user << "<span class='notice'>You work the bolt closed.</span>"
+		to_chat(user, "<span class='notice'>You work the bolt closed.</span>")
 		bolt_open = FALSE
 	add_fingerprint(user)
 	update_icon()
@@ -89,13 +85,13 @@
 
 /obj/item/weapon/gun/projectile/boltaction/special_check(mob/user)
 	if (gun_safety && safetyon)
-		user << "<span class='warning'>You can't fire \the [src] while the safety is on!</span>"
+		to_chat(user, "<span class='warning'>You can't fire \the [src] while the safety is on!</span>")
 		return FALSE
 	if (bolt_open)
-		user << "<span class='warning'>You can't fire [src] while the bolt is open!</span>"
+		to_chat(user, "<span class='warning'>You can't fire [src] while the bolt is open!</span>")
 		return FALSE
 	if (!user.has_empty_hand(both = FALSE) && !istype(src,/obj/item/weapon/gun/projectile/boltaction/mosin/obrez))
-		user << "<span class='warning'>You need both hands to fire \the [src]!</span>"
+		to_chat(user, "<span class='warning'>You need both hands to fire \the [src]!</span>")
 		return FALSE
 	return TRUE
 
@@ -277,7 +273,6 @@
 	fire_sound = 'sound/weapons/guns/fire/BarrettM99.ogg'
 	bolt_open_sound = 'sound/weapons/guns/interact/barrett_bolt_open.ogg'
 	bolt_close_sound = 'sound/weapons/guns/interact/barrett_bolt_close.ogg'
-	accuracy_increase_mod = 2.00
 	fire_delay = 10
 	equiptimer = 15
 	gun_safety = TRUE
@@ -315,7 +310,6 @@
 	magazine_type = /obj/item/ammo_magazine/mosin
 	load_shell_sound = 'sound/weapons/guns/interact/clip_reload.ogg'
 	fire_sound = 'sound/weapons/guns/fire/ptrd.ogg'
-	accuracy_increase_mod = 2.00
 
 	fire_delay = 10
 	equiptimer = 20
@@ -358,7 +352,6 @@
 	magazine_type = /obj/item/ammo_magazine/pzb_case
 	load_shell_sound = 'sound/weapons/guns/interact/clip_reload.ogg'
 	fire_sound = 'sound/weapons/guns/fire/ptrd.ogg'
-	accuracy_increase_mod = 2.00
 
 	fire_delay = 4
 	equiptimer = 20
@@ -371,7 +364,7 @@
 
 /obj/item/weapon/gun/projectile/boltaction/singleshot/special_check(mob/user)
 	if (bolt_open)
-		user << "<span class='warning'>You can't fire [src] while the breech is open!</span>"
+		to_chat(user, "<span class='warning'>You can't fire [src] while the breech is open!</span>")
 		return FALSE
 	return TRUE
 
@@ -386,17 +379,17 @@
 	if (bolt_open)
 		if (chambered)
 			playsound(loc, bolt_open_sound, 50, TRUE)
-			user << "<span class='notice'>You open the breech lever, ejecting [chambered]!</span>"
+			to_chat(user, "<span class='notice'>You open the breech lever, ejecting [chambered]!</span>")
 			chambered.loc = get_turf(src)
 			chambered.randomrotation()
 			loaded -= chambered
 			chambered = null
 		else
 			playsound(loc, bolt_open_sound, 50, TRUE)
-			user << "<span class='notice'>You open the breech lever.</span>"
+			to_chat(user, "<span class='notice'>You open the breech lever.</span>")
 	else
 		playsound(loc, bolt_close_sound, 50, TRUE)
-		user << "<span class='notice'>You close the breech lever.</span>"
+		to_chat(user, "<span class='notice'>You close the breech lever.</span>")
 		bolt_open = FALSE
 	add_fingerprint(user)
 	update_icon()

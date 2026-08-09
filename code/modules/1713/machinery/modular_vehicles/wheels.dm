@@ -5,7 +5,6 @@
 	desc = "Used to steer a vehicle."
 	icon_state = "wheel_b"
 	item_state = "wheel_b"
-	worn_state = "wheel_b"
 	var/obj/structure/bed/chair/drivers/drivingchair = null
 	var/obj/structure/vehicleparts/frame/control = null
 	var/lastdirchange = 0
@@ -16,13 +15,13 @@
 	..()
 
 /obj/item/vehicleparts/wheel/modular/proc/turndir(var/mob/living/mob = null, var/newdir = "left")
+	if (!control || !control.axis || isnull(control.axis.turntimer))
+		return FALSE
 	if (world.time <= lastdirchange)
 		return FALSE
-	lastdirchange = world.time+control.axis.turntimer
-	if (control && control.axis && (control.axis.moving == FALSE || control.axis.currentspeed == 0))
+	lastdirchange = world.time + control.axis.turntimer
+	if (control.axis.moving == FALSE || control.axis.currentspeed == 0)
 		return FALSE
-	if (!control || !control.axis)
-		return
 	for(var/obj/effect/pseudovehicle/O in control.axis.components)
 		for(var/obj/structure/vehicleparts/frame/VP in O.loc)
 			if (VP.axis != control.axis)
@@ -57,7 +56,8 @@
 
 /obj/structure/bed/chair/drivers/Destroy()
 	if (wheel)
-		wheel.control.axis.wheel = null
+		if (wheel.control && wheel.control.axis)
+			wheel.control.axis.wheel = null
 		wheel.Destroy()
 		wheel = null
 	visible_message("<span class='danger'>The [name] gets destroyed!</span>")
@@ -166,6 +166,9 @@
 	name = "tank driver's seat"
 	icon_state = "driver_tank"
 	flammable = FALSE
+
+/obj/structure/bed/chair/drivers/tank/anchored
+	anchored = TRUE
 
 /obj/structure/bed/chair/drivers/user_unbuckle_mob(mob/user)
 	var/mob/living/M = unbuckle_mob()
@@ -430,7 +433,6 @@
 	icon = 'icons/obj/device.dmi'
 	icon_state = "turret_control"
 	item_state = "turret_control"
-	worn_state = "turret_control"
 	nothrow = TRUE
 	nodrop = TRUE
 	var/datum/action/toggle_scope/azoom
@@ -519,9 +521,9 @@
 		rotating_dir = 0
 		return
 	if (rotating_dir > 0)
-		turret.icrease_target_azimuth(1)
+		turret.increase_target_azimuth(1)
 	else if (rotating_dir < 0)
-		turret.icrease_target_azimuth(-1)
+		turret.increase_target_azimuth(-1)
 
 	spawn(0.1)
 		rotate()
@@ -530,9 +532,9 @@
 	if(!turret)
 		return
 	if(distance > 0)
-		turret.icrease_target_distance(1)
+		turret.increase_target_distance(1)
 	else
-		turret.icrease_target_distance(-1)
+		turret.increase_target_distance(-1)
 
 /obj/item/turret_controls/attack_self(mob/living/human/user)
 	if(!turret)

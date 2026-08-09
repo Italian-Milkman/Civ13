@@ -48,20 +48,20 @@
 							crimereason = "Polish civilian. Original city inhabitant."
 					document_details = list(H.h_style, H.f_style, crimereason, H.gender, rand(6,32),P.original_eyes, P.randrole)
 /obj/item/weapon/civilian_passport/examine(mob/user)
-	user << "<span class='info'>*---------*</span>"
+	to_chat(user, "<span class='info'>*---------*</span>")
 	..(user)
 	if (document_details.len >= 7)
-		user << "<b><span class='info'>Hair:</b> [document_details[1]]</span>"
+		to_chat(user, "<b><span class='info'>Hair:</b> [document_details[1]]</span>")
 		if (document_details[4] == "male")
-			user << "<b><span class='info'>Face:</b> [document_details[2]]</span>"
-		user << "<b><span class='info'>Eyes:</b> [document_details[6]]</span>"
-		user << "<b><span class='info'>Extra Info:</b> [document_details[3]]</span>"
-		user << "<b><span class='info'>Job:</b> [document_details[7]]</span>"
-	user << "<span class='info'>*---------*</span>"
+			to_chat(user, "<b><span class='info'>Face:</b> [document_details[2]]</span>")
+		to_chat(user, "<b><span class='info'>Eyes:</b> [document_details[6]]</span>")
+		to_chat(user, "<b><span class='info'>Extra Info:</b> [document_details[3]]</span>")
+		to_chat(user, "<b><span class='info'>Job:</b> [document_details[7]]</span>")
+	to_chat(user, "<span class='info'>*---------*</span>")
 	if (guardnotes.len)
 		for(var/i in guardnotes)
-			user << "NOTE: [i]"
-		user << "<span class='info'>*---------*</span>"
+			to_chat(user, "NOTE: [i]")
+		to_chat(user, "<span class='info'>*---------*</span>")
 
 /obj/item/weapon/civilian_passport/attackby(var/obj/item/I, var/mob/living/human/H)
 	if (!ishuman(H))
@@ -90,6 +90,7 @@
 	title = " UPA Khorunzhyj"
 	en_meaning = " UPA 2nd Lieutenant"
 	rank_abbreviation = ""
+	allowed_maps = list(MAP_OCCUPATION)
 
 	spawn_location = "JoinLateCiv"
 
@@ -178,6 +179,7 @@
 	rank_abbreviation = ""
 	can_be_female = TRUE
 	spawn_location = "JoinLateCivD"
+	allowed_maps = list(MAP_OCCUPATION)
 
 	is_medic = TRUE
 	is_ww2 = TRUE
@@ -256,6 +258,7 @@
 	rank_abbreviation = ""
 	can_be_female = TRUE
 	spawn_location = "JoinLateCiv"
+	allowed_maps = list(MAP_OCCUPATION)
 
 	is_ww2 = TRUE
 	uses_squads = TRUE
@@ -342,6 +345,7 @@
 	title = " UPA Strilets"
 	en_meaning = "UPA Partisan"
 	rank_abbreviation = ""
+	allowed_maps = list(MAP_OCCUPATION)
 
 	spawn_location = "JoinLateCiv"
 	can_be_female = TRUE
@@ -431,6 +435,7 @@
 	title = "SS Hauptsturmfuhrer"
 	en_meaning = "SS Captain"
 	rank_abbreviation = "Hptsrmfhr."
+	allowed_maps = list(MAP_OCCUPATION)
 
 
 	spawn_location = "JoinLateGECap"
@@ -439,7 +444,7 @@
 	whitelisted = TRUE
 
 	is_ww2 = TRUE
-	is_reichstag = FALSE
+	
 	is_occupation = TRUE
 
 	min_positions = 1
@@ -480,7 +485,7 @@
 	uniform.attackby(SS_hauptsturmfuhrer, H)
 	uniform.attackby(ss_sadler, H)
 	give_random_name(H)
-	world << "<b><big>[H.real_name] is the Hauptsturmfuhrer of the German Forces!</big></b>"
+	to_chat(world, "<big><b>[H.real_name] is the Hauptsturmfuhrer of the German Forces!</b></big>")
 	H.add_note("Role", "You are a <b>[title]</b>, the highest ranking officer present. Your job is to command the SS troops and organize them to find and apprehend the UPA partisans.")
 	H.setStat("strength", STAT_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -499,6 +504,7 @@
 	title = "SS Obersturmmfuhrer"
 	en_meaning = "SS First Lieutenant"
 	rank_abbreviation = "Obstmfhr."
+	allowed_maps = list(MAP_OCCUPATION)
 
 
 	spawn_location = "JoinLateGECap"
@@ -506,7 +512,7 @@
 	whitelisted = TRUE
 	is_commander = TRUE
 	is_ww2 = TRUE
-	is_reichstag = FALSE
+	
 	is_occupation = TRUE
 
 	min_positions = 1
@@ -562,6 +568,7 @@
 	title = "SS Untersturmmfuhrer"
 	en_meaning = "SS Second Lieutenant"
 	rank_abbreviation = "Untstmfhr."
+	allowed_maps = list(MAP_OCCUPATION)
 
 
 	spawn_location = "JoinLateGECap"
@@ -569,7 +576,7 @@
 	whitelisted = TRUE
 	is_commander = TRUE
 	is_ww2 = TRUE
-	is_reichstag = FALSE
+	
 	is_occupation = TRUE
 	min_positions = 1
 	max_positions = 1
@@ -625,11 +632,12 @@
 	title = "SS Scharfuhrer"
 	en_meaning = "SS Squad Leader"
 	rank_abbreviation = "Schfhr."
+	allowed_maps = list(MAP_OCCUPATION)
 
 	spawn_location = "JoinLateGE"
 	is_squad_leader = TRUE
 	is_ww2 = TRUE
-	is_reichstag = FALSE
+	
 	uses_squads = TRUE
 	is_occupation = TRUE
 
@@ -683,12 +691,13 @@
 	title = "SS Sturmman"
 	en_meaning = "SS Soldier"
 	rank_abbreviation = ""
+	allowed_maps = list(MAP_OCCUPATION)
 
 	spawn_location = "JoinLateGE"
 
 	is_ww2 = TRUE
 	is_occupation = TRUE
-	is_reichstag = FALSE
+	
 	uses_squads = TRUE
 
 	min_positions = 8
@@ -814,6 +823,8 @@
 	var/original_facial = "Shaved"
 	var/original_hair = "Black"
 	can_be_female = TRUE
+	allowed_maps = list()
+
 /datum/job/civilian/occupation/equip(var/mob/living/human/H)
 	if (!H)	return FALSE
 	H.nationality = "none"
@@ -883,6 +894,7 @@
 	max_positions = 8
 	can_be_female = TRUE
 	spawn_location = "JoinLateCivA"
+	allowed_maps = list(MAP_OCCUPATION)
 	equip(var/mob/living/human/H)
 		..()
 		if (prob(80))
@@ -905,6 +917,7 @@
 	min_positions = 1
 	max_positions = 4
 	can_be_female = TRUE
+	allowed_maps = list(MAP_OCCUPATION)
 	equip(var/mob/living/human/H)
 		..()
 		H.equip_to_slot_or_del(new /obj/item/weapon/storage/belt/leather/occinn(H), slot_belt)
@@ -922,6 +935,7 @@
 	can_be_female = TRUE
 	min_positions = 1
 	max_positions = 3
+	allowed_maps = list(MAP_OCCUPATION)
 	equip(var/mob/living/human/H)
 		..()
 		H.add_note("Role", "You are a <b>Farmer</b>. Your job is to work for the german occupiers in either the fields or the woods. Misbehaviour can be met with severe punishment.")
@@ -936,6 +950,7 @@
 	en_meaning = ""
 	min_positions = 2
 	max_positions = 4
+	allowed_maps = list(MAP_OCCUPATION)
 /datum/job/civilian/occupation/doctor/equip(var/mob/living/human/H)
 	if (!H)	return FALSE
 	H.nationality = "none"
@@ -986,6 +1001,7 @@
 
 	min_positions = 2
 	max_positions = 5
+	allowed_maps = list(MAP_OCCUPATION)
 /datum/job/civilian/occupation/collaborator/equip(var/mob/living/human/H)
 	if (!H)	return FALSE
 
@@ -1025,6 +1041,7 @@
 	en_meaning = ""
 	can_be_female = TRUE
 	spawn_location = "JoinLateCiv"
+	allowed_maps = list(MAP_OCCUPATION)
 
 	min_positions = 8
 	max_positions = 30

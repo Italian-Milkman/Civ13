@@ -23,10 +23,10 @@
 	var/process_flag = FALSE
 	var/hideflag = FALSE
 
-/obj/screen/New(_name = "unnamed", _screen_loc = "7,7", mob/living/_parentmob, _icon, _icon_state)
+/obj/screen/New(_name, _screen_loc, mob/living/_parentmob, _icon, _icon_state)
 	parentmob = _parentmob
-	name = _name
-	screen_loc = _screen_loc
+	if (_name) name = _name
+	if (_screen_loc) screen_loc = _screen_loc
 	if (parentmob && parentmob.client)
 		icon = parentmob.client.prefs.UI_file
 	if (_icon)
@@ -515,7 +515,9 @@
 		return
 	
 	alpha = 255
-	icon_state = "cross[clamp(round(usr.get_active_hand().get_dispersion_range(usr), 3), 3, 30)]"
+	if (istype(usr.get_active_hand(), /obj/item/weapon/gun))
+		var/obj/item/weapon/gun/GN = usr.get_active_hand()
+		icon_state = "cross[clamp(round(GN.get_dispersion_range(usr), 3), 3, 30)]"
 	screen_loc = "[usr.client.mouse_screen_x]:[usr.client.mouse_screen_pixel_x - 16],[usr.client.mouse_screen_y]:[usr.client.mouse_screen_pixel_y - 16]"
 
 /obj/screen/aiming_cross/proc/update()
@@ -603,14 +605,14 @@
 	var/thirsty_percentage = "[round(thirsty_coeff*100)]%"
 
 	if (thirsty_coeff <= 0)
-		H << "<span class = 'danger'>You're dehydrating.</span>"
+		to_chat(H, "<span class = 'danger'>You're dehydrating.</span>")
 	else
-		H << "<span class = 'warning'>You're about [thirsty_percentage] hydrated.</span>"
+		to_chat(H, "<span class = 'warning'>You're about [thirsty_percentage] hydrated.</span>")
 
 	if (hungry_coeff <= 0)
-		H << "<span class = 'danger'>You're starving.</span>"
+		to_chat(H, "<span class = 'danger'>You're starving.</span>")
 	else
-		H << "<span class = 'warning'>You're about [hungry_percentage] full.</span>"
+		to_chat(H, "<span class = 'warning'>You're about [hungry_percentage] full.</span>")
 
 //--------------------------------------------------nutrition end---------------------------------------------------------
 
@@ -626,36 +628,39 @@
 	update_icon()
 
 /obj/screen/bodytemp/update_icon()
+	var/mob/living/human/H = parentmob
+	if (!istype(H))
+		return
 	//TODO: precalculate all of this stuff when the species datum is created
-	var/base_temperature = parentmob:species.body_temperature
+	var/base_temperature = H.species.body_temperature
 	if (base_temperature == null) //some species don't have a set metabolic temperature
-		base_temperature = (parentmob:species.heat_level_1 + parentmob:species.cold_level_1)/2
+		base_temperature = (H.species.heat_level_1 + H.species.cold_level_1)/2
 
 	var/temp_step
-	if (parentmob:bodytemperature >= base_temperature)
-		temp_step = (parentmob:species.heat_level_1 - base_temperature)/4
+	if (H.bodytemperature >= base_temperature)
+		temp_step = (H.species.heat_level_1 - base_temperature)/4
 
-		if (parentmob:bodytemperature >= parentmob:species.heat_level_1)
+		if (H.bodytemperature >= H.species.heat_level_1)
 			icon_state = "temp4"
-		else if (parentmob:bodytemperature >= base_temperature + temp_step*3)
+		else if (H.bodytemperature >= base_temperature + temp_step*3)
 			icon_state = "temp3"
-		else if (parentmob:bodytemperature >= base_temperature + temp_step*2)
+		else if (H.bodytemperature >= base_temperature + temp_step*2)
 			icon_state = "temp2"
-		else if (parentmob:bodytemperature >= base_temperature + temp_step*1)
+		else if (H.bodytemperature >= base_temperature + temp_step*1)
 			icon_state = "temp1"
 		else
 			icon_state = "temp0"
 
-	else if (parentmob:bodytemperature < base_temperature)
-		temp_step = (base_temperature - parentmob:species.cold_level_1)/4
+	else if (H.bodytemperature < base_temperature)
+		temp_step = (base_temperature - H.species.cold_level_1)/4
 
-		if (parentmob:bodytemperature <= parentmob:species.cold_level_1)
+		if (H.bodytemperature <= H.species.cold_level_1)
 			icon_state = "temp-4"
-		else if (parentmob:bodytemperature <= base_temperature - temp_step*3)
+		else if (H.bodytemperature <= base_temperature - temp_step*3)
 			icon_state = "temp-3"
-		else if (parentmob:bodytemperature <= base_temperature - temp_step*2)
+		else if (H.bodytemperature <= base_temperature - temp_step*2)
 			icon_state = "temp-2"
-		else if (parentmob:bodytemperature <= base_temperature - temp_step*1)
+		else if (H.bodytemperature <= base_temperature - temp_step*1)
 			icon_state = "temp-1"
 		else
 			icon_state = "temp0"
@@ -753,10 +758,10 @@
 		L.set_face_dir()
 
 		if (!L.facing_dir)
-			L << "You are no longer facing anything."
+			to_chat(L, "You are no longer facing anything.")
 			icon_state = "fixeye"
 		else
-			L << "You are now facing [dir2text(L.facing_dir)]."
+			to_chat(L, "You are now facing [dir2text(L.facing_dir)].")
 			icon_state = "fixeye_on"
 		update_icon()
 
@@ -801,25 +806,25 @@
 			if("charge") //10% damage buff
 				parentmob.tactic = "aim"
 				icon_state = "aim"
-				parentmob << "<span class='warning'>You will now focus on aiming.</span>"
+				to_chat(parentmob, "<span class='warning'>You will now focus on aiming.</span>")
 				update_icon()
 				return
 			if("aim") //10% accuracy buff
 				parentmob.tactic = "rush"
 				icon_state = "rush"
-				parentmob << "<span class='warning'>You will now focus on rushing.</span>"
+				to_chat(parentmob, "<span class='warning'>You will now focus on rushing.</span>")
 				update_icon()
 				return
 			if("rush") // 15% cooldown buff
 				parentmob.tactic = "defend"
 				icon_state = "defend"
-				parentmob << "<span class='warning'>You will now focus on defending.</span>"
+				to_chat(parentmob, "<span class='warning'>You will now focus on defending.</span>")
 				update_icon()
 				return
 			if("defend") //20% dodge/parry buff
 				parentmob.tactic = "charge"
 				icon_state = "charge"
-				parentmob << "<span class='warning'>You will now focus on charging.</span>"
+				to_chat(parentmob, "<span class='warning'>You will now focus on charging.</span>")
 				update_icon()
 				return
 
@@ -870,10 +875,10 @@
 			if(80 to INFINITY)
 				icon_state = "mood1"
 		if(old_icon && old_icon != icon_state)
-			if(old_mood > L.mood)
-				src << "<span class='warning'>My mood gets worse.</span>"
+			if(L && old_mood > L.mood)
+				to_chat(L, "<span class='warning'>My mood gets worse.</span>")
 			else
-				src << "<span class='info'>My mood gets better.</span>"
+				to_chat(L, "<span class='info'>My mood gets better.</span>")
 //-----------------------mov_intent------------------------------
 /obj/screen/mov_intent
 	name = "mov_intent"
@@ -887,7 +892,7 @@
 	if (C.stat == DEAD)
 		return
 	if (C.legcuffed)
-		C << "<span class='notice'>You are legcuffed! You cannot run until you get [C.legcuffed] removed!</span>"
+		to_chat(C, "<span class='notice'>You are legcuffed! You cannot run until you get [C.legcuffed] removed!</span>")
 		C.m_intent = "walk"	//Just incase
 		update_icon()
 		return TRUE
@@ -1008,11 +1013,11 @@
 /obj/screen/mode/Click()
 	if (parentmob.defense_intent == I_DODGE)
 		parentmob.defense_intent = I_PARRY
-		parentmob << "<span class='warning'>You will now parry.</span>"
+		to_chat(parentmob, "<span class='warning'>You will now parry.</span>")
 		update_icon()
 	else
 		parentmob.defense_intent = I_DODGE
-		parentmob << "<span class='warning'>You will now dodge.</span>"
+		to_chat(parentmob, "<span class='warning'>You will now dodge.</span>")
 		update_icon()
 /obj/screen/mode/update_icon()
 	switch (parentmob.defense_intent)

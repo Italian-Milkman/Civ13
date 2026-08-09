@@ -44,65 +44,34 @@
 
 /////////////   FACTIONS   /////////////
 
+// The map types where players may found their own factions -- the condition
+// the Create Faction verb has always gated on.
+/obj/map_metadata/proc/allows_custom_factions()
+	return nomads == TRUE || ID == MAP_NATIONSRP || ID == MAP_NATIONSRP_TRIPLE || ID == MAP_NATIONSRPMED || ID == MAP_NATIONSRP_WW2 || ID == MAP_NATIONSRP_COLDWAR || ID == MAP_NATIONSRP_COLDWAR_CMP
+
+/obj/map_metadata/proc/faction_name_taken(name)
+	for (var/i = 1, i <= custom_faction_nr.len, i++)
+		if (custom_faction_nr[i] == name)
+			return TRUE
+	return FALSE
+
+// The whole founding flow -- name, symbol drawing, and the founding itself --
+// happens in one Faction Creation window (see faction_creation.dm) instead
+// of the old chain of separate popup dialogs.
 /mob/living/human/proc/create_faction()
 	set name = "Create Faction"
 	set category = "Faction"
-	var/mob/living/human/U
 
-	if (istype(src, /mob/living/human))
-		U = src
-	else
-		return
-
-	if (map.nomads == TRUE || map.ID == MAP_NATIONSRP || map.ID == MAP_NATIONSRP_TRIPLE || map.ID == MAP_NATIONSRPMED || map.ID == MAP_NATIONSRP_WW2 || map.ID == MAP_NATIONSRP_COLDWAR || map.ID == MAP_NATIONSRP_COLDWAR_CMP)
-		if (U.civilization != "none")
-			to_chat(usr, SPAN_DANGER("You are already in a faction. Abandon it first."))
-			return
-		else
-			var/choosename = input(src, "Choose a name for the faction:") as text|null
-			if (choosename != null && choosename != "")
-				create_faction_pr(choosename)
-				make_commander()
-				make_title_changer()
-				return
-	else
-		to_chat(usr, SPAN_DANGER("You cannot create a faction in this map."))
-		return
-
-/mob/living/human/proc/create_faction_pr(var/newname = "none")
 	if (!ishuman(src))
 		return
-	var/mob/living/human/H = src
-	for(var/i = 1, i <= map.custom_faction_nr.len, i++)
-		if (map.custom_faction_nr[i] == newname)
-			to_chat(usr, SPAN_DANGER("That faction already exists. Choose another name."))
-			return
-	if (newname != null && newname != "none")
-		var/choosecolor1 = "#000000"
-		var/choosecolor2 = "#FFFFFF"
-		var/choosesymbol = "star"
-		choosesymbol = WWinput(src, "Choose a symbol for the new faction:", "Faction Creation", "Cancel", list("Cancel","star","sun","moon","cross","big cross","saltire"))
-		if (choosesymbol == "Cancel")
-			return
-		choosecolor1 = WWinput(H, "Choose main/symbol color:", "Color" , "#000000", "color")
-		if (choosecolor1 == null || choosecolor1 == "")
-			return
-
-		choosecolor2 = WWinput(H, "Choose the secondary/background color:", "Color" , "#FFFFFF", "color")
-		if (choosecolor2 == null || choosecolor2 == "")
-			return
-
-		H.civilization = newname
-		H.leader = TRUE
-		H.faction_perms = list(1,1,1,1)
-		map.custom_faction_nr += newname
-												//ind						mil					med			leader money	symbol	main color	backcolor, sales tax, business tax
-		var/newnamev = list("[newname]" = list(map.default_research,map.default_research,map.default_research,H,0,choosesymbol,choosecolor1,choosecolor2,10,10))
-		map.custom_civs += newnamev
-		to_chat(usr, "<big>You are now the leader of the <b>[newname]</b> faction.</big>")
+	if (!map || !map.allows_custom_factions())
+		to_chat(usr, SPAN_WARNING("You cannot create a faction in this map."))
 		return
-	else
+	if (civilization != "none")
+		to_chat(usr, SPAN_WARNING("You are already in a faction. Abandon it first."))
 		return
+	var/datum/nano_module/faction_creation/wizard = new(src, src)
+	wizard.ui_interact(src)
 
 
 /mob/living/human/proc/abandon_faction()
@@ -125,7 +94,7 @@
 			else
 				faction_leaving_proc()
 	else
-		to_chat(usr, SPAN_DANGER("You cannot leave a faction in this map."))
+		to_chat(usr, SPAN_WARNING("You cannot leave a faction in this map."))
 		return
 
 
@@ -133,16 +102,23 @@
 	if (civilization == null || civilization == "none")
 		return FALSE
 	left_factions += list(list(civilization,world.realtime+864000)) //24 hours
-	if (map.custom_civs[civilization][4] != null)
-		if (map.custom_civs[civilization][4].real_name == real_name)
-			map.custom_civs[civilization][4] = null
+	var/list/civ_data = map.custom_civs[civilization]
+	if (civ_data && civ_data[4] != null)
+		var/mob/living/human/L = civ_data[4]
+		if (L.real_name == real_name)
+			civ_data[4] = null
+	// Shed any research-tree appointment so it can't carry into a new faction.
+	if (map && map.faction_research_director[civilization] == src)
+		map.faction_research_director[civilization] = null
+	research_role = null
 	civilization = "none"
 	name = replacetext(real_name,"[title] ","")
 	title = ""
 	leader = FALSE
 	faction_perms = list(0,0,0,0)
-	src << "You left your faction. You are now a Nomad."
+	to_chat(src, "You left your faction. You are now a Nomad.")
 	remove_commander()
+	remove_faction_symbol_editor()
 	return TRUE
 
 /mob/living/human/proc/transfer_faction()
@@ -159,8 +135,10 @@
 			to_chat(usr, "You are not part of any faction.")
 			return
 		else
-			if (map.custom_civs[U.civilization][4] != null)
-				if (map.custom_civs[U.civilization][4].real_name == U.real_name)
+			var/list/civ_data = map.custom_civs[U.civilization]
+			if (civ_data && civ_data[4] != null)
+				var/mob/living/human/L = civ_data[4]
+				if (L.real_name == U.real_name)
 					var/list/closemobs = list("Cancel")
 					for (var/mob/living/human/M in range(4,loc))
 						if (M.civilization == U.civilization)
@@ -174,20 +152,22 @@
 						var/mob/living/human/CM = choice2
 						CM.make_commander()
 						CM.make_title_changer()
+						CM.grant_faction_symbol_editor()
 						CM.leader = TRUE
 						CM.faction_perms = list(1,1,1,1)
 						U.leader = FALSE
 						U.faction_perms = list(0,0,0,0)
 						U.remove_title_changer()
 						U.remove_commander()
+						U.remove_faction_symbol_editor()
 				else
-					to_chat(usr, SPAN_DANGER("You are not the Leader, so you can't transfer the faction's leadership."))
+					to_chat(usr, SPAN_WARNING("You are not the Leader, so you can't transfer the faction's leadership."))
 					return
 			else
-				to_chat(usr, SPAN_DANGER("There is no Leader, so you can't transfer the faction's leadership."))
+				to_chat(usr, SPAN_WARNING("There is no Leader, so you can't transfer the faction's leadership."))
 
 	else
-		to_chat(usr, SPAN_DANGER("You cannot transfer leadership of a faction in this map."))
+		to_chat(usr, SPAN_WARNING("You cannot transfer leadership of a faction in this map."))
 		return
 
 /mob/living/human/proc/become_leader()
@@ -205,7 +185,7 @@
 			return
 		else
 			if (map.custom_civs[U.civilization][4] != null)
-				to_chat(usr, SPAN_DANGER("There already is a Leader of the faction. He must transfer the leadership or be removed first."))
+				to_chat(usr, SPAN_WARNING("There already is a Leader of the faction. He must transfer the leadership or be removed first."))
 				return
 
 			else if (map.custom_civs[U.civilization][4] == null)
@@ -215,8 +195,9 @@
 				U.faction_perms = list(1,1,1,1)
 				U.make_title_changer()
 				make_commander()
+				U.grant_faction_symbol_editor()
 	else
-		to_chat(usr, SPAN_DANGER("You cannot become a Leader in this map."))
+		to_chat(usr, SPAN_WARNING("You cannot become a Leader in this map."))
 		return
 
 
@@ -233,7 +214,7 @@
 				return
 			else
 				if (H.faction_perms[3] == 0)
-					to_chat(usr, SPAN_DANGER("You don't have the permissions to give titles."))
+					to_chat(usr, SPAN_WARNING("You don't have the permissions to give titles."))
 					return
 
 				else
@@ -283,7 +264,7 @@
 				WWalert(U, job_msg, "Job Assignment")
 				return
 	else
-		to_chat(usr, SPAN_DANGER("You cannot give titles in this map."))
+		to_chat(usr, SPAN_WARNING("You cannot give titles in this map."))
 		return
 
 /mob/living/human/proc/Remove_Title()
@@ -299,7 +280,7 @@
 				return
 			else
 				if (H.faction_perms[3] == 0)
-					to_chat(usr, SPAN_DANGER("You don't have the permissions to remove titles."))
+					to_chat(usr, SPAN_WARNING("You don't have the permissions to remove titles."))
 					return
 
 				else
@@ -341,7 +322,7 @@
 				to_chat(usr, "[U] has no job assigned.")
 				return
 	else
-		to_chat(usr, SPAN_DANGER("You cannot give titles in this map."))
+		to_chat(usr, SPAN_WARNING("You cannot give titles in this map."))
 		return
 
 ////////////////POSTERS, BANNERS, ETC//////////////////////////////
@@ -379,8 +360,18 @@
 			var/image/overc1 = image("icon" = icon, "icon_state" = "[bstyle]_2")
 			overc1.color = color2
 			overlays += overc1
-			var/image/overs = image("icon" = icon, "icon_state" = "b_[map.custom_civs[faction][6]]")
-			overs.color = color1
+			// A custom-drawn symbol (see code/game/mob/groups/faction_symbol.dm)
+			// takes over from the fixed shape list when the faction has saved
+			// one. It's already full-color pixel art, so -- unlike the fixed
+			// shapes -- it's laid down untinted; tinting it with color1 would
+			// just recolor over whatever the player actually drew.
+			var/icon/custom_symbol = map.get_faction_symbol_icon(faction)
+			var/image/overs
+			if (custom_symbol)
+				overs = image("icon" = custom_symbol)
+			else
+				overs = image("icon" = icon, "icon_state" = "b_[map.custom_civs[faction][6]]")
+				overs.color = color1
 			overlays += overs
 		update_icon()
 		invisibility = 0
@@ -556,14 +547,39 @@
 				if (relf == H.civilization && H.stat != DEAD)
 					map.facl[relf] += 1
 
-		var/body = "<html><head><title>Faction List</title></head><b>FACTION LIST</b><br><br>"
+		var/body = "<html><head><title>Faction List</title></head>[common_browser_style]<b>FACTION LIST</b><br><br><table cellpadding='4'>"
 		for (var/relf in map.facl)
 			if (map.facl[relf] > 0)
-				body += "<b>[relf]</b>: [map.facl[relf]] members.</br>"
-		body += {"<br>
+				// Faction symbol on the left: the custom-drawn icon if one
+				// was ever saved, otherwise the fixed shape tinted with the
+				// faction's main color -- the same look the banner overlay
+				// gives it (white art multiplied by color1).
+				var/icon/symbol = map.get_faction_symbol_icon(relf)
+				if (!symbol)
+					var/list/civ_data = map.custom_civs[relf]
+					if (civ_data && civ_data.len >= 7)
+						symbol = new/icon('icons/obj/banners.dmi', "b_[civ_data[6]]")
+						symbol.Blend(civ_data[7], ICON_MULTIPLY)
+				var/img_cell = ""
+				if (symbol)
+					// browse_rsc BEFORE the browse() below, so the page can
+					// reference the image by name. ckey() makes the faction
+					// name filesystem-safe.
+					usr << browse_rsc(symbol, "flist_[ckey(relf)].png")
+					img_cell = "<img src='flist_[ckey(relf)].png' width='32' height='32'>"
+				// Name with the motto to its right, flavour text below, then
+				// the member count. Motto/flavour are stored html-encoded.
+				var/text_cell = "<b>[relf]</b>"
+				if (map.faction_motto[relf])
+					text_cell += " &mdash; <i>[map.faction_motto[relf]]</i>"
+				if (map.faction_flavour[relf])
+					text_cell += "<br>[map.faction_flavour[relf]]"
+				text_cell += "<br><small>[map.facl[relf]] member\s.</small>"
+				body += "<tr><td valign='top'>[img_cell]</td><td>[text_cell]</td></tr>"
+		body += {"</table><br>
 			</body></html>
 		"}
 
-		usr << browse(body,"window=artillery_window;border=1;can_close=1;can_resize=1;can_minimize=0;titlebar=1;size=250x450")
+		usr << browse(body,"window=faction_list_window;border=1;can_close=1;can_resize=1;can_minimize=0;titlebar=1;size=420x520")
 	else
 		return

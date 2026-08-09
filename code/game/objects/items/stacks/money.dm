@@ -36,7 +36,6 @@
 	attack_verb = list("hit")
 	w_class = ITEM_SIZE_SMALL // fits in pockets
 	value = 1
-	real_value = 1
 	var/novariants = TRUE
 
 /obj/item/stack/money/cents
@@ -102,6 +101,41 @@
 	icon_state = "ruble[icon_suffix]"
 	// TO-DO: Check if the parent update_icon proc has to be called
 
+/obj/item/stack/money/rubles/fivehundred
+	amount = 500
+
+/obj/item/stack/money/francs
+	name = "French franc"
+	desc = "A French 1 franc banknote."
+	singular_name = "franc"
+	icon_state = "franc_1"
+	amount = 1
+	value = 1
+	max_amount = 25
+
+/obj/item/stack/money/francs/New()
+	update_icon()
+	return ..()
+
+/obj/item/stack/money/francs/update_icon()
+	var/icon_suffix = ""
+	switch(amount)
+		if (1 to 3)
+			icon_suffix = "1"
+		if (4 to 6)
+			icon_suffix = "2"
+		if (7 to 10)
+			icon_suffix = "3"
+		if (11 to 15)
+			icon_suffix = "4"
+		if (16 to INFINITY)
+			icon_suffix = "5"
+	icon_state = "franc_[icon_suffix]"
+
+/obj/item/stack/money/francs/ten
+	amount = 10
+
+
 /obj/item/stack/money/european
 	name = ""
 	desc = ""
@@ -117,7 +151,6 @@
 	attack_verb = list("hit")
 	w_class = ITEM_SIZE_SMALL // fits in pockets
 	value = 1
-	real_value = 1
 	novariants = TRUE
 
 /obj/item/stack/money/asian
@@ -135,7 +168,6 @@
 	attack_verb = list("hit")
 	w_class = ITEM_SIZE_SMALL // fits in pockets
 	value = 1
-	real_value = 1
 	novariants = TRUE
 
 /obj/item/stack/money/fictional
@@ -153,7 +185,6 @@
 	attack_verb = list("hit")
 	w_class = ITEM_SIZE_SMALL // fits in pockets
 	value = 1
-	real_value = 1
 	novariants = TRUE
 
 // -------------------------------------------------
@@ -613,12 +644,12 @@
 
 /obj/structure/oil_deposits/attack_hand(mob/living/human/user as mob)
 	if (user.civilization == "none")
-		user << "You are not part of a faction!"
+		to_chat(user, "You are not part of a faction!")
 		return
 	else if (faction == null)
 		faction = user.civilization
 		desc = "Belongs to the [faction]. Stored oil: [storedvalue]."
-		user << "You set the oil deposit faction as [faction]."
+		to_chat(user, "You set the oil deposit faction as [faction].")
 		return
 	else
 		..()
@@ -733,6 +764,9 @@
 		if (500 to INFINITY)
 			icon_suffix = "_5"
 	icon_state = "silvercoin_pile[icon_suffix]"
+
+/obj/item/stack/money/silvercoin/twenty
+	amount = 20
 
 /obj/item/stack/money/silvercoin/twohundred
 	amount = 200

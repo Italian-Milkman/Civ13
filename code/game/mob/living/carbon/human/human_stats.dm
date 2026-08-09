@@ -36,15 +36,14 @@
 				return (stats[lowertext(statname)][1]/100)*mood_modifier*dex_mod
 			if ("crafting")
 				return (stats[lowertext(statname)][1]/100)*mood_modifier*craft_mod
+			if ("magic")
+				return (stats[lowertext(statname)][1]/100)
 			else
 				return (stats[lowertext(statname)][1]/100)*mood_modifier
 	else
 		return FALSE
 
-/mob/living/human/proc/getLesserStatCombinedCoeff(var/list/statnames = list())
-	. = 1 - (statnames.len/10)
-	for (var/statname in statnames)
-		. += stats[lowertext(statname)][1]/1000
+
 
 /mob/living/human/proc/setStat(statname, statval)
 
@@ -146,11 +145,20 @@
 		stats[statname][1] *= (1 + round(multiplier/100, increase_multiple))
 		stats[statname][2] *= (1 + round(multiplier/100, increase_multiple))
 
-	else
+	else if (list("strength", "stamina").Find(statname))
+		stats[statname][1] *= (1 + round(multiplier/150, increase_multiple))
+		stats[statname][2] *= (1 + round(multiplier/150, increase_multiple))
+
+	else if (statname == "throwing")
+		stats[statname][1] *= (1 + round(multiplier/200, increase_multiple))
+		stats[statname][2] *= (1 + round(multiplier/200, increase_multiple))
+
+	else if (statname == "philosophy")
 		stats[statname][1] *= (1 + round(multiplier/100, increase_multiple))
 		stats[statname][2] *= (1 + round(multiplier/100, increase_multiple))
 
-	// stats may not go over 250
-	for (var/sname in stats)
-		stats[sname][1] = min(stats[sname][1], 250.00)
-		stats[sname][2] = min(stats[sname][1], 250.00)
+	// stats may not go over 250, magic 100
+	var/cap = (statname == "magic") ? 100.00 : 250.00
+	stats[statname][1] = min(stats[statname][1], cap)
+	stats[statname][2] = min(stats[statname][2], cap)
+		

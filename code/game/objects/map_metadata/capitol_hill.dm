@@ -1,13 +1,15 @@
 /obj/map_metadata/capitol_hill
 	ID = MAP_CAPITOL_HILL
 	title = "Capitol Hill"
-	lobby_icon = 'icons/lobby/capitol.png'
+	description = "A modern siege scenario where the Militia attempts to capture the U.S. Capitol from the defending National Guard."
+	lobby_icon = "icons/lobby/capitol.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/one,/area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 1200
 	no_winner = "The operation is still underway."
 	gamemode = "Siege"
 	no_hardcore = TRUE
 	can_spawn_on_base_capture = TRUE
+	gamemode_vote = TRUE
 	var/list/HVT_list = list()
 
 	faction_organization = list(
@@ -28,7 +30,7 @@
 	faction2 = CIVILIAN
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET)
 	songs = list(
-		"To Arms in Dixie:1" = 'sound/music/to_arms_in_dixie.ogg',)
+		"To Arms in Dixie:1" = "sound/music/to_arms_in_dixie.ogg",)
 	artillery_count = 0
 	valid_artillery = list()
 	scores = list(
@@ -41,6 +43,7 @@
 	var/a2_control = "none"
 	grace_wall_timer = 2400
 
+
 /obj/map_metadata/capitol_hill/New()
 	..()
 	spawn(2500)
@@ -49,20 +52,6 @@
 				new /area/caribbean/british/land/inside/objective(T)
 			for (var/turf/T in get_area_turfs(/area/caribbean/no_mans_land/capturable/two))
 				new /area/caribbean/british/land/inside/objective(T)
-
-/obj/map_metadata/capitol_hill/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_capitol == TRUE)
-		if (gamemode != "Protect the VIP")
-			if (J.is_whitehouse == TRUE)
-				. = FALSE
-			else
-				. = TRUE
-		else
-			. = TRUE
-	else
-		. = FALSE
-
 
 /obj/map_metadata/capitol_hill/roundend_condition_def2name(define)
 	..()
@@ -116,7 +105,7 @@ var/no_loop_capitol = FALSE
 				win_condition.hash = 0
 				last_win_condition = win_condition.hash
 				message = "25 minutes have passed! The HVT is now safe!"
-				world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+				to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 				win_condition_spam_check = TRUE
 				return FALSE
 			if (processes.ticker.playtime_elapsed >= 3000)
@@ -127,7 +116,7 @@ var/no_loop_capitol = FALSE
 							count++
 					if (count == 0)
 						message = "The battle is over! All the <b>HVT</b>s are dead!"
-						world << "<font size = 4 color='yellow'><span class = 'notice'>[message]</span></font>"
+						to_chat(world, "<font size = 4 color='yellow'><span class = 'notice'>[message]</span></font>")
 						win_condition_spam_check = TRUE
 						ticker.finished = TRUE
 						next_win = -1
@@ -144,7 +133,7 @@ var/no_loop_capitol = FALSE
 						return FALSE
 					ticker.finished = TRUE
 					message = "The <b>Soviets</b> have reached [sov_points] points and won!"
-					world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+					to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 					show_global_battle_report(null)
 					win_condition_spam_check = TRUE
 					return FALSE
@@ -153,7 +142,7 @@ var/no_loop_capitol = FALSE
 						return FALSE
 					ticker.finished = TRUE
 					message = "The <b>Germans</b> have reached [ger_points] points and won!"
-					world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+					to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 					show_global_battle_report(null)
 					win_condition_spam_check = TRUE
 					return FALSE
@@ -165,14 +154,14 @@ var/no_loop_capitol = FALSE
 					return FALSE
 				ticker.finished = TRUE
 				message = "The National Guard has managed to defend the Capitol! The militias retreat!"
-				world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+				to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 				show_global_battle_report(null)
 				win_condition_spam_check = TRUE
 				return FALSE
 			if ((current_winner && current_loser && world.time > next_win) && no_loop_capitol == FALSE)
 				ticker.finished = TRUE
 				message = "The Militias have captured the Capitol!"
-				world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+				to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 				show_global_battle_report(null)
 				win_condition_spam_check = TRUE
 				no_loop_capitol = TRUE
@@ -215,7 +204,7 @@ var/no_loop_capitol = FALSE
 						current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 			else
 				if (current_win_condition != no_winner && current_winner && current_loser)
-					world << "<font size = 3>The National Guard has recaptured the Capitol!</font>"
+					to_chat(world, "<font size = 3>The National Guard has recaptured the Capitol!</font>")
 					current_winner = null
 					current_loser = null
 				next_win = -1
@@ -250,9 +239,9 @@ var/no_loop_capitol = FALSE
 			sov_points++
 		if (a1_control != prev_control)
 			if (prev_control != "none")
-				world << "<big><font color='[cust_color]'>[prev_control]</font> lost the <b>House</b>!</big>"
+				to_chat(world, "<big><font color='[cust_color]'>[prev_control]</font> lost the <b>House</b>!</big>")
 			else
-				world << "<big><font color='[cust_color]'>[a1_control]</font> captured the <b>House</b>!</big>"
+				to_chat(world, "<big><font color='[cust_color]'>[a1_control]</font> captured the <b>House</b>!</big>")
 		c1 = 0
 		c2 = 0
 		prev_control = a2_control
@@ -275,14 +264,14 @@ var/no_loop_capitol = FALSE
 			sov_points++
 		if (a2_control != prev_control)
 			if (prev_control != "none")
-				world << "<big><font color='[cust_color]'>[prev_control]</font> lost the <b>Senate</b>!</big>"
+				to_chat(world, "<big><font color='[cust_color]'>[prev_control]</font> lost the <b>Senate</b>!</big>")
 			else
-				world << "<big><font color='[cust_color]'>[a2_control]</font> captured the <b>Senate</b>!</big>"
-	world << "<big><b>Current Points:</big></b>"
-	world << "<big>National Guard: [scores["National Guard"]]</big>"
-	world << "<big>Militia: [scores["Militia"]]</big>"
-//	world << "<big>Militia: [ger_points]</big>"
-//	world << "<big>Soviet Army: [sov_points]</big>"
+				to_chat(world, "<big><font color='[cust_color]'>[a2_control]</font> captured the <b>Senate</b>!</big>")
+	to_chat(world, "<big><b>Current Points:</b></big>")
+	to_chat(world, "<big>National Guard: [scores["National Guard"]]</big>")
+	to_chat(world, "<big>Militia: [scores["Militia"]]</big>")
+//	to_chat(world, "<big>Militia: [ger_points]</big>")
+//	to_chat(world, "<big>Soviet Army: [sov_points]</big>")
 	spawn(300)
 		points_check()
 
@@ -306,12 +295,13 @@ var/no_loop_capitol = FALSE
 /obj/map_metadata/capitol_hill/pla_offensive
 	ID = MAP_CAPITOL_HILL_PLA
 	title = "PLA Offensive on the Capitol Hill"
-	lobby_icon = 'icons/lobby/capitolchina.png'
+	lobby_icon = "icons/lobby/capitolchina.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/one,/area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 600
 	no_winner = "The operation is still underway."
 	no_hardcore = TRUE
 	gamemode = "Protect the VIP"
+	gamemode_vote = FALSE
 	faction_organization = list(
 		AMERICAN,
 		CHINESE)
@@ -327,25 +317,13 @@ var/no_loop_capitol = FALSE
 	faction1 = AMERICAN
 	faction2 = CHINESE
 	songs = list(
-		"Red Sun Up in the Sky (Phonk Remix):1" = 'sound/music/redphonkinthesky.ogg',)
+		"Red Sun Up in the Sky (Phonk Remix):1" = "sound/music/redphonkinthesky.ogg",)
 	valid_artillery = list()
 	scores = list(
 		"Peoples Liberation Army" = 0,
 		"National Guard" = 0,
 	)
 
-/obj/map_metadata/capitol_hill/pla_offensive/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if(istype(J, /datum/job/american))
-		if (J.is_capitol == TRUE && !(J.title == "US HVT"))
-			. = TRUE
-		else
-			if (istype(J, /datum/job/american/hvt/specials))
-				. = TRUE
-			else
-				. = FALSE
-	else if (istype(J, /datum/job/chinese/pla))
-		. = TRUE
 
 /obj/map_metadata/capitol_hill/pla_offensive/roundend_condition_def2name(define)
 	..()
@@ -405,7 +383,7 @@ var/no_loop_capitol = FALSE
 					count++
 			if (count == 0)
 				message = "The battle is over! All the <b>HVT</b>s are dead!"
-				world << "<font size = 4 color='yellow'><span class = 'notice'>[message]</span></font>"
+				to_chat(world, "<font size = 4 color='yellow'><span class = 'notice'>[message]</span></font>")
 				win_condition_spam_check = TRUE
 				ticker.finished = TRUE
 				next_win = -1

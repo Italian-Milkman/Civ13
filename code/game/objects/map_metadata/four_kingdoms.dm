@@ -1,8 +1,9 @@
 /obj/map_metadata/four_kingdoms
 	ID = MAP_FOUR_KINGDOMS
 	title = "Four Kingdoms"
+	description = "Several tribes are settling in this land. Will they be able to get along?."
 	no_winner ="The round is proceeding normally."
-	lobby_icon = 'icons/lobby/fantasy.png'
+	lobby_icon = "icons/lobby/fantasy.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall/jungle,/area/caribbean/no_mans_land/invisible_wall/temperate,/area/caribbean/no_mans_land/invisible_wall/desert,/area/caribbean/no_mans_land/invisible_wall/semiarid,/area/caribbean/no_mans_land/invisible_wall/taiga,/area/caribbean/no_mans_land/invisible_wall/tundra,/area/caribbean/no_mans_land/invisible_wall)
 	respawn_delay = 3600 // 6 minutes!
 	force_mapgen = TRUE
@@ -19,7 +20,7 @@
 	faction_distribution_coeffs = list(CIVILIAN = 1)
 	battle_name = "The Four Kingdoms"
 	mission_start_message = "<big>Several tribes are settling in this land. Will they be able to get along?.</big>"
-	ambience = list('sound/ambience/jungle1.ogg')
+	ambience = list("sound/ambience/jungle1.ogg")
 	faction1 = CIVILIAN
 	is_singlefaction = TRUE
 	valid_weather_types = list(WEATHER_WET, WEATHER_NONE, WEATHER_EXTREME, WEATHER_SMOG)
@@ -30,8 +31,9 @@
 	force_mapgen = TRUE
 	grace_wall_timer = 1500
 	songs = list(
-		"Words Through the Sky:1" = 'sound/music/words_through_the_sky.ogg',)
+		"Words Through the Sky:1" = "sound/music/words_through_the_sky.ogg",)
 	gamemode = "Faction-Based RP"
+	gamemode_vote = FALSE
 /obj/map_metadata/four_kingdoms/New()
 	var/newnamea = list("Orc Horde" = list(48,49,48,null,0,"skull","#7F6865","#252232",0,0))
 	var/newnameb = list("Ant Colony" = list(35,35,35,null,0,"star","#0C1EA7","#67A7CE",0,0))
@@ -69,12 +71,6 @@
 		seasons()
 	..()
 
-/obj/map_metadata/four_kingdoms/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (istype(J, /datum/job/civilian/fantasy))
-		. = TRUE
-	else
-		. = FALSE
 /obj/map_metadata/four_kingdoms/faction2_can_cross_blocks()
 	return (processes.ticker.playtime_elapsed >= 1500 || admin_ended_all_grace_periods)
 

@@ -98,26 +98,26 @@
 	flags = FALSE
 
 /obj/item/weapon/melee/nightbaton/sandman
-    name = "Heavy duty"
-    desc = "A baton held by the camp commander nicknamed the sandman by prisoners because of how hard it hits."
-    icon = 'icons/obj/weapons.dmi'
-    icon_state = "kombaton"
-    item_state = "nightbaton"
-    slot_flags = SLOT_BELT
-    force = WEAPON_FORCE_WEAK+2
-    weakens = 0
-    flammable = TRUE
-    var/cooldown = FALSE
+	name = "Heavy duty"
+	desc = "A baton held by the camp commander nicknamed the sandman by prisoners because of how hard it hits."
+	icon = 'icons/obj/weapons.dmi'
+	icon_state = "kombaton"
+	item_state = "nightbaton"
+	slot_flags = SLOT_BELT
+	force = WEAPON_FORCE_WEAK+2
+	weakens = 0
+	flammable = TRUE
+	var/cooldown = FALSE
 
 /obj/item/weapon/melee/nightbaton/sandman/attack(mob/M as mob, mob/living/user as mob)
-    if(!cooldown)
-        M.SetWeakened(50)
-        src.cooldown = TRUE
-        spawn(100)
-            src.cooldown = FALSE
-    else
-        user << "<span class='notice'>You have used this batton not long ago. Chill out!</span>"
-    ..()
+	if(!cooldown)
+		M.SetWeakened(50)
+		src.cooldown = TRUE
+		spawn(100)
+			src.cooldown = FALSE
+	else
+		to_chat(user, "<span class='notice'>You have used this batton not long ago. Chill out!</span>")
+	..()
 
 /obj/item/weapon/melee/classic_baton/club
 	name = "wood club"
@@ -280,7 +280,7 @@
 		return
 /obj/item/garrote/proc/start_garroting(mob/living/human/user,mob/living/human/target)
 	if (!user.has_empty_hand())
-		user << "<span class='notice'>You need a free hand to use the garrote!</span>"
+		to_chat(user, "<span class='notice'>You need a free hand to use the garrote!</span>")
 		return
 	var/obj/item/weapon/grab/GR = new /obj/item/weapon/grab(user, target)
 	user.put_in_hands(GR)
@@ -300,7 +300,7 @@
 		return
 /obj/item/garrote/proc/stop_garroting(mob/living/human/user,mob/living/human/target)
 	garroting = FALSE
-	user << "<span class='notice'>You release the garrote on your victim.</span>" //Not the grab, though. Only the garrote.
+	to_chat(user, "<span class='notice'>You release the garrote on your victim.</span>") //Not the grab, though. Only the garrote.
 	update_icon()
 	return
 /obj/item/garrote/attack_self(mob/living/human/user)

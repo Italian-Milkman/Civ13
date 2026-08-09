@@ -24,8 +24,16 @@
 	layer = LIGHTING_LAYER
 	blend_mode = BLEND_MULTIPLY
 	invisibility	 = INVISIBILITY_LEVEL_TWO
-	appearance_flags = NO_CLIENT_COLOR | PLANE_MASTER// | KEEP_TOGETHER
+	appearance_flags = NO_CLIENT_COLOR | PLANE_MASTER
 	mouse_opacity = 0
+
+/obj/screen/plane_master/lighting/New()
+	..()
+	#ifdef OPENDREAM
+	appearance_flags |= KEEP_TOGETHER
+	invisibility = 0
+	#endif
+// Removed backdrop logic for multiplicative model
 
 /obj/screen/plane_master/hud
 	name = "hud plane master"

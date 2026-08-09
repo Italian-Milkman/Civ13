@@ -18,6 +18,7 @@
 	var/simulated = TRUE //filter for actions - used by lighting overlays
 	var/fluorescent // Shows up under a UV light.
 	var/allow_spin = TRUE
+	var/initial_opacity = FALSE
 
 	///Chemistry.
 	var/datum/reagents/reagents = null
@@ -25,21 +26,6 @@
 	//var/chem_is_open_container = FALSE
 	// replaced by OPENCONTAINER flags and atom/proc/is_open_container()
 	///Chemistry.
-
-	var/crafted = FALSE //optimization for map loaded atoms
-
-	//Detective Work, used for the duplicate data points kept in the scanners
-	var/list/original_atom
-
-	// supply trains
-
-	var/uses_initial_density = FALSE
-
-	var/initial_density = FALSE
-
-	var/uses_initial_opacity = FALSE
-
-	var/initial_opacity = FALSE
 
 	var/radiation = 0
 
@@ -102,11 +88,6 @@
 
 /atom/proc/CheckExit()
 	return TRUE
-
-// If you want to use this, the atom must have the PROXMOVE flag, and the moving
-// atom must also have the PROXMOVE flag currently to help with lag. ~ ComicIronic
-/atom/proc/HasProximity(atom/movable/AM as mob|obj)
-	return
 
 /atom/proc/emp_act(var/severity)
 	return
@@ -173,7 +154,7 @@
 	if (!isobserver(user))
 		user.visible_message("<font size=1>[user.name] looks at \the [src].</font>", "<font size =1>You look at \the [src].</font>")
 
-	to_chat(user, "\icon[src] That's [f_name] [suffix]")
+	to_chat(user, "\icon[getFlatIcon(src)] That's [f_name] [suffix]")
 
 	if(desc) // If the description is not null.
 		to_chat(user, desc)
@@ -254,8 +235,6 @@
 	if (isnull(M)) return
 	if (isnull(M.key)) return
 	if (ishuman(M))
-		//Fibers
-		add_fibers(M)
 		//Add the list if it does not exist.
 		if (!fingerprintshidden)
 			fingerprintshidden = list()
@@ -481,7 +460,7 @@
 
 	if(user.handcuffed && prob(45) && !user.incapacitated(INCAPACITATION_FORCELYING))//User can fail to kick smbd if cuffed
 		user.visible_message(SPAN_DANGER("[user.name] loses \his balance while trying to kick \the [src]."), \
-                    " You lost your balance.")
+					" You lost your balance.")
 		user.Weaken(1)
 		return
 
@@ -501,14 +480,14 @@
 	if(!Adjacent(user) || user.incapacitated(INCAPACITATION_STUNNED|INCAPACITATION_KNOCKOUT) || istype(user.loc, /obj/structure/closet) || !ishuman(src))
 		return
 	if(user.pacifist)
-		to_chat(src, "<font color='yellow'><b><big>I don't want to bite!</big></b></font>")
+		to_chat(src, "<font color='yellow'><big><b>I don't want to bite!</b></big></font>")
 		return
 	var/mob/living/human/target = src
 	if(user.middle_click_intent == "bite")//We're in bite mode, so bite the opponent
 		var/limbcheck = user.targeted_organ
 		if (limbcheck == "random")
 			limbcheck = pick("l_arm","r_arm","l_hand","r_hand")
-		if(limbcheck in list("l_hand","r_hand","l_arm","r_arm") || user.werewolf)
+		if((limbcheck in list("l_hand","r_hand","l_arm","r_arm")) || user.werewolf)
 			var/obj/item/organ/external/affecting = target.get_organ(limbcheck)
 			if(!affecting)
 				to_chat(user, SPAN_NOTICE("[src] is missing that body part."))

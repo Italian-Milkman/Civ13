@@ -1,7 +1,7 @@
 /obj/map_metadata/lab
 	ID = MAP_LAB
 	title = "Lab"
-	lobby_icon = 'icons/lobby/ww2.png'
+	lobby_icon = "icons/lobby/ww2.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/temperate, /area/caribbean/no_mans_land/invisible_wall/four)
 	respawn_delay = 1200
 	no_winner ="No one has escaped yet."
@@ -23,7 +23,7 @@
 	faction2 = PRISONERS
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET)
 	songs = list(
-		"Words Through the Sky:1" = 'sound/music/words_through_the_sky.ogg',)
+		"Words Through the Sky:1" = "sound/music/words_through_the_sky.ogg",)
 	gamemode = "Lab breach"
 
 
@@ -93,14 +93,14 @@
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The <b>PMCS</b> have sucessfuly defended the lab bridge! Order has been restored!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_r == FALSE)
 		ticker.finished = TRUE
 		var/message = "The <b>Prisoners</b> have captured the lab Bridge! The battle for the lab is over!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_r = TRUE
@@ -143,7 +143,7 @@
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The <b>Lab personnel</b> have recaptured the Bridge!</font>"
+			to_chat(world, "<font size = 3>The <b>Lab personnel</b> have recaptured the Bridge!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1

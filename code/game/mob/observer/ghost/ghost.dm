@@ -10,7 +10,6 @@ var/global/list/image/ghost_sightless_images = list() //this is a list of images
 	blinded = FALSE
 	anchored = TRUE	//  don't get pushed around
 	var/can_reenter_corpse
-	var/datum/hud/living/carbon/hud = null // hud
 	var/started_as_observer //This variable is set to TRUE when you enter the game as an observer.
 							//If you died in the game and are a ghsot - this will remain as null.
 							//Note that this is not a reliable way to determine if admins started as observers, since they change mobs a lot.
@@ -28,8 +27,6 @@ var/global/list/image/ghost_sightless_images = list() //this is a list of images
 
 	//ghostcombat stuff
 	var/combatmode = "melee"
-	var/ghostlife = 100
-
 	var/last_revive_notification = null // world.time of last notification, used to avoid spamming players from defibs or cloners.
 
 /mob/observer/ghost/New(mob/body)
@@ -58,7 +55,7 @@ var/global/list/image/ghost_sightless_images = list() //this is a list of images
 		if (body.real_name)
 			name = body.real_name
 		else
-			if (body.mind.name)
+			if (body && body.mind && body.mind.name)
 				name = body.mind.name
 			else
 				if (gender == MALE)
@@ -86,14 +83,10 @@ var/global/list/image/ghost_sightless_images = list() //this is a list of images
 
 /mob/observer/ghost/Topic(href, href_list)
 	if (href_list["track"])
-		if (istype(href_list["track"],/mob))
-			var/mob/target = locate(href_list["track"]) in mob_list
-			if (target)
-				ManualFollow(target)
-		else
-			var/atom/target = locate(href_list["track"])
-			if (istype(target))
-				ManualFollow(target)
+		var/atom/movable/target = locate(href_list["track"])
+		if (istype(target))
+			ManualFollow(target)
+		return
 	if(href_list["reenter"])
 		reenter_corpse()
 		return
@@ -116,12 +109,12 @@ var/global/list/image/ghost_sightless_images = list() //this is a list of images
 		user.setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
 		var/attverb = pick("punches", "kicks", "slaps")
 		for(var/mob/observer/ghost/NG in range(7,src))
-			NG << "<span class='notice'>[G] [attverb] \the [src]!</span>"
+			to_chat(NG, "<span class='notice'>[G] [attverb] \the [src]!</span>")
 		user.do_attack_animation(src)
 		src.ghostlife = max(0, src.ghostlife - 15)
 		if (src.ghostlife <= 0)
 			var/anim = "dust-ghost"
-			src << "<span class='warning'>Your ethereal self vaporizes!</span>"
+			to_chat(src, "<span class='warning'>Your ethereal self vaporizes!</span>")
 			var/atom/movable/overlay/animation = null
 			animation = new(loc)
 			animation.icon_state = "blank"
@@ -157,7 +150,7 @@ var/global/list/image/ghost_sightless_images = list() //this is a list of images
 	if (!lastKnownCkey)
 		return
 	
-	if (map && (map.ID == MAP_CAMPAIGN || map.ID == MAP_NATIONSRP_COLDWAR_CMP))
+	if (map && (map.ID == MAP_CAMPAIGN || map.ID == MAP_NATIONSRP_COLDWAR_CMP || map.ID == CAMPAIGN_MAP_LIST_MAPID_OR))
 		if (!client.holder)
 			to_chat(client, SPAN_WARNING("<font size=5>You cannot ghost in the campaign.</font>"))
 			return
@@ -176,7 +169,7 @@ var/global/list/image/ghost_sightless_images = list() //this is a list of images
 		ghost.timeofdeath = stat == DEAD ? timeofdeath : world.time
 		ghost.key = key
 		if (!(ghost.started_as_observer))
-			ghost << "<span class = 'good'><font size = 4>Or click <a href='?src=\ref[ghost];respawn=1'>THIS</a> button to respawn!</font></span>"
+			to_chat(ghost, "<span class = 'good'><font size = 4>Or click <a href='?src=\ref[ghost];respawn=1'>THIS</a> button to respawn!</font></span>")
 		if (ishuman(src))
 			if (human_clients_mob_list.Find(src))
 				human_clients_mob_list -= src
@@ -190,10 +183,10 @@ var/global/list/image/ghost_sightless_images = list() //this is a list of images
 	set name = "Re-enter Corpse"
 	if (!client)	return
 	if (!(mind && mind.current && can_reenter_corpse))
-		src << "<span class='warning'>You have no body.</span>"
+		to_chat(src, "<span class='warning'>You have no body.</span>")
 		return
 	if (mind.current.key && copytext(mind.current.key,1,2)!="@")	//makes sure we don't accidentally kick any clients
-		usr << "<span class='warning'>Another consciousness is in your body... it is resisting you.</span>"
+		to_chat(usr, "<span class='warning'>Another consciousness is in your body... it is resisting you.</span>")
 		return
 
 	stop_following()
@@ -227,186 +220,17 @@ var/global/list/image/ghost_sightless_images = list() //this is a list of images
 		if (mobs[input])
 			ManualFollow(mobs[input])
 
-/mob/observer/ghost/verb/follow_pirates(input in getfitmobs(PIRATES)+"Cancel")
-	set category = "Ghost"
-	set name = "Follow a Pirate"
-	set desc = "Follow and haunt a living Pirate."
-
-	if (input != "Cancel")
-		var/list/mobs = getfitmobs(PIRATES)
-		if (mobs[input])
-			ManualFollow(mobs[input])
-
-/mob/observer/ghost/verb/follow_british(input in getfitmobs(BRITISH)+"Cancel")
-	set category = "Ghost"
-	set name = "Follow a British"
-	set desc = "Follow and haunt a living British."
-
-	if (input != "Cancel")
-		var/list/mobs = getfitmobs(BRITISH)
-		if (mobs[input])
-			ManualFollow(mobs[input])
-
-/mob/observer/ghost/verb/follow_civilian(input in getfitmobs(CIVILIAN)+"Cancel")
-	set category = "Ghost"
-	set name = "Follow a Civilian"
-	set desc = "Follow and haunt a living Civilian."
-
-	if (input != "Cancel")
-		var/list/mobs = getfitmobs(CIVILIAN)
-		if (mobs[input])
-			ManualFollow(mobs[input])
-
-/mob/observer/ghost/verb/follow_portuguese(input in getfitmobs(PORTUGUESE)+"Cancel")
-	set category = "Ghost"
-	set name = "Follow a Portuguese"
-	set desc = "Follow and haunt a living Portuguese."
-
-	if (input != "Cancel")
-		var/list/mobs = getfitmobs(PORTUGUESE)
-		if (mobs[input])
-			ManualFollow(mobs[input])
-
-/mob/observer/ghost/verb/follow_spanish(input in getfitmobs(SPANISH)+"Cancel")
-	set category = "Ghost"
-	set name = "Follow a Spanish"
-	set desc = "Follow and haunt a living Spanish."
-
-	if (input != "Cancel")
-		var/list/mobs = getfitmobs(SPANISH)
-		if (mobs[input])
-			ManualFollow(mobs[input])
-/mob/observer/ghost/verb/follow_french(input in getfitmobs(FRENCH)+"Cancel")
-	set category = "Ghost"
-	set name = "Follow a French"
-	set desc = "Follow and haunt a living French."
-
-	if (input != "Cancel")
-		var/list/mobs = getfitmobs(FRENCH)
-		if (mobs[input])
-			ManualFollow(mobs[input])
-
-/mob/observer/ghost/verb/follow_dutch(input in getfitmobs(DUTCH)+"Cancel")
-	set category = "Ghost"
-	set name = "Follow a Dutch"
-	set desc = "Follow and haunt a living Dutch."
-
-	if (input != "Cancel")
-		var/list/mobs = getfitmobs(DUTCH)
-		if (mobs[input])
-			ManualFollow(mobs[input])
-
-/mob/observer/ghost/verb/follow_italian(input in getfitmobs(ITALIAN)+"Cancel")
-	set category = "Ghost"
-	set name = "Follow an Italian"
-	set desc = "Follow and haunt a living Italian."
-
-	if (input != "Cancel")
-		var/list/mobs = getfitmobs(ITALIAN)
-		if (mobs[input])
-			ManualFollow(mobs[input])
-
-/mob/observer/ghost/verb/follow_indians(input in getfitmobs(INDIANS)+"Cancel")
-	set category = "Ghost"
-	set name = "Follow a Native"
-	set desc = "Follow and haunt a living Native."
-	if (input != "Cancel")
-		var/list/mobs = getfitmobs(INDIANS)
-		if (mobs[input])
-			ManualFollow(mobs[input])
-
-/mob/observer/ghost/verb/follow_roman(input in getfitmobs(ROMAN)+"Cancel")
-	set category = "Ghost"
-	set name = "Follow a Roman"
-	set desc = "Follow and haunt a living Roman."
-	if (input != "Cancel")
-		var/list/mobs = getfitmobs(ROMAN)
-		if (mobs[input])
-			ManualFollow(mobs[input])
-
-/mob/observer/ghost/verb/follow_greek(input in getfitmobs(GREEK)+"Cancel")
-	set category = "Ghost"
-	set name = "Follow a Greek"
-	set desc = "Follow and haunt a living Greek."
-	if (input != "Cancel")
-		var/list/mobs = getfitmobs(GREEK)
-		if (mobs[input])
-			ManualFollow(mobs[input])
-
-/mob/observer/ghost/verb/follow_german(input in getfitmobs(GERMAN)+"Cancel")
-	set category = "Ghost"
-	set name = "Follow a German"
-	set desc = "Follow and haunt a living German."
-	if (input != "Cancel")
-		var/list/mobs = getfitmobs(GERMAN)
-		if (mobs[input])
-			ManualFollow(mobs[input])
-
-/mob/observer/ghost/verb/follow_american(input in getfitmobs(AMERICAN)+"Cancel")
-	set category = "Ghost"
-	set name = "Follow an American"
-	set desc = "Follow and haunt a living American."
-	if (input != "Cancel")
-		var/list/mobs = getfitmobs(AMERICAN)
-		if (mobs[input])
-			ManualFollow(mobs[input])
-
-/mob/observer/ghost/verb/follow_vietnamese(input in getfitmobs(VIETNAMESE)+"Cancel")
-	set category = "Ghost"
-	set name = "Follow a Vietnamese"
-	set desc = "Follow and haunt a living Vietnamese."
-	if (input != "Cancel")
-		var/list/mobs = getfitmobs(VIETNAMESE)
-		if (mobs[input])
-			ManualFollow(mobs[input])
-
-/mob/observer/ghost/verb/follow_filipino(input in getfitmobs(FILIPINO)+"Cancel")
-	set category = "Ghost"
-	set name = "Follow a Filipino"
-	set desc = "Follow and haunt a living Filipino."
-	if (input != "Cancel")
-		var/list/mobs = getfitmobs(FILIPINO)
-		if (mobs[input])
-			ManualFollow(mobs[input])
-			
-/mob/observer/ghost/verb/follow_arab(input in getfitmobs(ARAB)+"Cancel")
-	set category = "Ghost"
-	set name = "Follow an Arab"
-	set desc = "Follow and haunt a living Arab."
-	if (input != "Cancel")
-		var/list/mobs = getfitmobs(ARAB)
-		if (mobs[input])
-			ManualFollow(mobs[input])
-
-/mob/observer/ghost/verb/follow_bluefaction(input in getfitmobs(BLUEFACTION)+"Cancel")
-	set category = "Ghost"
-	set name = "Follow a Blugoslavian"
-	set desc = "Follow and haunt a living Blugoslavian."
-	if (input != "Cancel")
-		var/list/mobs = getfitmobs(BLUEFACTION)
-		if (mobs[input])
-			ManualFollow(mobs[input])
-
-/mob/observer/ghost/verb/follow_redfaction(input in getfitmobs(REDFACTION)+"Cancel")
-	set category = "Ghost"
-	set name = "Follow a Redmenian"
-	set desc = "Follow and haunt a living Redmenian."
-	if (input != "Cancel")
-		var/list/mobs = getfitmobs(REDFACTION)
-		if (mobs[input])
-			ManualFollow(mobs[input])
-
 /mob/observer/ghost/verb/toggle_visibility()
 	set category = "Ghost"
 	set name = "Toggle Visibility"
 	if (!icon)
 		icon = original_icon
 		overlays = original_overlays
-		src << "<span class = 'good'>You are now visible again.</span>"
+		to_chat(src, "<span class = 'good'>You are now visible again.</span>")
 	else
 		icon = null
 		overlays.Cut()
-		src << "<span class = 'good'>You are now invisible.</span>"
+		to_chat(src, "<span class = 'good'>You are now invisible.</span>")
 
 // This is the ghost's follow verb with an argument
 /mob/observer/ghost/proc/ManualFollow(var/atom/movable/target)
@@ -450,18 +274,18 @@ var/global/list/image/ghost_sightless_images = list() //this is a list of images
 
 /mob/observer/ghost/memory()
 	set hidden = TRUE
-	src << "<span class = 'red'>You are dead! You have no mind to store memory!</span>"
+	to_chat(src, "<span class = 'red'>You are dead! You have no mind to store memory!</span>")
 
 /mob/observer/ghost/add_memory()
 	set hidden = TRUE
-	src << "<span class = 'red'>You are dead! You have no mind to store memory!</span>"
+	to_chat(src, "<span class = 'red'>You are dead! You have no mind to store memory!</span>")
 
 /mob/observer/ghost/Post_Incorpmove()
 	stop_following()
 
 /mob/observer/ghost/proc/try_possession(var/mob/living/M)
 	if (!config.ghosts_can_possess_animals)
-		usr << "<span class='warning'>Ghosts are not permitted to possess animals.</span>"
+		to_chat(usr, "<span class='warning'>Ghosts are not permitted to possess animals.</span>")
 		return FALSE
 	if (!M.can_be_possessed_by(src))
 		return FALSE
@@ -487,7 +311,7 @@ var/global/list/image/ghost_sightless_images = list() //this is a list of images
 	set category = "Ghost"
 	ghostvision = !(ghostvision)
 	updateghostsight()
-	usr << "You [(ghostvision?"now":"no longer")] have ghost vision."
+	to_chat(usr, "You [(ghostvision?"now":"no longer")] have ghost vision.")
 
 /mob/observer/ghost/verb/toggle_darkness()
 	set name = "Toggle Darkness"
@@ -499,7 +323,7 @@ var/global/list/image/ghost_sightless_images = list() //this is a list of images
 	if (!seedarkness)
 		see_invisible = SEE_INVISIBLE_OBSERVER_NOLIGHTING
 	else
-		see_invisible = ghostvision ? SEE_INVISIBLE_OBSERVER : SEE_INVISIBLE_LIVING
+		see_invisible = SEE_INVISIBLE_LIVING
 
 	updateghostimages()
 
@@ -521,13 +345,13 @@ var/global/list/image/ghost_sightless_images = list() //this is a list of images
 		return FALSE
 	if (mind && mind.current && mind.current.stat != DEAD && can_reenter_corpse)
 		if (feedback)
-			src << "<span class='warning'>Your non-dead body prevent you from respawning.</span>"
+			to_chat(src, "<span class='warning'>Your non-dead body prevent you from respawning.</span>")
 		return FALSE
 
 	var/timedifference = world.time - timeofdeath
 	if (respawn_time && timeofdeath && timedifference < respawn_time MINUTES)
 		var/timedifference_text = time2text(respawn_time MINUTES - timedifference,"mm:ss")
-		src << "<span class='warning'>You must have been dead for [respawn_time] minute\s to respawn. You have [timedifference_text] left.</span>"
+		to_chat(src, "<span class='warning'>You must have been dead for [respawn_time] minute\s to respawn. You have [timedifference_text] left.</span>")
 		return FALSE
 
 	return TRUE
@@ -544,7 +368,7 @@ var/global/list/image/ghost_sightless_images = list() //this is a list of images
 
 /proc/ghost_follow_link(var/atom/target, var/atom/ghost)
 	if ((!target) || (!ghost)) return
-	. = "<a href='byond://?src=\ref[ghost];track=\ref[target]'>follow</a>"
+	. = "<a href='?src=\ref[ghost];track=\ref[target]'>follow</a>"
 	. += target.extra_ghost_link(ghost)
 
 // Lets a ghost know someone's trying to bring them back, and for them to get into their body.

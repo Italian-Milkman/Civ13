@@ -4,14 +4,12 @@
 	voice_name = "unknown"
 	icon = 'icons/mob/human.dmi'
 	icon_state = "human_m_s"
-	var/is_murderer = FALSE // for the "find the murderer" gamemode
 	var/can_mutate = FALSE //from high rads, into ant etc
 	var/looking = FALSE
 	var/look_amount = 3
 	var/can_defib = TRUE //Horrible damage (like beheadings) will prevent defibbing organics.
 	var/spawned_at_fob = FALSE // For spawning in at an FOB or your normal job spawnpoint
 	var/immune_to_barbwire = FALSE
-	var/voice_pitch = 100
 
 /mob/living/human/New(var/new_loc, var/new_species = null)
 
@@ -65,11 +63,16 @@
 		if (map.civilizations == TRUE && map.ID != MAP_PEPELSIBIRSK)
 			nutrition = rand(max_nutrition * 0.45, max_nutrition * 0.55) // 180 to 220
 			water = round(rand(max_water * 0.45, max_water * 0.55)) // 157 to 192
-		if (map.ID == MAP_GULAG13)
+		if (map.ID == MAP_GULAG13 || map.ID == MAP_BAGNE13)
 			spawn(10)
 				if (istype(original_job, /datum/job/civilian/prisoner))
 					nutrition = max_nutrition*0.1
 					water = max_water*0.2
+		else if (map.ID == MAP_ANTARCTICA)
+			spawn(10)
+				if (istype(original_job, /datum/job/civilian/prisoner))
+					nutrition = max_nutrition*0.5
+					water = max_water*0.5
 		else
 			nutrition = max_nutrition
 			water = max_water
@@ -106,62 +109,86 @@ var/list/coefflist = list()
 	. = ..()
 	if (.)
 		// the loc.density short circuits 95% of the time and bypasses an expensive typecheck - Kachnov
-		if (client.status_tabs && statpanel("Character"))
-			stat("")
-			stat(stat_header("Character"))
-			stat("")
-			stat("Attack Intent:", a_intent)
-			stat("Move Mode:", m_intent)
+		if (client.status_tabs && (client.add_stat_tab("Character") || client.statpanel_tab == "Character"))
+			if (map && istype(map, /obj/map_metadata/football))
+				var/obj/map_metadata/football/FM = map
+				client.add_stat("<h3>Football Match</h3>", "")
+				var/clr1 = FM.teams[FM.team1][FM.team1_kit]["shirt_color"]
+				var/clr2 = FM.teams[FM.team2][FM.team2_kit]["shirt_color"]
+				client.add_stat("<font style='color:[clr1]'><b>[FM.team1]:</b></font>", "[FM.teams[FM.team1][2]]")
+				client.add_stat("<font style='color:[clr2]'><b>[FM.team2]:</b></font>", "[FM.teams[FM.team2][2]]")
+				
+				var/time_left = FM.match_duration - processes.ticker.playtime_elapsed
+				if (time_left < 0)
+					time_left = 0
+				var/seconds = round(time_left / 10)
+				var/minutes = round(seconds / 60)
+				seconds = seconds % 60
+				var/seconds_text = "[seconds]"
+				if (seconds < 10)
+					seconds_text = "0[seconds]"
+				client.add_stat("<b>Time Remaining:</b>", "[minutes]:[seconds_text]")
+				if (FM.stopped)
+					var/stopped_time_left = FM.stopped_until - world.time
+					if (stopped_time_left < 0)
+						stopped_time_left = 0
+					var/stopped_sec = round(stopped_time_left / 10)
+					client.add_stat("<b>Restarting in:</b>", "[stopped_sec] seconds")
+				else if (processes.ticker.playtime_elapsed < 1200 && !map.admin_ended_all_grace_periods)
+					var/grace_time_left = 1200 - processes.ticker.playtime_elapsed
+					if (grace_time_left < 0)
+						grace_time_left = 0
+					var/grace_sec = round(grace_time_left / 10)
+					client.add_stat("<b>Grace Period:</b>", "[grace_sec] seconds")
+			client.add_stat("<h3>Character</h3>", "")
+			client.add_stat("<b>Attack Intent:</b>", a_intent)
+			client.add_stat("<b>Move Mode:</b>", m_intent)
 			if (stats["stamina"] && stats["stamina"][2] > 0)
-				stat("Stamina: ", "[round((getStat("stamina")/stats["stamina"][2]) * 100)]%")
-			stat("")
-			stat(stat_header("Factions"))
-			stat("")
-			stat("Religion:", religion)
-			stat("Civilization:", civilization)
+				client.add_stat("<b>Stamina:</b> ", "[round((getStat("stamina")/stats["stamina"][2]) * 100)]%")
+			client.add_stat("<h3>Factions</h3>", "")
+			client.add_stat("<b>Religion:</b>", religion)
+			client.add_stat("<b>Civilization:</b>", civilization)
 			if (map)
-				stat("Epoch:", map.age)
+				client.add_stat("<b>Epoch:</b>", map.age)
 			if (original_job_title == "Civilization A Citizen")
-				stat("Industrial Research:","[map.civa_research[1]]/[civmax_research[1]]")
-				stat("Military Research:","[map.civa_research[2]]/[civmax_research[2]]")
-				stat("Health Research:","[map.civa_research[3]]/[civmax_research[3]]")
+				client.add_stat("<b>Industrial Research:", "[map.civa_research[1]]/[civmax_research[1]]")
+				client.add_stat("<b>Military Research:", "[map.civa_research[2]]/[civmax_research[2]]")
+				client.add_stat("<b>Health Research:", "[map.civa_research[3]]/[civmax_research[3]]")
 			else if (original_job_title == "Civilization B Citizen")
-				stat("Industrial Research:","[map.civb_research[1]]/[civmax_research[1]]")
-				stat("Military Research:","[map.civb_research[2]]/[civmax_research[2]]")
-				stat("Health Research:","[map.civb_research[3]]/[civmax_research[3]]")
+				client.add_stat("<b>Industrial Research:", "[map.civb_research[1]]/[civmax_research[1]]")
+				client.add_stat("<b>Military Research:", "[map.civb_research[2]]/[civmax_research[2]]")
+				client.add_stat("<b>Health Research:</b>", "[map.civb_research[3]]/[civmax_research[3]]")
 			else if (original_job_title == "Civilization C Citizen")
-				stat("Industrial Research:","[map.civc_research[1]]/[civmax_research[1]]")
-				stat("Military Research:","[map.civc_research[2]]/[civmax_research[2]]")
-				stat("Health Research:", "[map.civc_research[3]]/[civmax_research[3]]")
+				client.add_stat("<b>Industrial Research:</b>", "[map.civc_research[1]]/[civmax_research[1]]")
+				client.add_stat("<b>Military Research:</b>", "[map.civc_research[2]]/[civmax_research[2]]")
+				client.add_stat("<b>Health Research:</b>", "[map.civc_research[3]]/[civmax_research[3]]")
 			else if (original_job_title == "Civilization D Citizen")
-				stat("Industrial Research:","[map.civd_research[1]]/[civmax_research[1]]")
-				stat("Military Research:","[map.civd_research[2]]/[civmax_research[2]]")
-				stat("Health Research:","[map.civd_research[3]]/[civmax_research[3]]")
+				client.add_stat("<b>Industrial Research:</b>", "[map.civd_research[1]]/[civmax_research[1]]")
+				client.add_stat("<b>Military Research:</b>", "[map.civd_research[2]]/[civmax_research[2]]")
+				client.add_stat("<b>Health Research:</b>", "[map.civd_research[3]]/[civmax_research[3]]")
 			else if (original_job_title == "Civilization E Citizen")
-				stat("Industrial Research:","[map.cive_research[1]]/[civmax_research[1]]")
-				stat("Military Research:","[map.cive_research[2]]/[civmax_research[2]]")
-				stat("Health Research:","[map.cive_research[3]]/[civmax_research[3]]")
+				client.add_stat("<b>Industrial Research:</b>", "[map.cive_research[1]]/[civmax_research[1]]")
+				client.add_stat("<b>Military Research:</b>", "[map.cive_research[2]]/[civmax_research[2]]")
+				client.add_stat("<b>Health Research:</b>", "[map.cive_research[3]]/[civmax_research[3]]")
 			else if (original_job_title == "Civilization F Citizen")
-				stat("Industrial Research:","[map.civf_research[1]]/[civmax_research[1]]")
-				stat("Military Research:","[map.civf_research[2]]/[civmax_research[2]]")
-				stat("Health Research:","[map.civf_research[3]]/[civmax_research[3]]")
+				client.add_stat("<b>Industrial Research:</b>", "[map.civf_research[1]]/[civmax_research[1]]")
+				client.add_stat("<b>Military Research:</b>", "[map.civf_research[2]]/[civmax_research[2]]")
+				client.add_stat("<b>Health Research:</b>", "[map.civf_research[3]]/[civmax_research[3]]")
 
 			if (original_job_title == "Redmenian Civilian")
-				stat("Industrial Research:","[map.civa_research[1]]/[civmax_research[1]]")
-				stat("Military Research:","[map.civa_research[2]]/[civmax_research[2]]")
-				stat("Health Research:","[map.civa_research[3]]/[civmax_research[3]]")
+				client.add_stat("<b>Industrial Research:</b>", "[map.civa_research[1]]/[civmax_research[1]]")
+				client.add_stat("<b>Military Research:</b>", "[map.civa_research[2]]/[civmax_research[2]]")
+				client.add_stat("<b>Health Research:</b>", "[map.civa_research[3]]/[civmax_research[3]]")
 			if (original_job_title == "Blugoslavian Civilian")
-				stat("Industrial Research:","[map.civa_research[1]]/[civmax_research[1]]")
-				stat("Military Research:","[map.civa_research[2]]/[civmax_research[2]]")
-				stat("Health Research:","[map.civa_research[3]]/[civmax_research[3]]")
+				client.add_stat("<b>Industrial Research:</b>", "[map.civb_research[1]]/[civmax_research[1]]")
+				client.add_stat("<b>Military Research:</b>", "[map.civb_research[2]]/[civmax_research[2]]")
+				client.add_stat("<b>Health Research:</b>", "[map.civb_research[3]]/[civmax_research[3]]")
 			else if (original_job_title == "Nomad")
 				if (civilization != null && civilization != "none")
-					stat("Industrial Research:", "[map.custom_civs[civilization][1]]/[civmax_research[1]]")
-					stat("Military Research:", "[map.custom_civs[civilization][2]]/[civmax_research[2]]")
-					stat("Health Research:",  "[map.custom_civs[civilization][3]]/[civmax_research[3]]")
-			stat("")
-			stat(stat_header("Stats"))
-			stat("")
+					client.add_stat("<b>Industrial Research:</b>", "[map.custom_civs[civilization][1]]/[civmax_research[1]]")
+					client.add_stat("<b>Military Research:</b>", "[map.custom_civs[civilization][2]]/[civmax_research[2]]")
+					client.add_stat("<b>Health Research:</b>", "[map.custom_civs[civilization][3]]/[civmax_research[3]]")
+			client.add_stat("<h3>Stats</h3>", "")
 
 			for (var/statname in stats)
 
@@ -196,7 +223,7 @@ var/list/coefflist = list()
 						coeff = "[coeff]0"
 
 				if (statname != "stamina")
-					stat("[capitalize(statname)]: ", "[coeff]x average")
+					client.add_stat("<b>[capitalize(statname)]:</b> ", "[coeff]x average")
 
 
 /mob/living/human/ex_act(severity)
@@ -330,10 +357,10 @@ var/list/coefflist = list()
 	dat += "<BR><A href='?src=\ref[src];item=splints'>Remove splints</A>"
 	dat += "<BR><A href='?src=\ref[src];item=pockets'>Empty pockets</A>"
 	dat += "<BR><A href='?src=\ref[user];refresh=1'>Refresh</A>"
-	dat += "<BR><A href='?src=\ref[user];mach_close=mob[name]'>Close</A>"
+	dat += "<BR><A href='?src=\ref[user];mach_close=inventory'>Close</A>"
 
-	user << browse(dat, text("window=mob[name];size=340x540"))
-	onclose(user, "mob[name]")
+	user << browse(dat, "window=inventory;size=340x540")
+	onclose(user, "inventory")
 	return
 
 //repurposed proc. Now it combines get_id_name() and get_face_name() to determine a mob's name variable. Made into a seperate proc as it'll be useful elsewhere
@@ -462,9 +489,9 @@ var/list/coefflist = list()
 		return
 	if (!lastpuke)
 		lastpuke = TRUE
-		src << "<span class='warning'>You feel nauseous...</span>"
+		to_chat(src, "<span class='warning'>You feel nauseous...</span>")
 		spawn(150)	//15 seconds until second warning
-			src << "<span class='warning'>You feel like you are about to throw up!</span>"
+			to_chat(src, "<span class='warning'>You feel like you are about to throw up!</span>")
 			spawn(100)	//and you have 10 more for mad dash to the bucket
 				Stun(5)
 
@@ -489,9 +516,9 @@ var/list/coefflist = list()
 		return
 	if (!lastpuke)
 		lastpuke = TRUE
-		src << "<span class='warning'>You feel nauseous...</span>"
+		to_chat(src, "<span class='warning'>You feel nauseous...</span>")
 		spawn(150)	//15 seconds until second warning
-			src << "<span class='warning'>You feel like you are about to throw up!</span>"
+			to_chat(src, "<span class='warning'>You feel like you are about to throw up!</span>")
 			spawn(100)	//and you have 10 more for mad dash to the bucket
 				Stun(5)
 
@@ -514,11 +541,7 @@ var/list/coefflist = list()
 		return NEUTER
 	return gender
 
-/mob/living/human/proc/increase_germ_level(n)
-	if (gloves)
-		gloves.germ_level += n
-	else
-		germ_level += n
+
 
 /mob/living/human/revive()
 
@@ -648,9 +671,9 @@ var/list/coefflist = list()
 
 	to_chat(usr, "You must[self ? "" : " both"] remain still until counting is finished.")
 	if (do_after(usr, 60, usr.loc))
-		usr << "<span class='notice'>[self ? "Your" : "[src]'s"] pulse is [get_pulse(GETPULSE_HAND)].</span>"
+		to_chat(usr, "<span class='notice'>[self ? "Your" : "[src]'s"] pulse is [get_pulse(GETPULSE_HAND)].</span>")
 	else
-		usr << "<span class='warning'>You failed to check the pulse. Try again.</span>"
+		to_chat(usr, "<span class='warning'>You failed to check the pulse. Try again.</span>")
 
 /mob/living/human/proc/set_species(var/new_species, var/default_colour)
 //	to_chat(world, "set species")
@@ -746,26 +769,26 @@ var/list/coefflist = list()
 		verbs -= /mob/living/human/proc/bloody_doodle
 
 	if (gloves)
-		src << "<span class='warning'>Your [gloves] are getting in the way.</span>"
+		to_chat(src, "<span class='warning'>Your [gloves] are getting in the way.</span>")
 		return
 
 	var/turf/T = loc
 	if (!istype(T)) //to prevent doodling out of mechs and lockers
-		src << "<span class='warning'>You cannot reach the floor.</span>"
+		to_chat(src, "<span class='warning'>You cannot reach the floor.</span>")
 		return
 
 	var/direction = input(src,"Which way?","Tile selection") as anything in list("Here","North","South","East","West")
 	if (direction != "Here")
 		T = get_step(T,text2dir(direction))
 	if (!istype(T))
-		src << "<span class='warning'>You cannot doodle there.</span>"
+		to_chat(src, "<span class='warning'>You cannot doodle there.</span>")
 		return
 
 	var/num_doodles = FALSE
 	for (var/obj/effect/decal/cleanable/blood/writing/W in T)
 		num_doodles++
 	if (num_doodles > 4)
-		src << "<span class='warning'>There is no space to write on!</span>"
+		to_chat(src, "<span class='warning'>There is no space to write on!</span>")
 		return
 
 	var/max_length = bloody_hands * 30 //tweeter style
@@ -778,7 +801,7 @@ var/list/coefflist = list()
 
 		if (length(message) > max_length)
 			message += "-"
-			src << "<span class='warning'>You ran out of blood to write with!</span>"
+			to_chat(src, "<span class='warning'>You ran out of blood to write with!</span>")
 
 		var/obj/effect/decal/cleanable/blood/writing/W = new(T)
 		W.basecolor = (hand_blood_color) ? hand_blood_color : "#A10808"
@@ -812,7 +835,7 @@ var/list/coefflist = list()
 		if (!fail_msg)
 			fail_msg = "There is no exposed flesh or thin material [target_zone == "head" ? "on their head" : "on their body"] to inject into."
 		to_chat(user, "<span class='alert'>[fail_msg]</span>")
-		
+
 
 /mob/living/human/proc/exam_self()
 	var/organpain = FALSE
@@ -873,9 +896,8 @@ var/list/coefflist = list()
 				if (status == "")
 					status = " OK"
 
-				src << output(text("\t [] []:[][]",status==" OK"?"<span class = 'notice'>":"<span class = 'warning'> ", capitalize(org.name), status, "</span>"), TRUE)
-
-
+				var/prefix = (status == " OK") ? "<span class='notice'>" : "<span class='warning'>"
+				to_chat(src, "\t[prefix] [capitalize(org.name)]:[status] </span>")
 
 
 /mob/living/human/print_flavor_text(var/shrink = TRUE)
@@ -938,11 +960,11 @@ var/list/coefflist = list()
 	usr.setClickCooldown(20)
 
 	if (usr.stat > 0)
-		usr << "You are unconcious and cannot do that!"
+		to_chat(usr, "You are unconcious and cannot do that!")
 		return
 
 	if (usr.restrained())
-		usr << "You are restrained and cannot do that!"
+		to_chat(usr, "You are restrained and cannot do that!")
 		return
 
 	var/mob/S = src
@@ -964,9 +986,9 @@ var/list/coefflist = list()
 	var/obj/item/organ/external/current_limb = organs_by_name[choice]
 
 	if (self)
-		src << "<span class='warning'>You brace yourself to relocate your [current_limb.joint]...</span>"
+		to_chat(src, "<span class='warning'>You brace yourself to relocate your [current_limb.joint]...</span>")
 	else
-		U << "<span class='warning'>You begin to relocate [S]'s [current_limb.joint]...</span>"
+		to_chat(U, "<span class='warning'>You begin to relocate [S]'s [current_limb.joint]...</span>")
 
 	if (!do_after(U, 30, src))
 		return
@@ -974,10 +996,10 @@ var/list/coefflist = list()
 		return
 
 	if (self)
-		src << "<span class='danger'>You pop your [current_limb.joint] back in!</span>"
+		to_chat(src, "<span class='danger'>You pop your [current_limb.joint] back in!</span>")
 	else
-		U << "<span class='danger'>You pop [S]'s [current_limb.joint] back in!</span>"
-		S << "<span class='danger'>[U] pops your [current_limb.joint] back in!</span>"
+		to_chat(U, "<span class='danger'>You pop [S]'s [current_limb.joint] back in!</span>")
+		to_chat(S, "<span class='danger'>[U] pops your [current_limb.joint] back in!</span>")
 	current_limb.undislocate()
 
 /mob/living/human/drop_from_inventory(var/obj/item/W, var/atom/Target = null)
@@ -1041,7 +1063,7 @@ var/list/coefflist = list()
 
 	if (stat) return
 	pulling_punches = !pulling_punches
-	src << "<span class='notice'>You are now [pulling_punches ? "pulling your punches" : "not pulling your punches"].</span>"
+	to_chat(src, "<span class='notice'>You are now [pulling_punches ? "pulling your punches" : "not pulling your punches"].</span>")
 	return
 
 //generates realistic-ish pulse output based on preset levels
@@ -1294,6 +1316,24 @@ var/list/coefflist = list()
 /mob/living/human/Move()
 	..()
 	handle_looks_with_movement()
+
+	if (phosphor_dye_timer > 0)
+		var/turf/T = get_turf(src)
+		if (istype(T, /turf/floor))
+			var/turf/floor/F = T
+			if (F.watertile)
+				phosphor_dye_timer = 0
+				set_light(0)
+				visible_message("<span class='notice'>The water washes the glowing phosphor dye off of [src]!</span>")
+
+	if (m_intent != "stealth")
+		var/range_val = 6
+		if (m_intent == "run")
+			range_val = 12
+		var/turf/T = get_turf(src)
+		if (T)
+			for (var/mob/living/simple_animal/hostile/echofiend/EF in range(range_val, T))
+				EF.hear_sound(T)
 
 /mob/living/human/proc/handle_looks_with_movement()
 

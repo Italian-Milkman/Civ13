@@ -1,7 +1,8 @@
 /obj/map_metadata/ardennes
 	ID = MAP_ARDENNES
 	title = "Ardennes Offensive"
-	lobby_icon = 'icons/lobby/ardennes.png'
+	description = "The Americans will win if they hold out for 45 minutes. The Germans will win if they manage to reach the HQ in the middle of the city."
+	lobby_icon = "icons/lobby/ardennes.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall/tundra,/area/caribbean/no_mans_land/invisible_wall/tundra/one,/area/caribbean/no_mans_land/invisible_wall/tundra/two)
 	respawn_delay = 1200
 	no_winner = "The HQ stays under American control, stalling the German offense."
@@ -24,25 +25,19 @@
 	grace_wall_timer = 3600
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET)
 	songs = list(
-		"Over There!:1" = 'sound/music/overthere.ogg',)
+		"Over There!:1" = "sound/music/overthere.ogg",)
 	gamemode = "Siege"
 
 /obj/map_metadata/ardennes/job_enabled_specialcheck(var/datum/job/J)
 	..()
-	if (istype(J, /datum/job/german))
-		if (J.is_ardennes)
-			. = TRUE
-		else
-			. = FALSE
-	else if (istype(J, /datum/job/american))
+
+	if (istype(J, /datum/job/american))
 		if (J.is_ardennes)
 			. = TRUE
 			if (istype(J, /datum/job/american/tanker_ww2))
 				J.spawn_location = "JoinLateRN2" // Doing this because changing the spawn_loc in the job file will bust other maps
 		else
 			. = FALSE
-	else
-		. = FALSE
 
 /obj/map_metadata/ardennes/roundend_condition_def2name(define)
 	..()
@@ -124,14 +119,14 @@ var/no_loop_ar = FALSE
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The <b>Americans</b> Have successfully defended the HQ! The Germans were halted!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_ar == FALSE)
 		ticker.finished = TRUE
 		var/message = "The <b>Germans</b> have captured the building! The Battle of the Bulge is over!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_ar = TRUE
@@ -174,7 +169,7 @@ var/no_loop_ar = FALSE
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The <b>Americans</b> have recaptured the HQ!</font>"
+			to_chat(world, "<font size = 3>The <b>Americans</b> have recaptured the HQ!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1
@@ -196,5 +191,4 @@ var/no_loop_ar = FALSE
 				return TRUE
 		else
 			return !faction1_can_cross_blocks()
-			return !faction2_can_cross_blocks()
 	return FALSE

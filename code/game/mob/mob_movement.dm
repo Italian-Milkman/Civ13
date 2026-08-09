@@ -89,7 +89,6 @@
 		return (!mover.density || !density || lying || prone)
 	else
 		return (!mover.density || !density || lying || prone)
-	return
 
 /mob/proc/setMoveCooldown(var/timeout)
 	if (client)
@@ -231,7 +230,6 @@
 			dir = olddir
 			set_dir(direct)
 		l_move_time = world.time
-		m_flag = TRUE
 		if ((A != loc && A && A.z == z))
 			last_move = get_dir(A, loc)
 	if (istype(src, /mob/living/human))
@@ -466,6 +464,14 @@
 						standing_on_snow = 4
 					if (3)
 						standing_on_snow = 6
+			if(istype(F, /turf/floor/sub_deck))
+				var/turf/floor/sub_deck/SD = F
+				if(SD.water_depth >= 150)
+					standing_on_snow = 6
+				else if(SD.water_depth >= 100)
+					standing_on_snow = 4
+				else if(SD.water_depth >= 50)
+					standing_on_snow = 2
 			if ((F_area.weather == WEATHER_WET && findtext(F_area.icon_state,"rain")) || F_area.weather == WEATHER_EXTREME)
 				if (F.may_become_muddy)
 					if (F_area.climate != "semiarid" || F_area.climate != "jungle" || F_area.climate != "desert" || F_area.climate != "savanna" || season == "WINTER" || season == "SPRING")
@@ -537,7 +543,7 @@
 						snow_span = "danger"
 */
 				if (snow_message && world.time >= mob.next_snow_message)
-					mob << "<span class = '[snow_span]'>[snow_message]</span>"
+					to_chat(mob, "<span class = '[snow_span]'>[snow_message]</span>")
 					mob.next_snow_message = world.time+100
 
 			else if (F.muddy && !H.lizard && F_area.icon_state != "")
@@ -641,11 +647,11 @@
 
 		if (mob_is_human)
 			if (H.getStat("stamina") == (H.getMaxStat("stamina")/2) && H.m_intent == "run" && world.time >= H.next_stamina_message)
-				to_chat(H, SPAN_DANGER("You're starting to tire from running so much."))
+				to_chat(H, SPAN_WARNING("You're starting to tire from running so much."))
 				H.next_stamina_message = world.time + 20
 
 			if (H.getStat("stamina") <= 0 && H.m_intent == "run")
-				to_chat(H, SPAN_DANGER("You're too tired to keep running."))
+				to_chat(H, SPAN_WARNING("You're too tired to keep running."))
 				if (H.m_intent != "walk")
 					H.m_intent = "walk" // Incase we don't set the intent to walk somehow, force-set it here...
 					if (mob.HUDneed.Find("m_intent")) // Find the movement intent in the HUDneed list() on mob_defines.
@@ -733,7 +739,7 @@
 			else
 				. = mob.SelfMove(n, direct)
 
-			skipgrab
+			skipgrab:
 
 			#define STOMP_TIME 1
 
@@ -952,7 +958,7 @@
 				H.football.update_movement()
 			for(var/obj/item/vehicleparts/wheel/modular/MW in H)
 				if (MW && MW.control && MW.control.axis && MW.control.axis.reverse && MW.control.axis.currentspeed == 0 && !MW.control.axis.moving)
-					H << "You switch into forward."
+					to_chat(H, "You switch into forward.")
 					playsound(H.loc, 'sound/effects/lever.ogg',65, TRUE)
 					MW.control.axis.reverse = FALSE
 			for(var/obj/item/turret_controls/C in H)
@@ -996,7 +1002,7 @@
 				H.football.update_movement()
 			for(var/obj/item/vehicleparts/wheel/modular/MW in H)
 				if (MW && MW.control && MW.control.axis && !MW.control.axis.reverse && MW.control.axis.currentspeed == 0 && !MW.control.axis.moving)
-					H << "You switch into reverse."
+					to_chat(H, "You switch into reverse.")
 					playsound(H.loc, 'sound/effects/lever.ogg',65, TRUE)
 					MW.control.axis.reverse = TRUE
 			for(var/obj/item/turret_controls/C in H)
@@ -1039,7 +1045,12 @@
 			for(var/obj/item/vehicleparts/wheel/modular/MW in H)
 				MW.turndir(mob,"right")
 			for(var/obj/item/turret_controls/C in H)
-				C.start_rotation(1)
+				if (!C.is_rotating)
+					C.start_rotation(1)
+				else
+					if (C.rotating_dir == -1)
+						C.stop_rotation()
+
 			for(var/obj/item/drone_controller/RC in H)
 				if(H.using_drone)
 					RC.start_move_drone(EAST)
@@ -1078,7 +1089,11 @@
 			for(var/obj/item/vehicleparts/wheel/modular/MW in H)
 				MW.turndir(mob,"left")
 			for(var/obj/item/turret_controls/C in H)
-				C.start_rotation(-1)
+				if (!C.is_rotating)
+					C.start_rotation(-1)
+				else
+					if (C.rotating_dir == 1)
+						C.stop_rotation()
 			for(var/obj/item/drone_controller/RC in H)
 				if(H.using_drone)
 					RC.start_move_drone(WEST)
@@ -1106,7 +1121,7 @@
 	set instant = TRUE
 	if (mob && mob.movement_northsouth == NORTH)
 		mob.movement_northsouth = null
-		for(var/obj/item/drone_controller/RC in mob)
+		for(var/obj/item/drone_controller/RC in mob.contents)
 			if(mob.using_drone)
 				RC.stop_move_drone()
 
@@ -1115,7 +1130,7 @@
 	set instant = TRUE
 	if (mob && mob.movement_northsouth == SOUTH)
 		mob.movement_northsouth = null
-		for(var/obj/item/drone_controller/RC in mob)
+		for(var/obj/item/drone_controller/RC in mob.contents)
 			if(mob.using_drone)
 				RC.stop_move_drone()
 
@@ -1124,9 +1139,7 @@
 	set instant = TRUE
 	if (mob && mob.movement_eastwest == EAST)
 		mob.movement_eastwest = null
-		for(var/obj/item/turret_controls/C in mob)
-			C.stop_rotation()
-		for(var/obj/item/drone_controller/RC in mob)
+		for(var/obj/item/drone_controller/RC in mob.contents)
 			if(mob.using_drone)
 				RC.stop_move_drone()
 
@@ -1135,8 +1148,40 @@
 	set instant = TRUE
 	if (mob && mob.movement_eastwest == WEST)
 		mob.movement_eastwest = null
-		for(var/obj/item/turret_controls/C in mob)
-			C.stop_rotation()
-		for(var/obj/item/drone_controller/RC in mob)
+		for(var/obj/item/drone_controller/RC in mob.contents)
 			if(mob.using_drone)
 				RC.stop_move_drone()
+
+
+// this is a wrapper that checks if the game is running in OpenDream,
+// if YES: Run our own implementation of walk_away(), since it is not implemented
+// if NO: Run the normal walk_away() proc
+/atom/var/walk_id = 0
+
+/atom/proc/walk_away_od(atom/Trg, Max=5, Lag=0, Speed=0)
+	set waitfor = FALSE
+	#ifndef OPENDREAM
+	walk_away(Trg, Max, Lag, Speed)
+	return
+	#endif
+	#ifdef OPENDREAM
+	walk(src, 0) // Halts any built-in walk loop to mimic BYOND
+	
+	if(!Trg) return
+	
+	var/current_walk_id = rand(1, 100000)
+	src.walk_id = current_walk_id
+	
+	// Loop continuously in the background
+	while(src && Trg && src.walk_id == current_walk_id)
+		if(get_dist(src, Trg) > Max)
+			break
+		
+		step_away(src, Trg)
+		
+		// Wait for the lag, or fallback to world.tick_lag if 0 
+		if(Lag > 0)
+			sleep(Lag)
+		else
+			sleep(world.tick_lag)
+	#endif

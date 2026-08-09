@@ -3,7 +3,6 @@
 	if (!material)
 		return
 
-	construction_stage = null
 	if (!material)
 		material = get_material_by_name(DEFAULT_WALL_MATERIAL)
 	if (material)
@@ -25,8 +24,6 @@
 
 /turf/wall/proc/set_wall_state(var/new_state)
 
-	ref_state = new_state
-
 	if (!material)
 		return
 
@@ -45,7 +42,6 @@
 		if (material.icon_colour)
 			I.color = material.icon_colour
 		wall_cache["[new_state]-[material.icon_colour]"] = I
-		ref_state = "[new_state]"
 	overlays |= wall_cache["[new_state]-[material.icon_colour]"]
 
 /turf/wall/proc/set_material(var/material/newmaterial)
@@ -114,6 +110,12 @@
 			T.check_relatives(1,0)
 	if (!isnull(junction))
 		set_wall_state("[material.icon_base][junction]")
+		if (istype(src, /turf/wall/sub_bulkhead))
+			var/turf/wall/sub_bulkhead/SB = src
+			if (SB.draw_color_lines)
+				var/image/line_ov = image(icon = 'icons/turf/wall_masks.dmi', icon_state = "wall_line_ov[junction]")
+				line_ov.color = SB.color_lines_color
+				overlays += line_ov
 	return
 /turf/wall/can_join_with(var/atom/W)
 	if (istype(W,src))

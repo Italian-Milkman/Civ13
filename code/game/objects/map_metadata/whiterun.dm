@@ -2,7 +2,8 @@
 /obj/map_metadata/whiterun
 	ID = MAP_WHITERUN
 	title = "Whiterun"
-	lobby_icon = 'icons/lobby/tes13.png'
+	description = "The Stormcloaks troops are besieging the Imperial City of Whiterun! The Imperials will win if they manage to hold the city for 30 minutes."
+	lobby_icon = "icons/lobby/tes13.png"
 	no_winner ="The fighting is still going on."
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall)
 	respawn_delay = 300
@@ -23,26 +24,12 @@
 	mission_start_message = "<font size=4>The <b>Stormcloaks</b> troops are besieging the <b>Imperial</b> City of <b>Whiterun</b>! The Imperials will win if they manage to hold the city for 30 minutes. <br> The siege will start in <b>6 minutes</b>.</font>"
 	faction1 = ROMAN
 	faction2 = CIVILIAN
-	ambience = list('sound/ambience/desert.ogg')
+	ambience = list("sound/ambience/desert.ogg")
 	songs = list(
-		"One They Fear:1" = 'sound/music/tesonetheyfear.ogg',)
+		"One They Fear:1" = "sound/music/tesonetheyfear.ogg",)
 	gamemode = "Siege"
 	grace_wall_timer = 3600
 
-obj/map_metadata/whiterun/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (istype(J, /datum/job/roman))
-		if (J.is_skyrim && J.is_imperial)
-			. = TRUE
-		else
-			. = FALSE
-	else if (istype(J, /datum/job/civilian))
-		if (J.is_skyrim == TRUE && J.is_stormcloak == TRUE)
-			. = TRUE
-		else
-			. = FALSE
-	else
-		. = FALSE
 
 /obj/map_metadata/whiterun/roundend_condition_def2name(define)
 	..()
@@ -86,14 +73,14 @@ var/no_loop_whrn = FALSE
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The Imperials have managed to defend the city of Whiterun!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_whrn == FALSE)
 		ticker.finished = TRUE
 		var/message = "The Stormcloaks have captured the city of Whiterun! The remaining Imperials are retreating!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_whrn = TRUE
@@ -136,7 +123,7 @@ var/no_loop_whrn = FALSE
 				current_loser = "Imperials"
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The Imperials have recaptured the city!</font>"
+			to_chat(world, "<font size = 3>The Imperials have recaptured the city!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1

@@ -204,6 +204,14 @@
 	name = "radiation in the area!"
 	icon_state = "radiation"
 
+/obj/structure/sign/radiation2
+	name = "DANGER: Radiation!"
+	icon_state = "radiation2"
+
+/obj/structure/sign/electricity
+	name = "DANGER: Electricity!"
+	icon_state = "shock"
+
 /obj/structure/sign/traffic
 	name = "STOP sign"
 	desc = ""
@@ -802,6 +810,11 @@
 	name = "Finnish flag"
 	desc = "The flag of Finland."
 	icon_state = "flag_finland"
+
+/obj/structure/sign/flag/wales
+	name = "Wales flag"
+	desc = "The flag of Wales."
+	icon_state = "flag_wales"
 
 /obj/structure/sign/flag/warpact
 	name = "WARPACT flag"

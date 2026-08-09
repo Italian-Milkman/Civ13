@@ -1,7 +1,8 @@
 /obj/map_metadata/berlin
 	ID = MAP_BERLIN
 	title = "Berlin"
-	lobby_icon = 'icons/lobby/ww2.png'
+	description = "The Germans will win if they hold out for 40 minutes. The Soviets will win if they manage to reach and hold past the Branderburg Gate for 5 minutes."
+	lobby_icon = "icons/lobby/ww2.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall)
 	respawn_delay = 1200
 	no_winner ="The Branderburg Gate is under German control."
@@ -23,21 +24,8 @@
 	faction2 = RUSSIAN
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET)
 	songs = list(
-		"Red Army Choir - Katyusha:1" = 'sound/music/katyusha.ogg',)
+		"Red Army Choir - Katyusha:1" = "sound/music/katyusha.ogg",)
 	gamemode = "Siege"
-
-obj/map_metadata/berlin/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_ww2 == TRUE && J.is_reichstag == FALSE && J.is_occupation == FALSE)
-		. = TRUE
-	else if (J.is_ss_panzer == TRUE)
-		. = TRUE
-	else if (istype(J, /datum/job/german/mediziner) || istype(J, /datum/job/russian/doctor_soviet))
-		. = TRUE
-	else if (istype(J, /datum/job/german/volksturm_berlin))
-		. = TRUE
-	else
-		. = FALSE
 
 
 /obj/map_metadata/berlin/faction1_can_cross_blocks()
@@ -106,14 +94,14 @@ obj/map_metadata/berlin/job_enabled_specialcheck(var/datum/job/J)
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The <b>Wehrmacht</b> has sucessfuly defended the Branderburg Gate! The Soviets halted the attack!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_r == FALSE)
 		ticker.finished = TRUE
 		var/message = "The <b>Soviets</b> have captured the Branderburg Gate! The battle for the Berlin Gate is over!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_r = TRUE
@@ -156,7 +144,7 @@ obj/map_metadata/berlin/job_enabled_specialcheck(var/datum/job/J)
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The <b>Germans</b> have recaptured the Branderburg Gate!</font>"
+			to_chat(world, "<font size = 3>The <b>Germans</b> have recaptured the Branderburg Gate!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1

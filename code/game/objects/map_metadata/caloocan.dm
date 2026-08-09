@@ -1,7 +1,8 @@
 /obj/map_metadata/caloocan
 	ID = MAP_CALOOCAN
 	title = "Caloocan"
-	lobby_icon = 'icons/lobby/ph_us_war.png'
+	description = "The Armies will win if they capture the Chruch!."
+	lobby_icon = "icons/lobby/ph_us_war.png"
 	no_winner ="The church is under Filipino control."
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/one,/area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 600
@@ -25,13 +26,6 @@
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET, WEATHER_EXTREME)
 	gamemode = "King of the Hill"
 	grace_wall_timer = 2400
-/obj/map_metadata/caloocan/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_ph_us_war == TRUE)
-		. = TRUE
-	else
-		. = FALSE
-
 /obj/map_metadata/caloocan/short_win_time(faction)
 	if (!(alive_n_of_side(faction1)) || !(alive_n_of_side(faction2)))
 		return 600
@@ -95,7 +89,7 @@ var/no_loop_cal = FALSE
 		var/message = "The [battle_name ? battle_name : "battle"] has ended in a stalemate!"
 		if (current_winner && current_loser)
 			message = "The battle is over! The [current_winner] was victorious over the [current_loser][battle_name ? " in the [battle_name]" : ""]!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		win_condition_spam_check = TRUE
 		return FALSE
 	// German major
@@ -137,7 +131,7 @@ var/no_loop_cal = FALSE
 
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The [current_winner] have lost control of the Church!</font>"
+			to_chat(world, "<font size = 3>The [current_winner] have lost control of the Church!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1

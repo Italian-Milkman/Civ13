@@ -1,7 +1,8 @@
 /obj/map_metadata/port_arthur
 	ID = MAP_PORT_ARTHUR
 	title = "Port Arthur"
-	lobby_icon = 'icons/lobby/ww1.png'
+	description = "The Imperial Japanese Army and the Russian Army are battling for the control of Port Arthur!"
+	lobby_icon = "icons/lobby/ww1.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/one,/area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 0
 	no_hardcore = TRUE
@@ -22,7 +23,7 @@
 	faction2 = JAPANESE
 	ordinal_age = 5
 	songs = list(
-		"Argonnerwaldlied:1" = 'sound/music/argonnerwaldlied.ogg')
+		"Argonnerwaldlied:1" = "sound/music/argonnerwaldlied.ogg")
 	gamemode = "Siege"
 	var/no_loop_arth = FALSE
 	
@@ -31,21 +32,6 @@
 
 /obj/map_metadata/port_arthur/faction2_can_cross_blocks()
 	return (processes.ticker.playtime_elapsed >= 3600 || admin_ended_all_grace_periods)
-
-/obj/map_metadata/port_arthur/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (istype(J, /datum/job/japanese))
-		if (J.is_russojapwar)
-			. = TRUE
-		else
-			. = FALSE
-	else if (istype(J, /datum/job/russian))
-		if (J.is_russojapwar)
-			. = TRUE
-		else
-			. = FALSE
-	else
-		. = FALSE
 
 /obj/map_metadata/port_arthur/short_win_time(faction)
 	if (!(alive_n_of_side(faction1)) || !(alive_n_of_side(faction2)))
@@ -106,14 +92,14 @@
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The <b>Russian Army</b> has sucessfuly defended Port Arthur! The Japanese have halted the attack!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_arth == FALSE)
 		ticker.finished = TRUE
 		var/message = "The <b>Japanese</b> have captured the Artillery Battery! The battle for Port Arthur is over!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_arth = TRUE
@@ -157,7 +143,7 @@
 
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The [current_winner] has lost control of the Fort!</font>"
+			to_chat(world, "<font size = 3>The [current_winner] has lost control of the Fort!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1

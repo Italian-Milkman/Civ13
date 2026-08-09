@@ -1,4 +1,20 @@
 var/global/obj/map_metadata/map = null
+var/global/list/map_id_to_title = list()
+var/global/list/map_title_to_id = list()
+var/global/list/map_id_to_desc = list()
+
+/hook/startup/proc/init_map_titles()
+	for (var/map_type in typesof(/obj/map_metadata))
+		var/obj/map_metadata/M = map_type
+		var/id = initial(M.ID)
+		var/title = initial(M.title)
+		var/desc = initial(M.description)
+		if (id && title)
+			map_id_to_title[id] = title
+			map_title_to_id[title] = id
+			if (desc)
+				map_id_to_desc[id] = desc
+	return TRUE
 //Max levels showing players how far to advance, appears on the Character tab
 var/civmax_research = list(230,230,230)
 
@@ -12,7 +28,8 @@ var/civmax_research = list(230,230,230)
 	var/ID = null // MUST be text, or aspects will break
 	var/no_winner = "Neither side has captured the other side's base."
 	var/title = null
-	var/lobby_icon = 'icons/lobby/civ13.gif'
+	var/description = ""
+	var/lobby_icon = ""
 	var/list/caribbean_blocking_area_types = list()
 	var/list/allow_bullets_through_blocks = list()
 	var/last_crossing_block_status[3]
@@ -37,15 +54,16 @@ var/civmax_research = list(230,230,230)
 	var/list/roundend_condition_sides = list(
 		list(PIRATES) = /area/caribbean/pirates,
 		list(BRITISH) = /area/caribbean/british)
-	var/list/ambience = list('sound/ambience/ship1.ogg')
+	var/list/ambience = list("sound/ambience/ship1.ogg")
 	var/list/songs = list(
-		"Nassau Shores:1" = 'sound/music/nassau_shores.ogg',)
+		"Nassau Shores:1" = "sound/music/nassau_shores.ogg",)
 	var/mission_start_message = "Round will start soon!"
 	var/is_RP = FALSE
 	var/mosinonly = FALSE
 	var/squads = 1
 	var/fob_spawns = FALSE
-	var/list/faction1_squads = list(
+	var/gamemode_vote = TRUE
+	var/list/list/faction1_squads = alist(
 		1 = list(),
 		2 = list(),
 		3 = list(),
@@ -54,7 +72,7 @@ var/civmax_research = list(230,230,230)
 		6 = list(),
 		7 = list(),
 	)
-	var/list/faction2_squads = list(
+	var/list/list/faction2_squads = alist(
 		1 = list(),
 		2 = list(),
 		3 = list(),
@@ -63,7 +81,7 @@ var/civmax_research = list(230,230,230)
 		6 = list(),
 		7 = list(),
 	)
-	var/list/faction1_squad_leaders = list(
+	var/list/mob/living/human/faction1_squad_leaders = alist(
 		1 = null,
 		2 = null,
 		3 = null,
@@ -72,7 +90,7 @@ var/civmax_research = list(230,230,230)
 		6 = null,
 		7 = null,
 	)
-	var/list/faction2_squad_leaders = list(
+	var/list/mob/living/human/faction2_squad_leaders = alist(
 		1 = null,
 		2 = null,
 		3 = null,
@@ -83,7 +101,6 @@ var/civmax_research = list(230,230,230)
 	)
 	var/required_players = 1
 	var/time_both_sides_locked = -1
-	var/time_to_end_round_after_both_sides_locked = 9000
 	var/admins_triggered_roundend = FALSE
 	var/admins_triggered_noroundend = FALSE
 	var/list/faction_targets = list()
@@ -129,12 +146,13 @@ var/civmax_research = list(230,230,230)
 	var/nomads = FALSE
 	var/has_hunger = FALSE
 	var/list/custom_faction_nr = list()
-	var/list/custom_civs = list()
-	var/list/custom_religions = list()
+	var/list/list/custom_civs = list()
+	var/list/list/custom_religions = list()
 	var/list/custom_religion_nr = list()
-	var/list/custom_company = list() //name; percentage; realized (withdrawable) profits
+	var/list/list/custom_company = list() //name; percentage; realized (withdrawable) profits
 	var/list/custom_company_nr = list()
 	var/list/custom_company_value = list()
+	var/list/custom_company_fiat_value = list()
 	var/list/sales_registry = list()
 	var/list/custom_company_colors = list("Global" = list("#000000","#FFFFFF")) //1st color, 2nd color
 	var/is_singlefaction = FALSE
@@ -158,8 +176,6 @@ var/civmax_research = list(230,230,230)
 	var/perschadplus = FALSE
 	var/is_wasteland = FALSE
 	var/hasnukes = FALSE
-	var/disablehud = FALSE //Faction hud
-
 	//autoresearch
 	var/autoresearch = FALSE //if autoresearch is active
 	var/autoresearch_mult = 0.03 // the amount research goes up per minute. Can be editted by admins.
@@ -202,14 +218,12 @@ var/civmax_research = list(230,230,230)
 	var/age8_lim = 620
 	var/age8_done = 0
 	var/age8_timer = 7*24*36000
-	var/age8_top = 230
-
 	var/orespawners = 0
 
-	var/list/globalmarketplace = list()
+	var/list/list/globalmarketplace = list()
 	var/list/marketplaceaccounts = list()
 	var/list/pending_warrants = list()
-	var/list/emails = list("support@monkeysoft.ug" = list())
+	var/list/list/emails = list("support@monkeysoft.ug" = list())
 
 	var/list/assign_precursors = list(
 		"Rednikov Industries" = list("verdine crystals","indigon crystals","galdonium crystals"),
@@ -257,6 +271,8 @@ var/civmax_research = list(230,230,230)
 	var/ar_to_close_timeleft = 0
 
 	var/no_hardcore = FALSE
+	var/is_campaign_map = FALSE
+
 /obj/map_metadata/New()
 	..()
 	map = src
@@ -395,9 +411,9 @@ var/civmax_research = list(230,230,230)
 	if (tips.len)
 		for(var/client/C in clients)
 			if(C.is_preference_enabled(/datum/client_preference/show_tips))
-				C << "<font color='#5194BB'>---</font>"
-				C << "<font color='#5194BB'><b>Tip:</b> [pick(tips)]</font>"
-				C << "<font color='#5194BB'>---</font>"
+				to_chat(C, "<font color='#5194BB'>---</font>")
+				to_chat(C, "<font color='#5194BB'><b>Tip:</b> [pick(tips)]</font>")
+				to_chat(C, "<font color='#5194BB'>---</font>")
 
 /obj/map_metadata/proc/set_ordinal_age()
 	if (age == "5000 B.C.")
@@ -456,7 +472,7 @@ var/civmax_research = list(230,230,230)
 		if (faction2_can_cross_blocks() && cross_message(faction2) != "")
 			to_chat(world, cross_message(faction2))
 			if (battleroyale)
-				var/warning_sound = sound('sound/effects/siren.ogg', repeat = FALSE, wait = TRUE, channel = 777)
+				var/warning_sound = sound("sound/effects/siren.ogg", repeat = FALSE, wait = TRUE, channel = 777)
 				for (var/mob/M in player_list)
 					M.client << warning_sound
 
@@ -616,28 +632,11 @@ var/civmax_research = list(230,230,230)
 	return (faction1_can_cross_blocks() && faction2_can_cross_blocks())
 
 /obj/map_metadata/proc/job_enabled_specialcheck(var/datum/job/J)
-	if (age == "1013" && !civilizations)
-		if (J.is_medieval)
-			. = TRUE
-		else
-			. = FALSE
-	else
-		if (!J.is_medieval)
-			. = TRUE
-		else
-			. = FALSE
-	if (civilizations)
-		if (J.is_civilizations)
-			. = TRUE
-		else
-			. = FALSE
-	else if (!civilizations)
-		if (!J.is_civilizations)
-			. = TRUE
-		else
-			. = FALSE
-	if (J.is_nomad)
-		. = FALSE
+	// new logic: if the job specifies which maps it belongs to, use that exclusively
+	if (J.allowed_maps.len > 0)
+		. = (ID in J.allowed_maps)
+		return .
+
 /obj/map_metadata/proc/cross_message(faction)
 	return "<font size = 4>The [faction_const2name(faction,ordinal_age)] may now cross the invisible wall!</font>"
 
@@ -761,6 +760,8 @@ var/civmax_research = list(230,230,230)
 		FILIPINO = 0,
 		BLUEFACTION = 0,
 		REDFACTION = 0,
+		CAFR = 0,
+		TSFSR = 0,
 		)
 
 	if (!(side in soldiers))
@@ -960,7 +961,10 @@ var/civmax_research = list(230,230,230)
 				return "Rotstadt People's Republic"
 			else
 				return "Redmenia Defence Force"
-
+		if (CAFR)
+			return "CAFR Armed Forces"
+		if (TSFSR)
+			return "Turkestan Red Army"
 /obj/map_metadata/proc/army2name(army)
 	switch (army)
 		if ("British Empire")
@@ -1009,6 +1013,10 @@ var/civmax_research = list(230,230,230)
 			return "Blugoslavian"
 		if ("Redmenia Defence Force")
 			return "Redmenian"
+		if ("CAFR Armed Forces")
+			return "Central Asian"
+		if ("Turkestan Red Army")
+			return "Turkestani"
 
 /obj/map_metadata/proc/special_relocate(var/mob/M)
 	return FALSE
@@ -1234,6 +1242,21 @@ var/civmax_research = list(230,230,230)
 	if (value == 0)
 		return
 	for (var/i in map.globalmarketplace)
-		if (map.globalmarketplace[i][7]==0 && map.globalmarketplace[i][5]=="bank" && map.globalmarketplace[i][2] && map.globalmarketplace[i][1]==tfaction)
-			if (istype(map.globalmarketplace[i][2],/mob/living/human))
-				map.marketplaceaccounts[map.globalmarketplace[i][2].name] += value/2.5
+		var/list/entry = map.globalmarketplace[i]
+		if (entry[7]==0 && entry[5]=="bank" && entry[2] && entry[1]==tfaction)
+			if (istype(entry[2],/mob/living/human))
+				map.marketplaceaccounts[entry[1]] += value/2.5
+
+/obj/map_metadata/proc/spawn_canopy_stranglers(var/chance = 3)
+	if (grass_turf_list && grass_turf_list.len)
+		for (var/turf/floor/grass/jungle/T in grass_turf_list)
+			if (prob(chance))
+				new /mob/living/simple_animal/hostile/canopy_strangler(T)
+	else
+		for (var/turf/floor/grass/jungle/T in world)
+			if (prob(chance))
+				new /mob/living/simple_animal/hostile/canopy_strangler(T)
+
+//this shows up alongside the global report of X alive, X injured etc
+/obj/map_metadata/proc/show_map_report()
+	return

@@ -5,11 +5,11 @@
 	that's a lot of code duplication and is hard to maintain.
 	Note that this proc can be overridden, and is in the case of screen objects.*/
 /atom/Click(var/location, var/control, var/params)
-	if (src)
+	if (src && usr)
 		usr.ClickOn(src, params)
 
 /atom/DblClick(var/location, var/control, var/params)
-	if (src)
+	if (src && usr)
 		usr.DblClickOn(src, params)
 
 /*	Standard mob ClickOn()
@@ -23,6 +23,8 @@
 	* item/afterattack(atom,user,adjacent,params) - used both ranged and adjacent
 	* mob/RangedAttack(atom,params) - used only ranged, only used for tk and laser eyes but could be changed */
 /mob/proc/ClickOn(var/atom/A, var/params)
+	if (!isatom(A))
+		return
 	if (world.time <= next_click) // Hard check, before anything else, to avoid crashing
 		return
 	next_click = world.time + 1
@@ -67,27 +69,8 @@
 				visible_message("[src] kicks \the [FB.name].")
 				return
 			else if (ishuman(A) && get_dist(H,A) <= 1) //if we dont have the ball, try to apply pressure and take the ball without tackling
-				var/mob/living/human/HM = A
-				if (HM.civilization != H.civilization && H.stats["stamina"][1] >= 7) //no pressure on same team
-					H.setClickCooldown(10)
-					H.stats["stamina"][1] = max(H.stats["stamina"][1] - 7, 0)
-					H.do_attack_animation(HM)
-					var/obj/item/football/opponent_has_ball = null
-					if (HM.football)
-						opponent_has_ball = HM.football
-					if (prob(35) && opponent_has_ball)
-						H.visible_message("<font color='red'>[H] takes the ball from [HM]!</font>")
-						playsound(H.loc, 'sound/weapons/punch1.ogg', 50, 1)
-						HM.football = null
-						opponent_has_ball.last_owner = H
-						opponent_has_ball.owner = H
-						H.football = opponent_has_ball
-						opponent_has_ball.forceMove(H.loc)
-					else
-						H.visible_message("<font color='yellow'>[H] pressures [HM]!</font>")
-						H.do_attack_animation(HM)
-						playsound(H.loc, 'sound/weapons/punchmiss.ogg', 50, 1)
-					return
+				H.football_pressure(A)
+				return
 		if (istype(H.get_active_hand(), /obj/item/weapon/flamethrower)) //TO DO TODO: move it to flamethrower.dm
 			var/obj/item/weapon/flamethrower/FL = H.get_active_hand()
 			var/cdir = get_dir(H,A)
@@ -106,8 +89,12 @@
 				if ((H.loc != A.loc) && (A.x != 0 && A.y != 0))
 					H.dir = get_dir(H,A)
 					var/dt = world.time - GN.last_shot_time
-					if(dt > GN.firemodes[GN.sel_mode].burst_delay)
+					var/datum/firemode/CFM = GN.firemodes[GN.sel_mode]
+					if(dt > CFM.burst_delay)
 						GN.Fire(A,H,params)
+					else
+						spawn(GN.last_shot_time + CFM.burst_delay - world.time)
+							GN.Fire(A,H,params)
 		if (istype(H.buckled, /obj/structure/bed/chair/commander)) //TO DO TODO: move it to wheels.dm
 			var/obj/item/weapon/attachment/scope/adjustable/binoculars/periscope/P
 			if (istype(H.l_hand,/obj/item/weapon/attachment/scope/adjustable/binoculars/periscope))
@@ -119,7 +106,7 @@
 		if (istype(H.get_active_hand(), /obj/item/weapon/attachment/scope/adjustable/binoculars/laser_designator))
 			if (istype(H.back, /obj/item/weapon/radio) || istype(H.wear_id, /obj/item/weapon/radio/walkietalkie))
 				if (!map.faction1_can_cross_blocks() && !map.faction2_can_cross_blocks())
-					to_chat(H, SPAN_DANGER("You can't use this yet."))
+					to_chat(H, SPAN_WARNING("You can't use this yet."))
 					return
 				else
 					var/obj/item/weapon/attachment/scope/adjustable/binoculars/laser_designator/P = H.get_active_hand()
@@ -127,11 +114,11 @@
 						if (istype(H.get_inactive_hand(), /obj/item/weapon/compass))
 							P.rangecheck(H,A)
 						else
-							to_chat(H, SPAN_DANGER("You need to have a compass in your other hand to this!"))
+							to_chat(H, SPAN_WARNING("You need to have a compass in your other hand to this!"))
 					else
 						P.rangecheck(H,A)
 			else
-				to_chat(H, SPAN_DANGER("You need to have a radio to use this!"))
+				to_chat(H, SPAN_WARNING("You need to have a radio to use this!"))
 				return
 		if (istype(H.get_active_hand(), /obj/item/weapon/attachment/scope/adjustable/binoculars/binoculars))
 			var/obj/item/weapon/attachment/scope/adjustable/binoculars/binoculars/P = H.get_active_hand()
@@ -257,7 +244,8 @@
 					if (istype(W, /obj/item/weapon/gun))
 						var/obj/item/weapon/gun/G = W
 						var/dt = world.time - G.last_shot_time
-						if(dt > G.firemodes[G.sel_mode].burst_delay)
+						var/datum/firemode/CFM = G.firemodes[G.sel_mode]
+						if(dt > CFM.burst_delay)
 							W.afterattack(A, src, TRUE, params) // TRUE indicates adjacency
 					else
 						W.afterattack(A, src, TRUE, params) // TRUE indicates adjacency
@@ -271,7 +259,8 @@
 				if (istype(W, /obj/item/weapon/gun))
 					var/obj/item/weapon/gun/G = W
 					var/dt = world.time - G.last_shot_time
-					if(dt > G.firemodes[G.sel_mode].burst_delay)
+					var/datum/firemode/CFM = G.firemodes[G.sel_mode]
+					if(dt > CFM.burst_delay)
 						W.afterattack(A, src, FALSE, params)
 				else
 					W.afterattack(A, src, FALSE, params)
@@ -306,7 +295,7 @@
 
 /mob/living/UnarmedAttack(var/atom/A, var/proximity_flag, icon_x, icon_y)
 	if (!ticker)
-		src << "You cannot attack people before the game has started."
+		to_chat(src, "You cannot attack people before the game has started.")
 		return FALSE
 	if (stat)
 		return FALSE
@@ -439,12 +428,14 @@
 		facedir(direction)
 
 /mob/proc/scramble(var/turf/floor/F)
+	if (!isturf(F))
+		return
 	if (F.density)
 		return FALSE
 	if (stat || buckled || paralysis || stunned || sleeping || (status_flags & FAKEDEATH) || restrained() || (weakened > 10))
 		return FALSE
 	if (!has_limbs)
-		src << "<span class = 'red'>You can't even move yourself - you have no limbs!</span>"
+		to_chat(src, "<span class = 'red'>You can't even move yourself - you have no limbs!</span>")
 		return FALSE
 	if (scrambling)
 		return FALSE
@@ -467,7 +458,7 @@
 	if (stat || buckled || paralysis || stunned || sleeping || (status_flags & FAKEDEATH) || restrained() || (weakened > 10))
 		return FALSE
 	if (!has_limbs)
-		src << "<span class = 'red'>You can't even move yourself - you have no limbs!</span>"
+		to_chat(src, "<span class = 'red'>You can't even move yourself - you have no limbs!</span>")
 		return FALSE
 	if (scrambling)
 		return FALSE
@@ -488,15 +479,7 @@
 	scrambling = FALSE
 
 /atom/proc/middle_click_intent_check(var/mob/M)
-	if (map && map.ID == MAP_FOOTBALL)
-		if (ishuman(M))
-			var/mob/living/human/H = M
-			if (H.football)
-				H.football.owner = null
-				H.football.last_owner = H
-				H.football = null
-		jump_act(src, M)
-	if (map && map.ID == MAP_FOOTBALL_CMP)
+	if (map && istype(map, /obj/map_metadata/football))
 		if (ishuman(M))
 			var/mob/living/human/H = M
 			if (H.football)

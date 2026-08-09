@@ -7,11 +7,11 @@
 //   logged errors. Only one instance of this datum should ever exist, and it's
 //   right here:
 
-#ifdef DEBUG
+#ifdef USE_CUSTOM_ERROR_HANDLER
 GLOBAL_DATUM_INIT(error_cache, /datum/error_viewer/error_cache, new)
 #else
-// If debugging is disabled, there's nothing useful to log, so don't bother.
-GLOBAL_DATUM(error_cache, /datum/error_viewer/error_cache)
+// If the custom error handler is disabled, still initialize the datum so callers don't get null.
+GLOBAL_DATUM_INIT(error_cache, /datum/error_viewer/error_cache, new)
 #endif
 
 // - error_source datums exist for each line (of code) that generates an error,
@@ -88,7 +88,6 @@ GLOBAL_DATUM(error_cache, /datum/error_viewer/error_cache)
 /datum/error_viewer/error_cache
 	var/list/errors = list()
 	var/list/error_sources = list()
-	var/list/errors_silenced = list()
 
 /datum/error_viewer/error_cache/show_to(user, datum/error_viewer/back_to, linear)
 	var/html = build_header()
@@ -155,7 +154,6 @@ GLOBAL_DATUM(error_cache, /datum/error_viewer/error_cache)
 
 /datum/error_viewer/error_entry
 	var/datum/error_viewer/error_source/error_source
-	var/exception/exc
 	var/desc = ""
 	var/usr_ref
 	var/turf/usr_loc
@@ -175,8 +173,7 @@ GLOBAL_DATUM(error_cache, /datum/error_viewer/error_cache)
 		return
 
 	name = "<b>\[[time_stamp()]]</b> Runtime in <b>[e.file]</b>, line <b>[e.line]</b>: <b>[rhtml_encode(e.name)]</b>"
-	exc = e
-	
+
 	info_name = "Runtime in [e.file],[e.line]: [e]"
 	info = info_name
 

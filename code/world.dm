@@ -17,6 +17,8 @@ var/global/list/whitelist_list = list()
 var/global/list/faction_list_blue = list()
 var/global/list/faction_list_red = list()
 var/global/list/faction_list_organizer = list()
+var/global/disable_campaign_whitelist = FALSE
+var/global/list/player_faction_list = list()
 var/global/list/craftlist_lists = list("global" = list())
 var/global/list/dictionary_list = list()
 
@@ -37,6 +39,7 @@ var/global/list/dictionary_list = list()
 	qdel(src) //we're done
 
 /datum/global_init/Destroy()
+	..()
 	return TRUE
 
 /var/game_id = null
@@ -67,19 +70,10 @@ var/world_is_open = TRUE
 	view = 7
 	cache_lifespan = FALSE	//stops player uploaded stuff from being kept in the rsc past the current session
 
-#define RECOMMENDED_VERSION 514
+#define RECOMMENDED_VERSION 516
 /world/New()
-#ifdef USE_BYOND_TRACY
-	#warn USE_BYOND_TRACY is enabled
-	init_byond_tracy()
-#endif
-#ifdef USE_EXTOOLS
-	var/extools = world.GetConfig("env", "EXTOOLS_DLL") || (world.system_type == MS_WINDOWS ? "./byond-extools.dll" : "./libbyond-extools.so")
-	if(fexists(extools))
-		LIBCALL(extools, "maptick_initialize")()
-#endif
 
-	if (map && istype(map,/obj/map_metadata/nomads_persistence_beta))
+	if (map && istype(map,/obj/map_metadata/nomads/persistence_beta))
 		loop_checks = FALSE
 	config.post_load()
 
@@ -94,16 +88,21 @@ var/world_is_open = TRUE
 //	load_mods()
 	//end-emergency fix
 
+	lobby_titlecard = new /datum/titlecard()
+	lobby_titlecard.set_pregame_html()
+	
 	update_status()
 
 	..()
 
 	// This is kinda important. Set up details of what the hell things are made of.
 	populate_material_list()
+	// Build the shared research-tree node registry (faction-agnostic).
+	build_research_tree()
 	processScheduler = new
 
 	spawn(1)
-		processScheduler.deferSetupfor (/process/ticker)
+		processScheduler.deferSetupFor (/process/ticker)
 		processScheduler.setup()
 		setup_everything()
 //		master_controller.setup()
@@ -226,81 +225,6 @@ var/world_topic_spam_protect_time = world.timeofday
 	handler = new handler()
 	return handler.TryRun(input)
 
-/*
-// Old code
-/world/Topic(T, addr, master, key)
-	diary << "TOPIC: \"[T]\", from:[addr], master:[master], key:[key][log_end]"
-
-	// normal ss13 stuff
-
-	if (T == "ping")
-		return clients.len + 1
-
-	else if (T == "players")
-		return clients.len
-
-	else if (copytext(T,1,7) == "status")
-		var/input[] = params2list(T)
-		var/list/s = list()
-		s["version"] = game_version
-		s["respawn"] = GLOB.abandon_allowed
-		s["enter"] = GLOB.enter_allowed
-		s["vote"] = config.allow_vote_mode
-		s["host"] = host ? host : null
-
-		// This is dumb, but spacestation13.com's banners break if player count isn't the 8th field of the reply, so... this has to go here.
-		s["players"] = 0
-		s["game_id"] = game_id
-		s["stationtime"] = stationtime2text()
-		s["roundduration"] = roundduration2text()
-		s["rounddurationinsecond"] = round((round_start_time ? world.time - round_start_time : FALSE) * 10)
-		s["rounddurationinticks"] = (round_start_time ? world.time - round_start_time : FALSE)
-
-		s["map"] = "unknown"
-		s["age"] = "unknown"
-		s["stationname"] = config.server_name
-
-		if (input["status"] == "2")
-			var/list/players = list()
-			var/list/admins = list()
-
-			for (var/client/C in clients)
-				if (C.holder)
-					if (C.holder.fakekey)
-						continue
-					admins[C.key] = C.holder.rank
-				players += C.key
-
-			s["players"] = players.len
-			s["playerlist"] = list2params(players)
-			s["admins"] = admins.len
-			s["adminlist"] = list2params(admins)
-			if (map)
-				s["map"] = map.title
-				s["age"] = map.age
-				s["gamemode"] = map.gamemode
-			s["season"] = season
-		else
-			var/n = FALSE
-			var/admins = FALSE
-
-			for (var/client/C in clients)
-				if (C.holder)
-					if (C.holder.fakekey)
-						continue	//so stealthmins aren't revealed by the hub
-					admins++
-				s["player[n]"] = C.key
-				n++
-
-			s["players"] = n
-			s["admins"] = admins
-			if (map)
-				s["map"] = map.title
-				s["age"] = map.age
-				s["gamemode"] = map.gamemode
-			s["season"] = season
-		return list2params(s)
-*/
 
 /world/Reboot(var/reason)
 
@@ -379,7 +303,7 @@ var/world_topic_spam_protect_time = world.timeofday
 	. += "world.address=[world.address]"
 	. += ";"
 	. += "round_timer=[roundduration2text()]"
-	. += ";" 
+	. += ";"
 	if (map)
 		. += "map=[map.title]"
 		. += ";"
@@ -389,6 +313,9 @@ var/world_topic_spam_protect_time = world.timeofday
 		. += ";"
 	. += "ckey_list=[list2params(clients)]"
 	. += ";"
+	. += "allow_vote_restart=[config.allow_vote_restart?"1":"0"]"
+	. += ";"
+
 
 /proc/start_serverdata_loop()
 	spawn while (1)
@@ -399,6 +326,7 @@ var/world_topic_spam_protect_time = world.timeofday
 		sleep (100)
 
 var/global/nextsave = 0
+var/global/persistence_reboot_scheduled = FALSE
 /proc/start_persistence_loop()
 	if (! config.skip_persistence_saving)
 		spawn(300)
@@ -412,7 +340,34 @@ var/global/nextsave = 0
 					nextsave = world.realtime + 216000
 					spawn(0)
 						ticker.savemap()
+				// BYOND never returns freed memory to the OS, so a world that runs for days
+				// eventually hits the process memory ceiling and crashes. Once a day, save the
+				// map and reboot; setup_everything() restores the save on startup.
+				// The world.time check keeps a freshly restarted server from rebooting again
+				// within the same clock hour.
+				if (config.persistence_reboot_hour >= 0 && !persistence_reboot_scheduled)
+					if (text2num(time2text(world.realtime,"hh")) == config.persistence_reboot_hour && world.time > 36000)
+						persistence_reboot_scheduled = TRUE
+						spawn(0)
+							persistence_maintenance_reboot()
 			start_persistence_loop()
+
+/proc/persistence_maintenance_reboot()
+	to_chat(world, "<font color='yellow' size=4><b>Attention - The server will save the world and restart for scheduled maintenance in 5 minutes.</b></font>")
+	sleep(2400)
+	to_chat(world, "<font color='yellow' size=4><b>Attention - Saving and restarting in 1 minute. The world will resume from this save after the restart.</b></font>")
+	sleep(600)
+	nextsave = world.realtime + 216000 // suppress the periodic save around the reboot
+	if (ticker && ticker.savemap() && fexists("map_saves/save_complete.txt"))
+		to_chat(world, "<font color='yellow' size=4><b>Save complete. Rebooting - you can reconnect in a minute or two.</b></font>")
+		sleep(100)
+		world.Reboot("Scheduled persistence maintenance reboot.")
+	else
+		// Deliberately NOT clearing persistence_reboot_scheduled: the loop
+		// re-checks every 30s, so clearing it would re-announce "restarting in
+		// 5 minutes" and re-attempt a full save for the rest of the hour. The
+		// flag resets on the next successful reboot; until then admins decide.
+		message_admins("Scheduled maintenance reboot aborted: the map save did not complete. The server keeps running, but memory will not be reclaimed until it is manually saved and rebooted.")
 
 /proc/start_messaging_loop()
 	spawn while (1)
@@ -422,12 +377,12 @@ var/global/nextsave = 0
 			for(var/msg in messages_read)
 				var/list/tempmsg = splittext(msg, ":::")
 				if (tempmsg.len == 2)
-					var/dmsg =  "<IMG src='\ref[text_tag_icons.icon]' class='text_tag' iconstate='discord' alt='Discord'><b><font color='#31A8DE'>[tempmsg[1]]: [tempmsg[2]]</font></b>"
+					var/dmsg =  "<IMG src='\ref[text_tag_icons]' class='text_tag' iconstate='discord' alt='Discord'><b><font color='#31A8DE'>[tempmsg[1]]: [tempmsg[2]]</font></b>"
 					to_chat(world, dmsg)
 					log_discord(dmsg)
 					//to_chat(world, "<span class = 'ping'><small>["\["]DISCORD["\]"]</small></span> <span class='deadsay'><b>[tempmsg[1]]</b>:</span> [tempmsg[2]]")
 			fdel(F)
-			F << ""
+			to_chat(F, "")
 
 		var/G = file("SQL/discord2admin.txt")
 		if (fexists(G))
@@ -438,10 +393,10 @@ var/global/nextsave = 0
 
 					for (var/client/C in admins)
 						if (R_MENTOR & C.holder.rights || R_MOD & C.holder.rights)
-							C << "<span class='admin_channel'><IMG src='\ref[text_tag_icons.icon]' class='text_tag' iconstate='a-discord' alt='ASAY-Discord'> <span class='name'>[tempmsg[1]]</span>(Discord): <span class='message'>[tempmsg[2]]</span></span>"
+							to_chat(C, "<span class='admin_channel'><IMG src='\ref[text_tag_icons]' class='text_tag' iconstate='a-discord' alt='ASAY-Discord'> <span class='name'>[tempmsg[1]]</span>(Discord): <span class='message'>[tempmsg[2]]</span></span>")
 					log_discord_asay(msg)
 			fdel(G)
-			G << ""
+			to_chat(G, "")
 
 		var/H = file("SQL/discord2dm.txt")
 		if (fexists(H))
@@ -456,7 +411,7 @@ var/global/nextsave = 0
 						if (C.ckey == temp_ckey)
 							cmd_admin_pm_fromdiscord(C, tempmsg[3], tempmsg[1])
 			fdel(H)
-			H << ""
+			to_chat(H, "")
 
 		var/I = file("SQL/discord2ban.txt")
 		if (fexists(I))
@@ -471,7 +426,7 @@ var/global/nextsave = 0
 					if (quickBan_discord(temp_ckey, tempmsg[3], tempmsg[4], tempmsg[1]) == "successful.")
 						discord_admin_ban(tempmsg[1],temp_ckey,tempmsg[3],tempmsg[4])
 			fdel(I)
-			I << ""
+			to_chat(I, "")
 		var/J = file("SQL/discord2unban.txt")
 		if (fexists(J))
 			var/list/messages_read = splittext(file2text(J), "\n")
@@ -483,7 +438,7 @@ var/global/nextsave = 0
 					temp_ckey = replacetext(temp_ckey,"_", "")
 					discord_admin_unban(tempmsg[1],temp_ckey)
 			fdel(J)
-			J << ""
+			to_chat(J, "")
 		sleep (100)
 
 /proc/start_serverswap_loop()
@@ -529,17 +484,3 @@ var/global/nextsave = 0
 
 	fps = new_value
 	on_tickrate_change()
-
-/world/proc/init_byond_tracy()
-	var/library
-
-	switch (system_type)
-		if (MS_WINDOWS)
-			library = "prof.dll"
-		if (UNIX)
-			library = "libprof.so"
-		else
-			CRASH("Unsupported platform: [system_type]")
-	var/init_result = LIBCALL(library, "init")()
-	if (init_result != "0")
-		CRASH("Error initializing byond-tracy: [init_result]")

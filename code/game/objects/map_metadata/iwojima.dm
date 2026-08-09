@@ -1,7 +1,7 @@
 /obj/map_metadata/iwojima
 	ID = MAP_IWO_JIMA
 	title = "Iwo Jima"
-	lobby_icon = 'icons/lobby/ww2.png'
+	lobby_icon = "icons/lobby/ww2.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall/)
 	respawn_delay = 1200
 	no_hardcore = TRUE
@@ -24,18 +24,9 @@
 	grace_wall_timer = 4800
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET)
 	songs = list(
-		"Over There!:1" = 'sound/music/overthere.ogg',
-		"I Hate These Classes:2" = 'sound/music/i_hate_these_classes.ogg',)
+		"Over There!:1" = "sound/music/overthere.ogg",
+		"I Hate These Classes:2" = "sound/music/i_hate_these_classes.ogg",)
 	gamemode = "Siege"
-/obj/map_metadata/iwojima/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_ww2 == TRUE || J.is_navy == TRUE)
-		. = TRUE
-	else if (J.is_tanker == TRUE || J.is_prison == TRUE || J.is_yakuza || istype(J, /datum/job/japanese/ija_sergeant_tanker) || istype(J, /datum/job/japanese/ija_ww2_tanker) || istype(J, /datum/job/american/soldier_ww2_filipino) || J.is_samurai == TRUE)
-		. = FALSE
-	else
-		. = FALSE
-
 /obj/map_metadata/iwojima/roundend_condition_def2name(define)
 	..()
 	switch (define)
@@ -86,14 +77,14 @@ var/no_loop_iwo = FALSE
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The <b>Japanese</b> have successfuly defended the Island! The Americans have halted the attack!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_iwo == FALSE)
 		ticker.finished = TRUE
 		var/message = "The <b>Americans</b> have captured the Japanese Command! The battle for Iwo Jima is over!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_iwo = TRUE
@@ -136,7 +127,7 @@ var/no_loop_iwo = FALSE
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The <b>Japanese</b> have recaptured the Mountain!</font>"
+			to_chat(world, "<font size = 3>The <b>Japanese</b> have recaptured the Mountain!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1

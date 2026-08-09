@@ -1,7 +1,8 @@
 /obj/map_metadata/zhenbao
 	ID = MAP_ZHENBAO
 	title = "Sino-Soviet Border Conflict"
-	lobby_icon = 'icons/lobby/zhenbao.png'
+	description = "The Soviets will win if they hold out for 45 minutes. The Chinese will win if they manage to reach the Radio Station and hold it."
+	lobby_icon = "icons/lobby/zhenbao.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall/taiga,/area/caribbean/no_mans_land/invisible_wall/taiga/two,/area/caribbean/no_mans_land/invisible_wall/taiga/one)
 	respawn_delay = 1200
 	no_winner ="The Radio Station stays under Soviet control."
@@ -27,15 +28,8 @@
 	grace_wall_timer = 4800
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET)
 	songs = list(
-		"Song of Zhenbao Island - Sino-Soviet War Song:1" = 'sound/music/zhenbao.ogg',)
+		"Song of Zhenbao Island - Sino-Soviet War Song:1" = "sound/music/zhenbao.ogg",)
 	gamemode = "Siege"
-
-/obj/map_metadata/zhenbao/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_sinosovbor == TRUE)
-		. = TRUE
-	else
-		. = FALSE
 
 /obj/map_metadata/zhenbao/roundend_condition_def2name(define)
 	..()
@@ -84,14 +78,14 @@
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The <b>Soviets</b> Have successfully defended the Radio Station! The Chinese offensive was halted!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_r == FALSE)
 		ticker.finished = TRUE
 		var/message = "The <b>Chinese</b> have captured the Radio Station! The Soviet troops retreat from the border!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_r = TRUE
@@ -134,7 +128,7 @@
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The <b>Soviets</b> have recaptured the Radio Station!</font>"
+			to_chat(world, "<font size = 3>The <b>Soviets</b> have recaptured the Radio Station!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1
@@ -156,5 +150,4 @@
 				return TRUE
 		else
 			return !faction1_can_cross_blocks()
-			return !faction2_can_cross_blocks()
 	return FALSE

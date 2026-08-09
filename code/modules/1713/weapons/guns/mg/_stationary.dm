@@ -34,7 +34,6 @@
 	var/can_turn = TRUE // Used for fixed coaxial MGs (like the Breda 30)
 	var/hardness = 10 // How easy bullets can penetrate it
 
-	var/maximum_use_range = 0 // user loc at minigun's current loc (used in use_object.dm)
 	var/user_old_x = 0
 	var/user_old_y = 0
 
@@ -45,8 +44,6 @@
 
 	gun_type = GUN_TYPE_MG
 
-	accuracy_increase_mod = 1.00
-	accuracy_decrease_mod = 1.1
 	KD_chance = KD_CHANCE_HIGH
 
 /obj/item/weapon/gun/projectile/automatic/stationary/Destroy()
@@ -54,7 +51,7 @@
 		stopped_using(used_by_mob, FALSE)
 	..()
 
-/obj/item/weapon/gun/projectile/automatic/stationary/Fire(atom/A, mob/user)
+/obj/item/weapon/gun/projectile/automatic/stationary/Fire(atom/A, mob/user, clickparams = null, pointblank = FALSE, reflex = FALSE, forceburst = -1, force = FALSE, accuracy_mod = 1)
 	if(A == src)
 		if(firemodes.len > 1)
 			var/datum/firemode/new_mode = switch_firemodes(user)

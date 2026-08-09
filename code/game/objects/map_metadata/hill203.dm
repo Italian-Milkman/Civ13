@@ -1,7 +1,8 @@
 /obj/map_metadata/hill203
 	ID = MAP_HILL_203
 	title = "Hill 203"
-	lobby_icon = 'icons/lobby/ww1.png'
+	description = "The Imperial Japanese Army and the Russian Army are battling for the control of Hill 203! Each side will win if they manage to hold the hilltop for 6 minutes."
+	lobby_icon = "icons/lobby/ww1.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/one,/area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 0
 	can_spawn_on_base_capture = TRUE
@@ -22,28 +23,13 @@
 	faction2 = RUSSIAN
 	ordinal_age = 5
 	songs = list(
-		"Argonnerwaldlied:1" = 'sound/music/argonnerwaldlied.ogg')
+		"Argonnerwaldlied:1" = "sound/music/argonnerwaldlied.ogg")
 	gamemode = "King of the Hill"
 /obj/map_metadata/hill203/faction2_can_cross_blocks()
 	return (processes.ticker.playtime_elapsed >= 3600 || admin_ended_all_grace_periods)
 
 /obj/map_metadata/hill203/faction1_can_cross_blocks()
 	return (processes.ticker.playtime_elapsed >= 3600 || admin_ended_all_grace_periods)
-
-/obj/map_metadata/hill203/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (istype(J, /datum/job/japanese))
-		if (J.is_russojapwar)
-			. = TRUE
-		else
-			. = FALSE
-	else if (istype(J, /datum/job/russian))
-		if (J.is_russojapwar)
-			. = TRUE
-		else
-			. = FALSE
-	else
-		. = FALSE
 
 /obj/map_metadata/hill203/short_win_time(faction)
 	if (!(alive_n_of_side(faction1)) || !(alive_n_of_side(faction2)))
@@ -105,7 +91,7 @@
 		var/message = "The [battle_name ? battle_name : "battle"] has ended in a stalemate!"
 		if (current_winner && current_loser)
 			message = "The battle is over! The [current_winner] was victorious over the [current_loser][battle_name ? " in the [battle_name]" : ""]!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		win_condition_spam_check = TRUE
 		return FALSE
 	// German major
@@ -147,7 +133,7 @@
 
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The [current_winner] has lost control of the Hill!</font>"
+			to_chat(world, "<font size = 3>The [current_winner] has lost control of the Hill!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1

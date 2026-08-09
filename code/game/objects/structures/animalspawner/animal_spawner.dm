@@ -13,7 +13,6 @@
 	var/t_climate = null
 	var/aggroed = FALSE
 	var/empty = TRUE
-	var/max_pop = 10
 	var/procreate_holder = 27000 //45 minutes - TIMER TO PROCREATE
 	var/procreate_cooldown = FALSE
 	var/wanderer_holder = 18000 //30 minutes to roll the chance for the wanderer to go out
@@ -22,7 +21,7 @@
 /obj/structure/animalspawner/attackby(obj/W as obj, mob/user as mob)
 	if(istype(W,/obj/item/weapon/material/pickaxe) && empty)
 		if (do_after(user,65,src))
-			user << "<span class='notice'>You break apart \the [src].</span>"
+			to_chat(user, "<span class='notice'>You break apart \the [src].</span>")
 			new /obj/item/stack/material/stone(loc)
 			new /obj/item/stack/material/stone(loc)
 			new /obj/item/stack/material/stone(loc)

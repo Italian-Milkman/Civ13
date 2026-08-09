@@ -1,7 +1,8 @@
 /obj/map_metadata/omaha
 	ID = MAP_OMAHA
 	title = "Omaha Beach"
-	lobby_icon = 'icons/lobby/omaha.png'
+	description = "D-Day simulation: American forces must land on the beach and capture the German airfield hangar."
+	lobby_icon = "icons/lobby/omaha.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/one,/area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 1200
 	victory_time = 24000
@@ -24,20 +25,9 @@
 	faction1 = AMERICAN
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET)
 	songs = list(
-		"Over There!:1" = 'sound/music/overthere.ogg',)
+		"Over There!:1" = "sound/music/overthere.ogg",)
 	gamemode = "Siege"
 	grace_wall_timer = 4800
-/obj/map_metadata/omaha/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_tanker == TRUE || J.is_occupation == TRUE || J.is_reichstag == TRUE || J.is_ss_panzer == TRUE || J.is_navy == TRUE || istype(J, /datum/job/american/soldier_ww2_filipino || istype(J, /datum/job/german/german_antitank) || istype(J, /datum/job/german/german_antitankassitant)))
-		. = FALSE
-	else if (J.is_ww2 == TRUE && J.is_reichstag == FALSE)
-		. = TRUE
-	else if (istype(J, /datum/job/german/german_antitank) || istype(J, /datum/job/german/german_antitankassitant))
-		. = FALSE
-	else
-		. = FALSE
-
 /obj/map_metadata/omaha/roundend_condition_def2name(define)
 	..()
 	switch (define)
@@ -88,14 +78,14 @@ var/no_loop_o = FALSE
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The <b>Wehrmacht</b> has sucessfuly defended the Airfield! The Americans halted the attack!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_o == FALSE)
 		ticker.finished = TRUE
 		var/message = "The <b>Americans</b> have captured the Airfield! The battle for Omaha Beach is over!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_o = TRUE
@@ -138,7 +128,7 @@ var/no_loop_o = FALSE
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The <b>Germans</b> have recaptured the Airfield!</font>"
+			to_chat(world, "<font size = 3>The <b>Germans</b> have recaptured the Airfield!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1
@@ -173,13 +163,3 @@ var/no_loop_o = FALSE
 	mission_start_message = "<font size=4>All factions have <b>4 minutes</b> to prepare before the ceasefire ends!<br>The Germans will win if they hold out for <b>25 minutes</b>. The Americans will win if they manage to capture the <b>rear bunkers</b>.</font>"
 	grace_wall_timer = 2400
 
-/obj/map_metadata/omaha/micromaha/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_tanker == TRUE || J.is_occupation == TRUE || J.is_reichstag == TRUE || J.is_ss_panzer == TRUE || J.is_navy == TRUE || istype(J, /datum/job/american/soldier_ww2_filipino))
-		. = FALSE
-	else if (J.is_ww2 == TRUE && J.is_reichstag == FALSE)
-		. = TRUE
-	else if (istype(J, /datum/job/german/german_antitank) || istype(J, /datum/job/german/german_antitankassitant))
-		. = FALSE
-	else
-		. = FALSE

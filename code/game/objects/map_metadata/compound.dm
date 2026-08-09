@@ -2,7 +2,8 @@
 /obj/map_metadata/compound
 	ID = MAP_COMPOUND
 	title = "Compound"
-	lobby_icon = 'icons/lobby/vietnam.png'
+	description = "The Vietcong must defend the village from the Americans. The US Army must defend their base."
+	lobby_icon = "icons/lobby/vietnam.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/one,/area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 300
 	no_winner ="No base has been captured."
@@ -25,24 +26,10 @@
 	faction2 = VIETNAMESE
 	valid_weather_types = list(WEATHER_WET, WEATHER_NONE, WEATHER_EXTREME)
 	songs = list(
-		"Fortunate Son:1" = 'sound/music/fortunate_son.ogg',)
+		"Fortunate Son:1" = "sound/music/fortunate_son.ogg",)
 	artillery_count = 3
 	grace_wall_timer = 3000
 
-obj/map_metadata/compound/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (istype(J, /datum/job/vietnamese))
-		if (J.is_nva)
-			. = FALSE
-		else
-			. = TRUE
-	else if (istype(J, /datum/job/american))
-		if (J.is_coldwar && !J.is_specops && !J.is_modernday)
-			. = TRUE
-		else
-			. = FALSE
-	else
-		. = FALSE
 
 /obj/map_metadata/compound/cross_message(faction)
 	return "<font size = 4>All factions may cross the grace wall now!</font>"

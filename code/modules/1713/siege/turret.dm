@@ -85,10 +85,15 @@
 		point_x = ceil(i * cos(-actual_azimuth))
 		point_y = ceil(i * sin(-actual_azimuth))
 		if (point_x != 0 || point_y != 0)
-			aiming_line = new('icons/effects/Targeted.dmi', loc = src, icon_state="point", pixel_x = point_x, pixel_y = point_y, layer = 14)
+			aiming_line = new('icons/effects/Targeted.dmi', loc = src, icon_state="point", layer = 14)
 			aiming_line.alpha = 255 - (i / 4)
+			aiming_line.pixel_x = point_x
+			aiming_line.pixel_y = point_y
+
 			user.client.images += aiming_line
-	aiming_line = new('icons/effects/Targeted.dmi', loc = src, icon_state="cannon_target", pixel_x = point_x, pixel_y = point_y, layer = 14)
+	aiming_line = new('icons/effects/Targeted.dmi', loc = src, icon_state="cannon_target", layer = 14)
+	aiming_line.pixel_x = point_x
+	aiming_line.pixel_y = point_y
 	user.client.images += aiming_line
 
 /obj/structure/turret/update_icon()
@@ -183,13 +188,13 @@
 	if(selected_weapon > weapons.len)
 		selected_weapon = 1
 
-/obj/structure/turret/proc/icrease_target_azimuth(var/value)
+/obj/structure/turret/proc/increase_target_azimuth(var/value)
 	azimuth_to_target += value
 	if(stopped_rotation_time != 0 && world.time - stopped_rotation_time > 0.1)
 		stopped_rotation_time = 0
 		rotate_to_target()
 
-/obj/structure/turret/proc/icrease_target_distance(var/value)
+/obj/structure/turret/proc/increase_target_distance(var/value)
 	distance += value
 	if(distance < 5)
 		distance = 5
@@ -213,7 +218,7 @@
 
 /obj/structure/turret/proc/rotate_to_target()
 	if(azimuth_to_target)
-		var/delta_azimuth = sign(azimuth_to_target)
+		var/delta_azimuth = ((azimuth_to_target) ? ((azimuth_to_target) < 0 ? -1 : 1) : 0)
 		azimuth += delta_azimuth
 		clamp_azimuth(azimuth)
 		azimuth_to_target -= delta_azimuth
@@ -538,7 +543,7 @@
 
 /obj/structure/turret/course/rotate_to_target()
 	if(azimuth_to_target)
-		var/delta_azimuth = sign(azimuth_to_target)
+		var/delta_azimuth = ((azimuth_to_target) ? ((azimuth_to_target) < 0 ? -1 : 1) : 0)
 		azimuth += delta_azimuth
 		clamp_azimuth(azimuth)
 		azimuth_to_target -= delta_azimuth
@@ -966,7 +971,7 @@
 
 /obj/structure/turret/pzvi
 	turret_color = "#585A5C"
-	turret_icon = "pziv_turret"
+	turret_icon = "tiger_tank"
 	name = "PZ-VI"
 
 	turret_x = 0

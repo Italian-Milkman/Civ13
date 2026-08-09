@@ -96,8 +96,6 @@
 			damage = 0
 	H.damage_armor(def_zone, (P.damage - damage) * 0.01)
 	if (ishuman(src))
-		if (H.takes_less_damage)
-			damage /= H.getStatCoeff("strength")
 		var/instadeath = 0
 		if (def_zone == "eyes")
 			instadeath = 10
@@ -381,7 +379,6 @@ var/obj/human_fire_overlay_lying = null
 	return max(2.25*round(FIRESUIT_MAX_HEAT_PROTECTION_TEMPERATURE*(fire_stacks/FIRE_MAX_FIRESUIT_STACKS)**2), 700)
 
 /mob/living/proc/reagent_permeability()
-	return TRUE
 	return round(FIRESUIT_MAX_HEAT_PROTECTION_TEMPERATURE*(fire_stacks/FIRE_MAX_FIRESUIT_STACKS)**2)
 
 /mob/living/proc/handle_actions()

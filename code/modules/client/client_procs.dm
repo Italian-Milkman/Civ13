@@ -51,7 +51,7 @@
 		if (UID)
 			var/confirm = input("Are you sure you want to remove the ban with the UID '[UID]' ?") in list("Yes", "No")
 			if (confirm == "Yes")
-				var/client/caller = locate(href_list["caller"])
+				var/client/callers = locate(href_list["caller"])
 				var/ckey = href_list["quickBan_removeBan_ckey"]
 				var/cID = href_list["quickBan_removeBan_cID"]
 				var/ip = href_list["quickBan_removeBan_ip"]
@@ -71,11 +71,16 @@
 								fdel(bans_file)
 								for(var/L in details_lines)
 									text2file("[L]|||", bans_file)
-					log_admin("[key_name(caller)] removed a ban for '[UID]/[ckey]/[cID]/[ip]'.")
-					message_admins("[key_name(caller)] removed a ban for '[UID]/[ckey]/[cID]/[ip]'.", key_name(caller))
+					log_admin("[key_name(callers)] removed a ban for '[UID]/[ckey]/[cID]/[ip]'.")
+					message_admins("[key_name(callers)] removed a ban for '[UID]/[ckey]/[cID]/[ip]'.", key_name(callers))
 					for (var/client/C in clients)
 						if (C.ckey == ckey)
-							C << "<span class = 'good'>href_list["Your ban has been lifted."]</span>"
+							to_chat(C, "<span class = 'good'>href_list["Your ban has been lifted."]</span>")
+	if (href_list["chat_ready"])
+		if (chat)
+			chat.on_ready()
+		return
+
 	//Logs all hrefs
 	if (config && config.log_hrefs && href_logfile)
 		href_logfile << "<small>[time2text(world.timeofday,"hh:mm")] [src] (usr:[usr])</small> || [hsrc ? "[hsrc] " : ""][href]<br>"
@@ -92,11 +97,11 @@
 	if (config.automute_on && !holder && last_message == message)
 		last_message_count++
 		if (last_message_count >= SPAM_TRIGGER_AUTOMUTE)
-			src << "<span class = 'red'>You have exceeded the spam filter limit for identical messages. An auto-mute was applied.</span>"
+			to_chat(src, "<span class = 'red'>You have exceeded the spam filter limit for identical messages. An auto-mute was applied.</span>")
 			cmd_admin_mute(mob, mute_type, TRUE)
 			return TRUE
 		if (last_message_count >= SPAM_TRIGGER_WARNING)
-			src << "<span class = 'red'>You are nearing the spam filter limit for identical messages.</span>"
+			to_chat(src, "<span class = 'red'>You are nearing the spam filter limit for identical messages.</span>")
 			return FALSE
 	else
 		last_message = message
@@ -106,13 +111,13 @@
 //This stops files larger than UPLOAD_LIMIT being sent from client to server via input(), client.Import() etc.
 /client/AllowUpload(filename, filelength)
 	if (filelength > UPLOAD_LIMIT)
-		src << "<font color='red'>Error: AllowUpload(): File Upload too large. Upload Limit: [UPLOAD_LIMIT/1024]KiB.</font>"
+		to_chat(src, "<font color='red'>Error: AllowUpload(): File Upload too large. Upload Limit: [UPLOAD_LIMIT/1024]KiB.</font>")
 		return FALSE
 /*	//Don't need this at the moment. But it's here if it's needed later.
 	//Helps prevent multiple files being uploaded at once. Or right after eachother.
 	var/time_to_wait = fileaccess_timer - world.time
 	if (time_to_wait > 0)
-		src << "<font color='red'>Error: AllowUpload(): Spam prevention. Please wait [round(time_to_wait/10)] seconds.</font>"
+		to_chat(src, "<font color='red'>Error: AllowUpload(): Spam prevention. Please wait [round(time_to_wait/10)] seconds.</font>")
 		return FALSE
 	fileaccess_timer = world.time + FTPDELAY	*/
 	return TRUE
@@ -166,7 +171,7 @@
 		return FALSE
 
 	if (byond_version < REAL_MIN_CLIENT_VERSION)		//Out of date client.
-		src << "<span class = 'danger'><font size = 4>Please upgrade to BYOND [REAL_MIN_CLIENT_VERSION] to play.</font></span>"
+		to_chat(src, "<span class = 'danger'><font size = 4>Please upgrade to BYOND [REAL_MIN_CLIENT_VERSION] to play.</font></span>")
 		del(src)
 		return FALSE
 
@@ -195,7 +200,7 @@
 
 	if (clients.len >= PLAYERCAP)
 		if (!holder)
-			src << "<span class = 'danger'><font size = 4>The server is full right now, sorry.</font></span>"
+			to_chat(src, "<span class = 'danger'><font size = 4>The server is full right now, sorry.</font></span>")
 			del(src)
 			return
 
@@ -213,23 +218,21 @@
 	if (!holder)
 
 		if (!world_is_open)
-			src << "<span class = 'userdanger'>The server is currently closed to non-admins.</span>"
+			to_chat(src, "<span class = 'userdanger'>The server is currently closed to non-admins.</span>")
 			message_admins("[src] tried to log in, but was rejected, the server is closed to non-admins.", src)
 			del(src)
 			return
 
 
 	if (custom_event_msg && custom_event_msg != "")
-		src << "<h1 class='alert'>Custom Event</h1>"
-		src << "<h2 class='alert'>A custom event is taking place. OOC Info:</h2>"
-		src << "<span class='alert'>[custom_event_msg]</span>"
-		src << "<br>"
+		to_chat(src, "<h1 class='alert'>Custom Event</h1>")
+		to_chat(src, "<h2 class='alert'>A custom event is taking place. OOC Info:</h2>")
+		to_chat(src, "<span class='alert'>[custom_event_msg]</span>")
+		to_chat(src, "<br>")
 
 	if (holder)
 		add_admin_verbs()
 		admin_memo_show()
-
-	verbs += /client/proc/hide_status_tabs
 
 	// Forcibly enable hardware-accelerated graphics, as we need them for the lighting overlays.
 	// (but turn them off first, since sometimes BYOND doesn't turn them on properly otherwise)
@@ -243,12 +246,18 @@
 
 	fix_nanoUI()
 
+	chat = new(src)
+	chat.load()
+	
+	init_statpanel()
+	winset(src, "mainwindow", "macro=macro")
+
 	spawn (1)
 		log_to_db()
 
 	spawn (1)
 		if (!istype(mob, /mob/new_player))
-			src << browse(null, "window=playersetup;")
+			usr << browse(null, "window=playersetup;")
 
 		if (istype(mob, /mob/living/human))
 			human_clients_mob_list |= mob
@@ -275,11 +284,17 @@
 /client/proc/UpdateMouseScreenLoc(var/params)
 	var/list/click_params = params2list(params)
 
-	mouse_screen_x = text2num(splittext(splittext(click_params["screen-loc"], ",")[1], ":")[1])
-	mouse_screen_y = text2num(splittext(splittext(click_params["screen-loc"], ",")[2], ":")[1])
-
-	mouse_screen_pixel_x = text2num(splittext(splittext(click_params["screen-loc"], ",")[1], ":")[2])
-	mouse_screen_pixel_y = text2num(splittext(splittext(click_params["screen-loc"], ",")[2], ":")[2])
+	if (click_params["screen-loc"])
+		var/list/screen_loc_split = splittext(click_params["screen-loc"], ",")
+		if (length(screen_loc_split) >= 2)
+			var/list/x_split = splittext(screen_loc_split[1], ":")
+			var/list/y_split = splittext(screen_loc_split[2], ":")
+			if (length(x_split) >= 2)
+				mouse_screen_x = text2num(x_split[1])
+				mouse_screen_pixel_x = text2num(x_split[2])
+			if (length(y_split) >= 2)
+				mouse_screen_y = text2num(y_split[1])
+				mouse_screen_pixel_y = text2num(y_split[2])
 
 /client/MouseMove(object, location, control, params)
 	UpdateMouseScreenLoc(params)
@@ -381,6 +396,8 @@
 	getFiles(
 		'UI/images/uos94.png',
 		'UI/images/uos.png',
+		'UI/images/civ13.png',
+		'UI/images/favicon.ico',
 		'UI/templates/appearance_changer.tmpl',
 		'UI/templates/chem_disp.tmpl',
 		'UI/templates/layout_basic.tmpl',
@@ -407,7 +424,7 @@
 	return FALSE
 
 /client/verb/character_setup()
-	set name = "Character & Preferences Setup"
+	set name = "Character Preferences Setup"
 	set category = "OOC"
 	if (prefs)
 		prefs.ShowChoices(usr)
@@ -429,47 +446,11 @@
 	return is_active_non_observer
 
 /client/Stat()
-	..()
-	sleep(10)
-/*
-// Clients aren't datums so we have to define these procs indpendently.
-// These verbs are called for all key press and release events
-/client/verb/keyDown(_key as text)
-	set instant = TRUE
-	set hidden = TRUE
-
-	//Sanity check, nothing valid in game generates keypress "keys" this long
-	//Means it's some kind of bullshit going on, so get rid of them.
-	if(length(_key) > 50)
-		log_admin("Client [ckey] just attempted to send an invalid keypress, and was autokicked.")
-		message_admins("Client [ckey] just attempted to send an invalid keypress, and was autokicked.", ckey)
-		QDEL_IN(src, 1)
+	if (world.time < statpanel_next_update)
 		return
+	..()
+	update_statpanel()
 
-	client_keysend_amount += 1
-
-	var/cache = client_keysend_amount
-
-	if(keysend_tripped && next_keysend_trip_reset <= world.time)
-		keysend_tripped = FALSE
-
-	if(next_keysend_reset <= world.time)
-		client_keysend_amount = 0
-		next_keysend_reset = world.time + (1 SECONDS)
-
-	//The "tripped" system is to confirm that flooding is still happening after one spike
-	//not entirely sure how byond commands interact in relation to lag
-	//don't want to kick people if a lag spike results in a huge flood of commands being sent
-	if(cache >= 50)
-		if(!keysend_tripped)
-			keysend_tripped = TRUE
-			next_keysend_trip_reset = world.time + (2 SECONDS)
-		else
-			log_admin("Client [ckey] was just autokicked for flooding keysends; likely abuse but potentially lagspike.")
-			message_admins("Client [ckey] was just autokicked for flooding keysends; likely abuse but potentially lagspike.", ckey)
-			QDEL_IN(src, 1)
-			return
-*/
 
 /client/verb/fit_viewport()
 	set name = "Fit Viewport"
@@ -482,14 +463,18 @@
 
 	// Calculate desired pixel width using window size and aspect ratio
 	var/sizes = params2list(winget(src, "mainwindow.mainvsplit;mapwindow", "size"))
-	var/map_size = splittext(sizes["mapwindow.size"], "x")
+	var/list/map_size = splittext(sizes["mapwindow.size"], "x")
+	if (length(map_size) < 2)
+		return
 	var/height = text2num(map_size[2])
 	var/desired_width = round(height * aspect_ratio)
 	if (text2num(map_size[1]) == desired_width)
 		// Nothing to do
 		return
 
-	var/split_size = splittext(sizes["mainwindow.mainvsplit.size"], "x")
+	var/list/split_size = splittext(sizes["mainwindow.mainvsplit.size"], "x")
+	if (!length(split_size))
+		return
 	var/split_width = text2num(split_size[1])
 
 	// Calculate and apply a best estimate

@@ -18,7 +18,6 @@
 	
 	var/const/damage_threshold_count = 10
 	var/damage_threshold_value = 10
-	var/healed_threshold = 1
 	var/oxygen_reserve = 90 //number of processes that the brain can hold with low blood pressure 1 process = 2 secs, according to current obj process
 	var/defib_timer = -1
 
@@ -39,7 +38,7 @@
 
 /obj/item/organ/brain/examine(mob/user) // -- TLE
 	..(user)
-	user << "This one seems particularly lifeless. Perhaps it will regain some of its luster later.."
+	to_chat(user, "This one seems particularly lifeless. Perhaps it will regain some of its luster later..")
 
 /obj/item/organ/brain/removed(var/mob/living/user)
 
@@ -80,7 +79,6 @@
 
 /obj/item/organ/brain/proc/handle_severe_brain_damage()
 	set waitfor = FALSE
-	healed_threshold = 0
 	to_chat(owner, "<span class = 'notice' font size='10'><B>Where am I...?</B></span>")
 	sleep(5 SECONDS)
 	if(!owner)

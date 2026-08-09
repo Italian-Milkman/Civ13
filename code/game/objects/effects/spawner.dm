@@ -461,6 +461,14 @@
 	create_path = /mob/living/simple_animal/frog
 	timer = 4800
 
+/obj/effect/spawner/mobspawner/pigeon
+	name = "pigeon spawner"
+	hostile = FALSE
+	max_number = 4
+	max_range = 12
+	create_path = /mob/living/simple_animal/pigeon
+	timer = 4800
+
 /obj/effect/spawner/mobspawner/mouse
 	name = "mouse spawner"
 	max_number = 2
@@ -823,6 +831,80 @@
 			emptyTurfs += T
 	if (emptyTurfs.len)
 		return pick(emptyTurfs)
+
+/obj/effect/spawner/mobspawner/wendigo
+	name = "wendigo spawner"
+	hostile = TRUE
+	max_number = 1
+	max_range = 15
+	create_path = /mob/living/simple_animal/hostile/wendigo
+	timer = 6000
+
+/obj/effect/spawner/mobspawner/lightseeker
+	name = "lightseeker spawner"
+	hostile = TRUE
+	max_number = 3
+	max_range = 10
+	create_path = /mob/living/simple_animal/hostile/lightseeker
+	timer = 1500
+
+/obj/effect/spawner/mobspawner/alien
+	name = "xenomorph spawner"
+	hostile = TRUE
+	max_number = 2
+	max_range = 12
+	create_path = /mob/living/simple_animal/hostile/alien
+	timer = 5000
+
+/obj/effect/spawner/mobspawner/alien/drone
+	name = "alien drone spawner"
+	max_number = 4
+	create_path = /mob/living/simple_animal/hostile/alien/drone
+	timer = 3000
+
+/obj/effect/spawner/mobspawner/fata_morgana
+	name = "fata morgana spawner"
+	hostile = TRUE
+	max_number = 5
+	max_range = 20
+	create_path = /mob/living/simple_animal/hostile/fata_morgana
+	timer = 2000
+
+/obj/effect/spawner/mobspawner/boreas
+	name = "boreas spawner"
+	hostile = TRUE
+	max_number = 1
+	max_range = 15
+	create_path = /mob/living/simple_animal/hostile/boreas
+	timer = 9000
+
+/obj/effect/spawner/mobspawner/echofiend
+	name = "echofiend spawner"
+	hostile = TRUE
+	max_number = 2
+	max_range = 12
+	create_path = /mob/living/simple_animal/hostile/echofiend
+	timer = 1500
+
+/obj/effect/spawner/mobspawner/canopy_strangler
+	name = "canopy strangler spawner"
+	hostile = TRUE
+	max_number = 6
+	max_range = 10
+	create_path = /mob/living/simple_animal/hostile/canopy_strangler
+	timer = 3000
+
+/obj/effect/spawner/mobspawner/phosphor_beetle
+	name = "phosphor beetle spawner"
+	hostile = TRUE
+	max_number = 8
+	max_range = 15
+	create_path = /mob/living/simple_animal/hostile/phosphor_beetle
+	timer = 2000
+
+/obj/effect/spawner/mobspawner/phosphor_beetle/magic
+	create_path = /mob/living/simple_animal/hostile/phosphor_beetle/magic
+
 ////////////////////OBJ SPAWNER///////////
 /obj/effect/spawner/objspawner
 	name = "obj spawner"
@@ -945,4 +1027,3 @@
 		else
 			sourceturf.ChangeTurf(/turf/floor/dirt)
 			return
-		return

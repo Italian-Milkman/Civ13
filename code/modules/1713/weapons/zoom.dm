@@ -7,7 +7,6 @@ Parts of code courtesy of Super3222
 	name = "generic scope"
 	icon = 'icons/obj/device.dmi'
 	icon_state = "telescope1"
-	zoomdevicename = null
 	var/zoom_amt = 3
 	var/zoomed = FALSE
 	var/datum/action/toggle_scope/azoom
@@ -70,9 +69,9 @@ Parts of code courtesy of Super3222
 	var/dist2 = abs(H.y-target.y)
 	var/distcon = max(dist1,dist2)
 	var/gdir = get_dir(H, target)
-	H << "You start checking the range..."
+	to_chat(H, "You start checking the range...")
 	if (do_after(H, 40, src, can_move = FALSE))
-		H << "<big><b><font color='#ADD8E6'>Range: about [max(0,distcon+rand(-1,1))] meters [dir2text(gdir)]</font></b></big>"
+		to_chat(H, "<big><b><font color='#ADD8E6'>Range: about [max(0,distcon+rand(-1,1))] meters [dir2text(gdir)]</font></b></big>")
 		checking = FALSE
 	else
 		checking = FALSE
@@ -105,9 +104,9 @@ Parts of code courtesy of Super3222
 	var/dist2 = abs(H.y-target.y)
 	var/distcon = max(dist1,dist2)
 	var/gdir = get_dir(H, target)
-	H << "You start checking the range..."
+	to_chat(H, "You start checking the range...")
 	if (do_after(H, 25, src, can_move = TRUE))
-		H << "<big><b><font color='#ADD8E6'>Range: about [max(0,distcon+rand(-1,1))] meters [dir2text(gdir)].</font></b></big>"
+		to_chat(H, "<big><b><font color='#ADD8E6'>Range: about [max(0,distcon+rand(-1,1))] meters [dir2text(gdir)].</font></b></big>")
 		checking = FALSE
 	else
 		checking = FALSE
@@ -204,7 +203,7 @@ Parts of code courtesy of Super3222
 			to_chat(H, "<b>Payload type: <red>[payload ? payload : "None selected"]</red></b>")
 			to_chat(H, "<b>Payload type remaining: <red>[payload ? payload_remaining : "None selected"]</red></b>")
 		else // Failsafe for if a faction that does not have a jet or a faction which is not defined uses a designator
-			to_chat(H, SPAN_DANGER("<b>There's no friendly CAS that you can call in.</b>"))
+			to_chat(H, SPAN_WARNING("<b>There's no friendly CAS that you can call in.</b>"))
 
 /obj/item/weapon/attachment/scope/adjustable/binoculars/laser_designator/attack_self(var/mob/living/human/H)
 	var/selection_type = WWinput(H, "What do you want to change?", "Category selection", "Attack direction", list("Attack direction", "Payload type"))
@@ -253,7 +252,7 @@ Parts of code courtesy of Super3222
 							checking = TRUE
 							var/distcon = max(abs(H.x-target.x),abs(H.y-target.y))
 							var/gdir = get_dir(H, target)
-							to_chat(H, SPAN_DANGER("<big>You begin calling in the target, stay still...</big>"))
+							to_chat(H, SPAN_WARNING("<big>You begin calling in the target, stay still...</big>"))
 
 							if (do_after(H, call_in_time, src, can_move = FALSE))
 								to_chat(H, "<big><b><font color='#ADD8E6'>Calling in airstrike: [distcon] meters [dir2text(gdir)].</font></b></big>")
@@ -292,10 +291,10 @@ Parts of code courtesy of Super3222
 								to_chat(H, "<big><b><font color='#ADD8E6'>CAS is [faction2_aircraft_rearming ? "re-arming" : "making their way back around"], try again in [ceil((faction2_aircraft_cooldown - world.time)/10)] seconds.</font></b></big>")
 						return
 				else
-					to_chat(H, SPAN_DANGER("<big><b>Select a payload first.</b></big>"))
+					to_chat(H, SPAN_WARNING("<big><b>Select a payload first.</b></big>"))
 					return
 			else
-				to_chat(H, SPAN_DANGER("<big><b>There's no friendly CAS that you can call in.</b></big>"))
+				to_chat(H, SPAN_WARNING("<big><b>There's no friendly CAS that you can call in.</b></big>"))
 				return
 
 /obj/item/weapon/attachment/scope/adjustable/verb/adjust_scope_verb()
@@ -333,14 +332,14 @@ Parts of code courtesy of Super3222
 
 		if (input > max_zoom)
 			if (zoom_amt == max_zoom)
-				user << "<span class='warning'>You can't adjust it any further.</span>"
+				to_chat(user, "<span class='warning'>You can't adjust it any further.</span>")
 				return
 			else
 				zoom_amt = max_zoom
 				dial_check = TRUE
 		else if (input < min_zoom)
 			if (zoom_amt == min_zoom)
-				user << "<span class='warning'>You can't adjust it any further.</span>"
+				to_chat(user, "<span class='warning'>You can't adjust it any further.</span>")
 				return
 			else
 				zoom_amt = min_zoom
@@ -349,7 +348,7 @@ Parts of code courtesy of Super3222
 				dial_check = TRUE
 			zoom_amt = input
 
-		user << "<span class='notice'>You twist the dial on [src] [dial_check ? "clockwise, increasing" : "counterclockwise, decreasing"] the zoom range to [zoom_amt].</span>"
+		to_chat(user, "<span class='notice'>You twist the dial on [src] [dial_check ? "clockwise, increasing" : "counterclockwise, decreasing"] the zoom range to [zoom_amt].</span>")
 
 //Proc, so that gun accessories/scopes/etc. can easily add zooming.
 /obj/item/weapon/attachment/scope/proc/build_zooming()

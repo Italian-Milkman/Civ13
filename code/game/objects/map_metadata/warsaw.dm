@@ -1,7 +1,8 @@
 /obj/map_metadata/warsaw
 	ID = MAP_WARSAW
 	title = "Warsaw Uprising"
-	lobby_icon = 'icons/lobby/warsawup.png'
+	description = "The Polish Home Army will win if they hold out for 45 minutes.The Wehrmacht will win if they manage to reach the Radio Station inside the Polish HQ."
+	lobby_icon = "icons/lobby/warsawup.png"
 	no_winner = "The battle for the city of Warsaw is still going on."
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/one,/area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 1200
@@ -26,28 +27,11 @@
 	faction2 = POLISH
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET, WEATHER_EXTREME)
 	songs = list(
-		"Song of The Warsaw Uprising - Chłopcy Silni Jak Stal (Boys Strong As Steel):1" = 'sound/music/boysstrongassteel.ogg',)
+		"Song of The Warsaw Uprising - Chłopcy Silni Jak Stal (Boys Strong As Steel):1" = "sound/music/boysstrongassteel.ogg",)
 	grace_wall_timer = 3000
 	gamemode = "Siege"
-	ambience = list('sound/ambience/battle1.ogg')
+	ambience = list("sound/ambience/battle1.ogg")
 	no_hardcore = TRUE
-
-/obj/map_metadata/warsaw/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (istype(J, /datum/job/german/tank_crew))
-		. = TRUE
-	else if (J.is_warsawger == TRUE)
-		. = TRUE
-	else if (J.is_warpol == TRUE)
-		. = TRUE
-	else if (J.is_tanker == TRUE)
-		. = FALSE
-	else if (J.is_ww2 == TRUE && J.is_reichstag == FALSE)
-		. = FALSE
-	else if (J.is_reichstag == TRUE)
-		. = FALSE
-	else
-		. = FALSE
 
 /obj/map_metadata/warsaw/roundend_condition_def2name(define)
 	..()
@@ -107,14 +91,14 @@
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The <b>Polish Home Army</b> has successfully defended the HQ! The city of Warsaw is liberated!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_r == FALSE)
 		ticker.finished = TRUE
 		var/message = "The <b>Germans</b> have captured the building! The battle for the city of Warsaw is over!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_r = TRUE
@@ -157,7 +141,7 @@
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The <b>Polish</b> have recaptured the HQ!</font>"
+			to_chat(world, "<font size = 3>The <b>Polish</b> have recaptured the HQ!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1
@@ -179,5 +163,4 @@
 				return TRUE
 		else
 			return !faction1_can_cross_blocks()
-			return !faction2_can_cross_blocks()
 	return FALSE

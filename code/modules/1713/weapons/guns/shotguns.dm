@@ -7,8 +7,6 @@
 	equiptimer = 17
 	magazine_type = /obj/item/ammo_magazine/shellbox
 
-	accuracy_increase_mod = 1.00
-	accuracy_decrease_mod = 1.00
 	KD_chance = KD_CHANCE_HIGH
 	stat = "rifle"
 
@@ -97,7 +95,7 @@
 	if (world.time >= recentpump + 10)
 		if (open)
 			open = FALSE
-			user << "<span class='notice'>You close \the [src].</span>"
+			to_chat(user, "<span class='notice'>You close \the [src].</span>")
 			icon_state = "doublebarreled"
 			if (loaded.len)
 				var/obj/item/ammo_casing/AC = loaded[1] //load next casing.
@@ -105,25 +103,25 @@
 				chambered = AC
 		else
 			open = TRUE
-			user << "<span class='notice'>You break open \the [src].</span>"
+			to_chat(user, "<span class='notice'>You break open \the [src].</span>")
 			icon_state = "doublebarreled_open"
 		recentpump = world.time
 
 /obj/item/weapon/gun/projectile/shotgun/coachgun/load_ammo(var/obj/item/A, mob/user)
 	if (!open)
-		user << "<span class='notice'>You need to open \the [src] first!</span>"
+		to_chat(user, "<span class='notice'>You need to open \the [src] first!</span>")
 		return
 	..()
 
 /obj/item/weapon/gun/projectile/shotgun/coachgun/unload_ammo(mob/user, var/allow_dump=1)
 	if (!open)
-		user << "<span class='notice'>You need to open \the [src] first!</span>"
+		to_chat(user, "<span class='notice'>You need to open \the [src] first!</span>")
 		return
 	..()
 
 /obj/item/weapon/gun/projectile/shotgun/coachgun/special_check(mob/user)
 	if (open)
-		user << "<span class='warning'>You can't fire \the [src] while it is break open!</span>"
+		to_chat(user, "<span class='warning'>You can't fire \the [src] while it is break open!</span>")
 		return FALSE
 	return ..()
 
@@ -205,7 +203,7 @@
 	if (world.time >= recentpump + 10)
 		if (open)
 			open = FALSE
-			user << "<span class='notice'>You put the cylinder back into \the [src].</span>"
+			to_chat(user, "<span class='notice'>You put the cylinder back into \the [src].</span>")
 			icon_state = "mts225"
 			if (loaded.len)
 				var/obj/item/ammo_casing/AC = loaded[1] //load next casing.
@@ -213,25 +211,25 @@
 				chambered = AC
 		else
 			open = TRUE
-			user << "<span class='notice'>You release the cylinder of \the [src].</span>"
+			to_chat(user, "<span class='notice'>You release the cylinder of \the [src].</span>")
 			icon_state = "mts225_open"
 		recentpump = world.time
 
 /obj/item/weapon/gun/projectile/shotgun/mts225/load_ammo(var/obj/item/A, mob/user)
 	if (!open)
-		user << "<span class='notice'>You need release the cylinder of \the [src] first!</span>"
+		to_chat(user, "<span class='notice'>You need release the cylinder of \the [src] first!</span>")
 		return
 	..()
 
 /obj/item/weapon/gun/projectile/shotgun/coachgun/unload_ammo(mob/user, var/allow_dump=1)
 	if (!open)
-		user << "<span class='notice'>You need to release the cylinder of \the [src] first!</span>"
+		to_chat(user, "<span class='notice'>You need to release the cylinder of \the [src] first!</span>")
 		return
 	..()
 
 /obj/item/weapon/gun/projectile/shotgun/mts225/special_check(mob/user)
 	if (open)
-		user << "<span class='warning'>You can't fire \the [src] while the cylinder is not in the gun!</span>"
+		to_chat(user, "<span class='warning'>You can't fire \the [src] while the cylinder is not in the gun!</span>")
 		return FALSE
 	return ..()
 

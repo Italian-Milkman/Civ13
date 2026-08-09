@@ -28,7 +28,7 @@
 						central = F
 		if (!central)
 			world.log << "<b>Axis error! ([x],[y])</b>"
-			return FALSE
+			return
 		//now connect all the frames
 		for (var/obj/structure/vehicleparts/frame/A in rangeto)
 			if (!A.axis)
@@ -123,9 +123,11 @@
 //			world.log << "<b>Driver's Seat error! ([x],[y])</b>"
 //			return FALSE
 		sleep(2)
-		if (isemptylist(central.axis.corners))
+		if (isemptylist(central.axis.corners) || !central.axis.corners[1])
 			central.axis.check_corners()
 		for (var/turf/T in rangeto)
+			if (!central.axis || !central.axis.corners || !central.axis.corners.len || !central.axis.corners[1])
+				continue
 			if (abs(T.x-central.axis.corners[1].x)<=central.axis.maxdist || abs(T.y-central.axis.corners[1].y)<=central.axis.maxdist)
 				var/doneps = FALSE
 				for (var/obj/structure/vehicleparts/frame/FRE in T)
@@ -160,4 +162,4 @@
 				LP.desc = "A vehicle registration plate reading <b>[LP.reg_number]</b>."
 //		world.log << "[central.axis] assembly complete."
 		qdel(src)
-		return TRUE
+		return

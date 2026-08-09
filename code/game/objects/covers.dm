@@ -1,5 +1,4 @@
 /obj/covers
-
 	name = "floor covers"
 	desc = ""
 	icon = 'icons/turf/floors.dmi'
@@ -34,28 +33,15 @@
 	var/adjusts = FALSE //if it adjusts acording to neighbouring sprites
 
 	var/hardness = 50 //for projectile penetration
-/*
 
-/obj/covers/attackby(obj/item/W as obj, mob/user as mob)
-	switch(material)
-		if ("Wood")
-			//Do nothing, anything can cut through wood.
-		else if ("Stone")
-			//Swords no work on stone, unga dunga no knify wifey the wall.
-			if(!istype(W, /obj/item/weapon/sledgehammer) && !istype(W, /obj/item/projectile))
-				to_chat(user, "Your [W.name] glances off the [src.name]!")
-				return
-			else
-				//Damage the wall.
-		else if ("Metal" || "steel")
-			if(!istype(W, /obj/item/weapon/sledgehammer) && !istype(W, /obj/item/projectile))
-				to_chat(user, "Your [W.name] glances off the [src.name]!")
-				return
-			else
-				//Damage the wall.
-		else
-			//Do nothing, you're not important.
-			..()*/
+
+//for mapmaking purposes
+/obj/covers/invisible
+	wood = FALSE
+	opacity = FALSE
+	flammable = FALSE
+	density = TRUE
+	invisibility = 101
 
 /obj/covers/proc/run_decay()
 	if (!src || !wall)

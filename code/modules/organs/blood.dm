@@ -31,7 +31,7 @@ var/const/BLOOD_VOLUME_SURVIVE = 20
 	for (var/datum/reagent/blood/B in vessel.reagent_list)
 		if (B.id == "blood")
 			B.data = list(	"donor"=src,"viruses"=null,"species"=species.name,"blood_DNA"=dna.unique_enzymes,"blood_colour"= species.blood_color,"blood_type"=dna.b_type,	\
-							"resistances"=null,"trace_chem"=null, "virus2" = null, "antibodies" = list())
+							"resistances"=null,"trace_chem"=null)
 			B.color = B.data["blood_colour"]
 
 /* takes care of blood loss and regeneration
@@ -56,7 +56,7 @@ var/const/BLOOD_VOLUME_SURVIVE = 20
 	if (!L) // ditto for lungs
 		adjustOxyLoss(10)
 		if (prob(20))
-			src << "<span class = 'danger'>You're suffocating!</span>"
+			to_chat(src, "<span class = 'danger'>You're suffocating!</span>")
 		if (prob(40))
 			emote("gasp")
 
@@ -140,9 +140,9 @@ var/const/BLOOD_VOLUME_SURVIVE = 20
 						if(blinding)
 							H.eye_blurry = max(H.eye_blurry, 10)
 							H.eye_blind = max(H.eye_blind, 5)
-							H << "<span class='danger'>You are blinded by a spray of blood!</span>"
+							to_chat(H, "<span class='danger'>You are blinded by a spray of blood!</span>")
 						else
-							H << "<span class='danger'>You are hit by a spray of blood!</span>"
+							to_chat(H, "<span class='danger'>You are hit by a spray of blood!</span>")
 						hit_mob = TRUE
 
 				if(hit_mob || !A.CanPass(src, sprayloc))
@@ -155,10 +155,7 @@ var/const/BLOOD_VOLUME_SURVIVE = 20
 	return bled
 #undef BLOOD_SPRAY_DISTANCE
 
-/mob/living/human/proc/remove_blood(var/amt)
-	if(!amt)
-		return 0
-	return vessel.remove_reagent("blood", amt * (src.mob_size/MOB_MEDIUM))
+
 
 /****************************************************
 				BLOOD TRANSFERS
@@ -174,12 +171,6 @@ var/const/BLOOD_VOLUME_SURVIVE = 20
 
 	//set reagent data
 	B.data["donor"] = src
-	/*
-	if (!B.data["virus2"])
-		B.data["virus2"] = list()
-	B.data["virus2"] |= virus_copylist(virus2)
-	*/
-	B.data["antibodies"] = antibodies
 	B.data["blood_DNA"] = copytext(dna.unique_enzymes,1,0)
 	B.data["blood_type"] = copytext(dna.b_type,1,0)
 
@@ -212,13 +203,6 @@ var/const/BLOOD_VOLUME_SURVIVE = 20
 /mob/living/human/proc/inject_blood(var/datum/reagent/blood/injected, var/amount)
 	if (!injected || !istype(injected))
 		return
-
-/*	var/list/sniffles = virus_copylist(injected.data["virus2"])
-	for (var/ID in sniffles)
-		var/datum/disease2/disease/sniffle = sniffles[ID]
-		infect_virus2(src,sniffle,1)
-	if (injected.data["antibodies"] && prob(5))
-		antibodies |= injected.data["antibodies"]*/
 	var/list/chems = list()
 	chems = params2list(injected.data["trace_chem"])
 	for (var/C in chems)
@@ -324,10 +308,6 @@ proc/blood_splatter(var/target,var/datum/reagent/blood/source,var/large)
 		else
 			B.blood_DNA[source.data["blood_DNA"]] = "O+"
 
-/*	// Update virus information.
-	if (source.data["virus2"])
-		B.virus2 = virus_copylist(source.data["virus2"])*/
-
 	B.fluorescent  = FALSE
 	B.invisibility = FALSE
 	return B
@@ -372,24 +352,7 @@ proc/blood_splatter(var/target,var/datum/reagent/blood/source,var/large)
 	return min(blood_volume, 100)
 
 
-//Percentage of maximum blood volume, affected by the condition of circulation organs, affected by the oxygen loss. What ultimately matters for brain
-/mob/living/human/proc/get_blood_oxygenation()
-	var/blood_volume = get_blood_circulation()
-	if(is_asystole()) // Heart is missing or isn't beating and we're not breathing (hardcrit)
-		return min(blood_volume, BLOOD_VOLUME_SURVIVE)
 
-	else
-		blood_volume = 100
-
-	var/blood_volume_mod = max(0, 1 - getOxyLoss()/(species.total_health/2))
-	var/oxygenated_mult = 0
-	if(chem_effects["oxygen"] == 1) // Dexalin.
-		oxygenated_mult = 0.5
-	else if(chem_effects["oxygen"] >= 2) // Dexplus.
-		oxygenated_mult = 0.8
-	blood_volume_mod = blood_volume_mod + oxygenated_mult - (blood_volume_mod * oxygenated_mult)
-	blood_volume = blood_volume * blood_volume_mod
-	return min(blood_volume, 100)
 
 
 /mob/living/human/proc/get_effective_blood_volume()

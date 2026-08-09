@@ -3,7 +3,6 @@
 /datum/category_item/player_setup_item/general/basic
 	name = "Basic"
 	sort_order = 1
-	var/list/valid_second_languages = list(ENGLISH, FRENCH, SPANISH, PORTUGUESE)
 
 /datum/category_item/player_setup_item/general/basic/sanitize_character()
 	var/list/valid_player_genders = list(MALE, FEMALE)
@@ -38,19 +37,26 @@
 		for (var/v in TRUE to pref.preview_icons.len)
 			if (isicon(pref.preview_icons_front[v]))
 				user << browse_rsc(pref.preview_icons_front[v], "previewicon_[v]_front.png")
-			if (isicon(pref.preview_icons_back[v]))
-				user << browse_rsc(pref.preview_icons_back[v], "previewicon_[v]_back.png")
-			if (isicon(pref.preview_icons_east[v]))
-				user << browse_rsc(pref.preview_icons_east[v], "previewicon_[v]_east.png")
-			if (isicon(pref.preview_icons_west[v]))
-				user << browse_rsc(pref.preview_icons_west[v], "previewicon_[v]_west.png")
+			#ifndef OPENDREAM
+				if (isicon(pref.preview_icons_back[v]))
+					user << browse_rsc(pref.preview_icons_back[v], "previewicon_[v]_back.png")
+				if (isicon(pref.preview_icons_east[v]))
+					user << browse_rsc(pref.preview_icons_east[v], "previewicon_[v]_east.png")
+				if (isicon(pref.preview_icons_west[v]))
+					user << browse_rsc(pref.preview_icons_west[v], "previewicon_[v]_west.png")
+			#endif
 		. += "<b>Preview</b><br>"
 
 		for (var/v in TRUE to pref.preview_icons.len)
+			#ifndef OPENDREAM
 			. += "<img src=previewicon_[v]_front.png height=64 width=64>"
 			. += "<img src=previewicon_[v]_back.png height=64 width=64>"
 			. += "<img src=previewicon_[v]_east.png height=64 width=64>"
 			. += "<img src=previewicon_[v]_west.png height=64 width=64>"
+			#endif
+			#ifdef OPENDREAM
+			. += "<img src=previewicon_[v]_front.png height=64 width=256>"
+			#endif
 			. += "<br><br>"
 		// name
 		. += "<b>Name:</b> "
@@ -78,7 +84,7 @@
 				pref.real_name = new_name
 				return TOPIC_REFRESH
 			else
-				user << "<span class='warning'>Invalid name. Your name should be at least 2 and at most [MAX_NAME_LEN] characters long. It may only contain the characters A-Z, a-z, -, ' and .</span>"
+				to_chat(user, "<span class='warning'>Invalid name. Your name should be at least 2 and at most [MAX_NAME_LEN] characters long. It may only contain the characters A-Z, a-z, -, ' and .</span>")
 				return TOPIC_NOACTION
 
 	else if (href_list["random_name"])

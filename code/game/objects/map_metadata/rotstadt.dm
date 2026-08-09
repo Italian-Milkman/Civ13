@@ -1,7 +1,8 @@
 /obj/map_metadata/rotstadt
 	ID = MAP_ROTSTADT
 	title = "Rotstadt Counter Insurgency"
-	lobby_icon = 'icons/lobby/rotstadt.png'
+	description = "The Blugoslavian Armed Forces are launching an counter-insurgency operation in the occupied city of Rotstadt.Their objective is to capture the RPR militia's Commanding..."
+	lobby_icon = "icons/lobby/rotstadt.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/temperate)
 	respawn_delay = 1800
 	no_winner = "The battle is still going on."
@@ -26,7 +27,7 @@
 	faction2 = BLUEFACTION
 	valid_weather_types = list(WEATHER_WET, WEATHER_EXTREME)
 	songs = list(
-		"Noisia - Shellshock:1" = 'sound/music/shellshock.ogg',)
+		"Noisia - Shellshock:1" = "sound/music/shellshock.ogg",)
 	artillery_count = 0
 	no_hardcore = TRUE
 	var/list/squad_jobs_blue = list(
@@ -42,22 +43,6 @@
 	var/list/squad_jobs_red = list(
 		"none" = list("Doctor" = 2, "Commander" = 1)
 	)
-
-/obj/map_metadata/rotstadt/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (istype(J, /datum/job/bluefaction))
-		if (J.is_event)
-			if(findtext(J.title, "BAF"))
-				. = TRUE
-			else
-				. = FALSE
-	else if (istype(J, /datum/job/redfaction))
-		if (J.is_rotstadt)
-			. = TRUE
-		else
-			. = FALSE
-	else
-		. = FALSE
 
 /obj/map_metadata/rotstadt/cross_message(faction)
 	if (faction == REDFACTION)
@@ -109,14 +94,14 @@ var/no_loop_rot = FALSE
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The <b>Rotstadt People's Republic</b> has successfully defended the city! The battle is over!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_rot == FALSE)
 		ticker.finished = TRUE
 		var/message = "The <b>Blugoslavians</b> have succeeded in their latest counter-terrorist operation in Rotstadt! The battle is over!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_rot = TRUE
@@ -159,7 +144,7 @@ var/no_loop_rot = FALSE
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The <b>Redmenians</b> have recaptured their stronghold!</font>"
+			to_chat(world, "<font size = 3>The <b>Redmenians</b> have recaptured their stronghold!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1
@@ -177,21 +162,15 @@ var/no_loop_rot = FALSE
 	src << browse(null, "window=latechoices")
 
 	var/list/dat = list("<center>")
-	dat += "<b><big>Welcome, [key].</big></b>"
+	dat += "<big><b>Welcome, [key].</b></big>"
 	dat += "<br>"
 	dat += "Round Duration: [roundduration2text_days()]"
 	dat += "<br>"
-	dat += "<b>Current Autobalance Status</b>: "
-	if (BLUEFACTION in map.faction_organization)
-		dat += "[alive_bluefaction.len] Blugoslavians "
-	if (REDFACTION in map.faction_organization)
-		dat += "[alive_redfaction.len] Redmenians "
+	dat += "<b>Current Autobalance Status</b>: [get_autobalance_status_html()]"
 
 	dat += "<br>"
 
 	for (var/datum/job/job in job_master.faction_organized_occupations)
-		if (!job.is_event)
-			continue
 		if (istype(job, /datum/job/bluefaction))
 			if(!findtext(job.title, "BAF"))
 				continue
@@ -242,26 +221,5 @@ var/no_loop_rot = FALSE
 
 	dat += "</center>"
 
-	var/data = ""
-	for (var/line in dat)
-		if (line != null)
-			if (line != "<br>")
-				data += "<span style = 'font-size:2.0rem;'>[line]</span>"
-			data += "<br>"
-
-	data = {"
-		<br>
-		<html>
-		<head>
-		[common_browser_style]
-		</head>
-		<body>
-		[data]
-		</body>
-		</html>
-		<br>
-	"}
-
-	spawn (1)
-		src << browse(data, "window=latechoices;size=600x640;can_close=1")
+	show_latechoices_window(dat)
 

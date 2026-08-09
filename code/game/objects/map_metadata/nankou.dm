@@ -1,7 +1,8 @@
 /obj/map_metadata/nankou
 	ID = MAP_NANKOU
 	title = "Nankou"
-	lobby_icon = 'icons/lobby/china.png'
+	description = "The Japanese will win if they capture the Train Station. The Chinese will win if they manage to defend their command for 20 minutes!."
+	lobby_icon = "icons/lobby/china.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/one,/area/caribbean/no_mans_land/invisible_wall/two)
 	no_hardcore = TRUE
 	can_spawn_on_base_capture = TRUE
@@ -23,19 +24,8 @@
 	faction2 = JAPANESE
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET)
 	songs = list(
-		"Mugi to Heitai:1" = 'sound/music/mugi_to_heitai.ogg',)
+		"Mugi to Heitai:1" = "sound/music/mugi_to_heitai.ogg",)
 	grace_wall_timer = 3000
-
-/obj/map_metadata/nankou/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_prison == TRUE || istype(J, /datum/job/japanese/ija_ww2ATunit) || J.is_pacific == TRUE || J.is_navy == TRUE || J.is_tanker == TRUE || J.is_samurai)
-		. = FALSE
-	else if (J.is_ww2 == TRUE)
-		. = TRUE
-	else if (istype(J, /datum/job/chinese/captain) || istype(J, /datum/job/chinese/lieutenant) || istype(J, /datum/job/chinese/sergeant) || istype(J, /datum/job/chinese/doctor) || istype(J, /datum/job/chinese/infantry) || istype(J, /datum/job/chinese/sniper))
-		. = TRUE
-	else
-		. = FALSE
 
 /obj/map_metadata/nankou/roundend_condition_def2name(define)
 	..()
@@ -85,14 +75,14 @@ var/no_loop_nk = FALSE
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The <b>Chinese</b> have sucessfuly defended the Nankou Train Station!! The Japanese have halted the attack!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_nk == TRUE)
 		ticker.finished = TRUE
 		var/message = "The <b>Japanese</b> have captured the Nankou Train Station! The battle for Beiping is over!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_nk = TRUE
@@ -135,7 +125,7 @@ var/no_loop_nk = FALSE
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The <b>Chinese</b> have recaptured the Nankou Train Station!</font>"
+			to_chat(world, "<font size = 3>The <b>Chinese</b> have recaptured the Nankou Train Station!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1

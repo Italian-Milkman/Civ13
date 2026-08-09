@@ -1,7 +1,8 @@
 /obj/map_metadata/sekigahara
 	ID = MAP_SEKIGAHARA
 	title = "Sekigahara"
-	lobby_icon = 'icons/lobby/medieval.png'
+	description = "The Eastern Army and Western Army are facing each other outside of Sekigahara! It will start in 2 minutes"
+	lobby_icon = "icons/lobby/medieval.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/one,/area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 300
 	no_winner ="The fighting for sekigahara is still going on."
@@ -18,7 +19,7 @@
 	mission_start_message = "<font size=4>The <b>Eastern Army</b> and <b>Western Army</b> are facing each other outside of Sekigahara! It will start in <b>2 minutes</b></font>"
 	faction1 = JAPANESE
 	songs = list(
-		"Tokkutai Bushi (Koji Tsuruta):1" = 'sound/music/tokkutai_bushi.ogg',)
+		"Tokkutai Bushi (Koji Tsuruta):1" = "sound/music/tokkutai_bushi.ogg",)
 	is_singlefaction = TRUE
 	grace_wall_timer = 1200
 	scores = list(
@@ -29,17 +30,10 @@
 		..()
 		spawn(600) // 1 minute
 			points_check()
-/obj/map_metadata/sekigahara/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if ((J.is_samurai == TRUE && J.is_western == TRUE) || (J.is_samurai == TRUE && J.is_eastern == TRUE))
-		. = TRUE
-	else
-		. = FALSE
-
 /obj/map_metadata/sekigahara/proc/points_check()
-	world << "<big><b>Current Points:</big></b>"
-	world << "<big>Eastern Army: [scores["Eastern Army"]]</big>"
-	world << "<big>Western Army: [scores["Western Army"]]</big>"
+	to_chat(world, "<big><b>Current Points:</b></big>")
+	to_chat(world, "<big>Eastern Army: [scores["Eastern Army"]]</big>")
+	to_chat(world, "<big>Western Army: [scores["Western Army"]]</big>")
 	spawn(300)
 		points_check()
 
@@ -53,21 +47,21 @@
 		message = "The round has ended!"
 		if (scores["Western Army"] > scores["Eastern Army"])
 			message = "The battle is over! The <b>Western Army</b> were victorious over the <b>Eastern Army</b>!"
-			world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+			to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 			win_condition_spam_check = TRUE
 			return FALSE
 		else if (scores["Eastern Army"] > scores["Western Army"])
 			message = "The battle is over! The <b>Eastern Army</b> were victorious over the <b>Western Army</b>!"
-			world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+			to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 			win_condition_spam_check = TRUE
 			return FALSE
 		else
 			message = "The battle has ended in a <b>stalemate</b>!"
-			world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+			to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 			win_condition_spam_check = TRUE
 			return FALSE
-		last_win_condition = win_condition.hash
-		return TRUE
+	last_win_condition = win_condition.hash
+	return TRUE
 
 /obj/map_metadata/sekigahara/cross_message(faction)
 	return "<font size = 4>The grace wall is lifted!</font>"

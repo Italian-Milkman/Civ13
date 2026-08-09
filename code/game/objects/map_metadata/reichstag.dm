@@ -2,7 +2,8 @@
 /obj/map_metadata/reichstag
 	ID = MAP_REICHSTAG
 	title = "Reichstag"
-	lobby_icon = 'icons/lobby/reichstag.png'
+	description = "The Germans will win if they hold out for 40 minutes. The Soviets will win if they manage to reach the top of the Reichstag."
+	lobby_icon = "icons/lobby/reichstag.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/one,/area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 1200
 	no_winner = "The Reichstag is still under German control."
@@ -25,29 +26,8 @@
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET)
 	grace_wall_timer = 3600 // 6 minutes
 	songs = list(
-		"Red Army Choir - Katyusha:1" = 'sound/music/katyusha.ogg',)
+		"Red Army Choir - Katyusha:1" = "sound/music/katyusha.ogg",)
 	gamemode = "Siege"
-
-/obj/map_metadata/reichstag/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (istype(J, /datum/job/german))
-		if (J.is_ss_panzer == TRUE || J.is_tanker == TRUE)
-			. = FALSE
-		else if (J.is_ww2 == TRUE && J.is_reichstag == TRUE)
-			. = TRUE
-		else
-			. = FALSE
-	else
-		if (istype(J, /datum/job/russian/antitank_soldier_soviet) || istype(J, /datum/job/russian/antitank_assistant_soldier_soviet))
-			. = FALSE
-		else if (J.is_ss_panzer == TRUE || J.is_tanker == TRUE)
-			. = FALSE
-		else if (J.is_ww2 == TRUE)
-			. = TRUE
-		else if (istype(J, /datum/job/russian/doctor))
-			. = TRUE
-		else
-			. = FALSE
 
 /obj/map_metadata/reichstag/roundend_condition_def2name(define)
 	..()
@@ -99,14 +79,14 @@ var/no_loop_r = FALSE
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The <b>Wehrmacht</b> has sucessfuly defended the Reichstag! The Soviets halted the attack!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_r == FALSE)
 		ticker.finished = TRUE
 		var/message = "The <b>Soviets</b> have captured the Reichstag! The battle for Berlin is over!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_r = TRUE
@@ -149,7 +129,7 @@ var/no_loop_r = FALSE
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The <b>Germans</b> have recaptured the Reichstag!</font>"
+			to_chat(world, "<font size = 3>The <b>Germans</b> have recaptured the Reichstag!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1

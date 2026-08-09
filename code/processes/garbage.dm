@@ -23,6 +23,8 @@ var/list/delayed_garbage = list()
 	name = "garbage"
 	schedule_interval = 5 SECONDS
 	start_delay = 0.3 SECONDS
+	priority = PROCESS_PRIORITY_HIGH
+	processes.garbage = src
 
 	for (var/garbage in delayed_garbage)
 		qdel(garbage)
@@ -31,8 +33,6 @@ var/list/delayed_garbage = list()
 	delayed_garbage = null
 
 	fires_at_gamestates = list(GAME_STATE_PREGAME, GAME_STATE_SETTING_UP, GAME_STATE_PLAYING, GAME_STATE_FINISHED)
-	priority = PROCESS_PRIORITY_HIGH
-	processes.garbage = src
 
 #ifdef GC_FINDREF
 /world/loop_checks = FALSE
@@ -50,30 +50,22 @@ var/list/delayed_garbage = list()
 	while (destroyed.len && --checkRemain >= 0)
 		if (remaining_force_dels <= 0)
 			#ifdef GC_DEBUG
-//			testing("GC: Reached max force dels per tick [dels] vs [maxDels]")
 			#endif
 			break // Server's already pretty pounded, everything else can wait 2 seconds
 		var/refID = destroyed[1]
 		var/GCd_at_time = destroyed[refID]
 		if (GCd_at_time > time_to_kill)
 			#ifdef GC_DEBUG
-//			testing("GC: [refID] not old enough, breaking at [world.time] for [GCd_at_time - time_to_kill] deciseconds until [GCd_at_time + collection_timeout]")
 			#endif
 			break // Everything else is newer, skip them
 		var/datum/A = locate(refID)
 		#ifdef GC_DEBUG
-//		testing("GC: [refID] old enough to test: GCd_at_time: [GCd_at_time] time_to_kill: [time_to_kill] current: [world.time]")
 		#endif
 		if (A && A.gcDestroyed == GCd_at_time) // So if something else coincidently gets the same ref, it's not deleted by mistake
 			#ifdef GC_FINDREF
 			LocateReferences(A)
 			#endif
 			// Something's still referring to the qdel'd object.  Kill it.
-
-			// hey stop fucking spamming me when I start up the server - Kachnov
-//			if (world.time > 6000)
-//				testing("GC: -- \ref[A] | [A.type] was unable to be GC'd and was deleted --")
-
 			logging["[A.type]"]++
 			del(A)
 
@@ -81,7 +73,6 @@ var/list/delayed_garbage = list()
 			remaining_force_dels--
 		else
 			#ifdef GC_DEBUG
-//			testing("GC: [refID] properly GC'd at [world.time] with timeout [GCd_at_time]")
 			#endif
 			soft_dels++
 		tick_dels++
@@ -149,10 +140,10 @@ var/list/delayed_garbage = list()
 	destroyed -= "\ref[A]" // Removing any previous references that were GC'd so that the current object will be at the end of the list.
 	destroyed["\ref[A]"] = world.time+1
 
-/process/garbage/statProcess()
-	..()
-	stat(null, "[garbage_collect ? "On" : "Off"], [destroyed.len] queued")
-	stat(null, "Dels: [total_dels], [soft_dels] soft, [hard_dels] hard, [tick_dels] last run")
+/process/garbage/statProcess(client/C)
+	..(C)
+	C.add_stat("[garbage_collect ? "On" : "Off"], [destroyed.len] queued")
+	C.add_stat("Dels: [total_dels], [soft_dels] soft, [hard_dels] hard, [tick_dels] last run")
 
 /process/garbage/htmlProcess()
 	return ..() + "[garbage_collect ? "On" : "Off"], [destroyed.len] queued<br>Dels: [total_dels], [soft_dels] soft, [hard_dels] hard, [tick_dels] last run"
@@ -209,6 +200,7 @@ var/list/delayed_garbage = list()
 	if (IsPooled(src))
 		PlaceInPool(src)
 	else
+		gcDestroyed = world.time
 		del(src)
 
 /atom/finalize_qdel()
@@ -221,25 +213,19 @@ var/list/delayed_garbage = list()
 			delayed_garbage |= src
 
 /icon/finalize_qdel()
+	gcDestroyed = world.time
 	del(src)
 
 /image/finalize_qdel()
+	gcDestroyed = world.time
 	del(src)
 
 /mob/finalize_qdel()
+	gcDestroyed = world.time
 	del(src)
 
 /turf/finalize_qdel()
+	gcDestroyed = world.time
 	del(src)
 
-/client/proc/purge_all_destroyed_objects()
-	set category = "Debug"
-	set name = "Purge Destroyed Objects"
-	if (processes.garbage)
-		while (processes.garbage.destroyed.len)
-			var/datum/o = locate(processes.garbage.destroyed[1])
-			if (istype(o) && o.gcDestroyed)
-				del(o)
-				processes.garbage.total_dels++
-				processes.garbage.hard_dels++
-			processes.garbage.destroyed.Cut(1, 2)
+	processes.garbage.destroyed.Cut(1, 2)

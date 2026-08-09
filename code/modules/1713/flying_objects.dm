@@ -31,7 +31,7 @@
 		uploaded_sound.priority = 250
 		for (var/mob/M in player_list)
 			if (!new_player_mob_list.Find(M))
-				//M << SPAN_DANGER("<font size=3>A nuclear missile has been launched!</font>")
+				//to_chat(M, SPAN_DANGER("<font size=3>A nuclear missile has been launched!</font>"))
 				M.client << uploaded_sound
 		animate(src, pixel_y = flight_distance*32, time = flight_time, alpha = 150, easing = SINE_EASING | EASE_IN)
 		spawn(flight_time) // has to be equal to flight time else it'll look weird
@@ -53,10 +53,6 @@
 	anchored = TRUE
 	var/flight_time = 12 SECONDS
 	var/flight_distance = 15 // in tiles
-	var/start_point_x = 0
-	var/start_point_y = 0
-	var/end_point_x = 0
-	var/end_point_y = 0
 	layer = 30
 
 /obj/structure/plane/proc/fly()

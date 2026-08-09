@@ -7,7 +7,7 @@
 
 	if (!check_HUDdatum())
 		log_debug("[H] trying to check a HUD, but HUDdatums does not have \"[H.client.prefs.UI_style]!\"")
-		H << "Some problem has occured, use default HUD type."
+		to_chat(H, "Some problem has occured, use default HUD type.")
 		H.defaultHUD = "1713Style"
 		++recreate_flag
 	else if (H.client.prefs.UI_style != H.defaultHUD)
@@ -71,7 +71,7 @@
 	for (var/gear_slot in species.hud.gear)
 		if (!HUDdatum.slot_data.Find(gear_slot))
 			log_debug("[usr] tring to make inventory data for [gear_slot], but HUDdatum does not have it!")
-			src << "Sorry, but something went wrong while creating the inventory slots, we recomendend that you change the HUD type or contact the admins."
+			to_chat(src, "Sorry, but something went wrong while creating the inventory slots, we recomendend that you change the HUD type or contact the admins.")
 			return
 		else
 			var/HUDtype
@@ -170,15 +170,13 @@ the HUD updates properly! */
 			shared_job_check = TRUE
 		else if (viewer.original_job.base_type_flag() == perp.original_job.base_type_flag())
 			shared_job_check = TRUE
-		if (istype(src, /mob/living/human))
+		if (ishuman(M))
 			if (M.original_job_title != perp.original_job_title && map.civilizations == TRUE)
 				shared_job_check = FALSE
 			else if (M.original_job_title == perp.original_job_title && map.civilizations == TRUE && perp.original_job_title != "Nomad")
 				shared_job_check = TRUE
-			if (((perp.original_job_title == "Nomad" && viewer.civilization == perp.civilization)) && !perp.civilization == "none")
+			if ((perp.original_job_title == "Nomad" && viewer.civilization == perp.civilization) && perp.civilization != "none")
 				shared_job_check = TRUE
-			else
-				shared_job_check = FALSE
 		if(!map.nomads)
 			if (map.ID == MAP_AFRICAN_WARLORDS)
 				if(viewer.nationality == perp.nationality)

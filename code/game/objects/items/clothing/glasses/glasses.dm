@@ -15,7 +15,7 @@
 			user.update_inv_eyes()
 			flash_protection = FLASH_PROTECTION_NONE
 			tint = TINT_NONE
-			usr << "You deactivate the optics on the [src]."
+			to_chat(usr, "You deactivate the optics on the [src].")
 			if (overtype == "nvg")
 				user.nvg = FALSE
 				restricts_view = 0
@@ -32,7 +32,7 @@
 			user.update_inv_eyes()
 			flash_protection = initial(flash_protection)
 			tint = initial(tint)
-			usr << "You activate the optics on the [src]."
+			to_chat(usr, "You activate the optics on the [src].")
 			if (overtype == "nvg")
 				user.nvg = TRUE
 				restricts_view = 1
@@ -102,6 +102,12 @@
 	desc = "Made by Uncool. Co."
 	icon_state = "hipster_glasses"
 	item_state = "hipster_glasses"
+
+/obj/item/clothing/glasses/regular/circle
+	name = "Circle Glasses"
+	desc = "Made by Uncool. Co."
+	icon_state = "circle_glasses"
+	item_state = "circle_glasses"
 
 /obj/item/clothing/glasses/gglasses
 	name = "Green Glasses"

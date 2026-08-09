@@ -9,7 +9,7 @@ var/list/ban_types = list("Faction Ban", "Job Ban", "Server Ban", "Playing Ban",
 /datum/quickBan_handler/Topic(href,href_list[])
 	..()
 	if (href_list["quickBan_removeBan"])
-		var/client/caller = locate(href_list["caller"])
+		var/client/callers = locate(href_list["caller"])
 		var/UID = href_list["quickBan_removeBan_UID"]
 		var/ckey = href_list["quickBan_removeBan_ckey"]
 		var/cID = href_list["quickBan_removeBan_cID"]
@@ -33,69 +33,15 @@ var/list/ban_types = list("Faction Ban", "Job Ban", "Server Ban", "Playing Ban",
 							for(var/L in details_lines)
 								text2file("[L]|||", bans_file)
 
-			log_admin("[key_name(caller)] removed a ban for '[UID]/[ckey]/[cID]/[ip]'.")
-			message_admins("[key_name(caller)] removed a ban for '[UID]/[ckey]/[cID]/[ip]'.", key_name(caller))
+			log_admin("[key_name(callers)] removed a ban for '[UID]/[ckey]/[cID]/[ip]'.")
+			message_admins("[key_name(callers)] removed a ban for '[UID]/[ckey]/[cID]/[ip]'.", key_name(callers))
 			for (var/client/C in clients)
 				if (C.ckey == ckey)
-					C << "<span class = 'good'>href_list["Your ban has been lifted."]</span>"
+					to_chat(C, "<span class = 'good'>href_list["Your ban has been lifted."]</span>")
 
 var/datum/quickBan_handler/quickBan_handler = null
 
 /* admin procedures */
-/client/proc/quickBan_search()
-	set category = "Bans"
-
-	if (!quickBan_handler)
-		quickBan_handler = new
-	var/list/result = list()
-	var/list/checkedUID = list() //to prevent same ban from showing multiple times
-	var/option = input(src, "Search for a ban?") in list("Yes","Show All","Cancel")
-	if (option == "No")
-		return
-	var/list/details_lines = splittext(file2text("SQL/bans.txt"), "|||\n")
-	for(var/i=1,i<=details_lines.len,i++)
-		if (findtext(details_lines[i], ";"))
-			var/list/presult = splittext(details_lines[i], ";")
-			var/found = FALSE
-			if (presult && presult.len>=11)
-				for(var/tuid in checkedUID)
-					if (presult[3] == tuid)
-						found = TRUE
-				if (!found && presult.len>=11)
-					checkedUID += presult[3]
-					result += list(presult)
-	if (option == "Yes")
-		var/option2 = input(src, "What to search for?") in list("ckey","cID","ip","Cancel")
-		var/list/result3 = list()
-		if (option2 == "Cancel")
-			return
-		else if (option2 == "ckey")
-			var/_ckey = ckey(input(src, "What ckey will you search for?") as null|text)
-			for(var/result2 in result)
-				if (result2[9]==_ckey)
-					result3 += list(result2)
-		else if (option2 == "cID")
-			var/cID = input(src, "What cID will you search for?") as null|text
-			for(var/result2 in result)
-				if (result2[11]==cID)
-					result3 += list(result2)
-		else if (option2 == "ip")
-			var/ip = input(src, "What address will you search for?") as null|text
-			for(var/result2 in result)
-				if (result2[10]==ip)
-					result3 += list(result2)
-		result = result3
-
-	var/html = "<center><big>List of Quick Bans</big></center>"
-	var/list/possibilities = list()
-	if (islist(result) && !isemptylist(result))
-		for (var/list/v in result)
-			possibilities += "<big><b>UID [v[3]]</b> (<a href='byond://?src=\ref[quickBan_handler];caller=\ref[src];quickBan_removeBan=1;quickBan_removeBan_UID=[v[3]];quickBan_removeBan_ckey=[v[9]];quickBan_removeBan_cID=[v[10]];quickBan_removeBan_ip=[v[11]]'>DELETE</a>)</big>: [v[9]]/[v[10]]/[v[11]], type '[v[1]]' ([v[2]]): banned for '[v[4]]' by [v[5]] on [v[6]]. <b>[v[8]]</b>. (After assigned date)"
-	for (var/possibility in possibilities)
-		html += "<br>"
-		html += possibility
-
-	src << browse(html, "window=quick_bans_search;")
 /proc/find_cID(var/current = "ckey", var/currentvar = null)
 	if (currentvar == null)
 		return FALSE
@@ -237,16 +183,16 @@ var/datum/quickBan_handler/quickBan_handler = null
 			var/datum/job/J = input("What job?") in possibilities
 			fields["type_specific_info"] = J.title
 		if ("Faction")
-			var/faction = input("What faction?") in list(BRITISH, PIRATES, CIVILIAN, INDIANS, PORTUGUESE, SPANISH, FRENCH, DUTCH, ITALIAN, GREEK, ROMAN, ARAB, JAPANESE, RUSSIAN, GERMAN, AMERICAN, VIETNAMESE, FINNISH, NORWEGIAN, SWEDISH, DANISH, CHECHEN, FILIPINO, CHINESE, POLISH, BLUEFACTION, REDFACTION)
+			var/faction = input("What faction?") in list(BRITISH, PIRATES, CIVILIAN, INDIANS, PORTUGUESE, SPANISH, FRENCH, DUTCH, ITALIAN, GREEK, ROMAN, ARAB, JAPANESE, RUSSIAN, GERMAN, AMERICAN, VIETNAMESE, FINNISH, NORWEGIAN, SWEDISH, DANISH, CHECHEN, FILIPINO, CHINESE, POLISH, BLUEFACTION, REDFACTION, CAFR, TSFSR)
 			fields["type_specific_info"] = faction
 
-	reenter_bantime
+	reenter_bantime:
 
 	var/duration_in_x_units = input(src, "How long do you want the ban to last ('5 hours', '4 days': the default unit is days)") as text
 	var/duration_in_days = text2num(ckey(splittext(duration_in_x_units, " ")[1]))
 	duration_in_days = max(0,min(duration_in_days,10000))
 	if (!isnum(duration_in_days))
-		src << "<span class = 'warning'>Invalid amount.</span>"
+		to_chat(src, "<span class = 'warning'>Invalid amount.</span>")
 		goto reenter_bantime
 
 	if (findtext(duration_in_x_units, "year"))
@@ -262,7 +208,7 @@ var/datum/quickBan_handler/quickBan_handler = null
 	else if (findtext(duration_in_x_units, "second"))
 		duration_in_days /= 86400
 	else if (!findtext(duration_in_x_units, "day"))
-		src << "<span class = 'warning'>Invalid unit.</span>"
+		to_chat(src, "<span class = 'warning'>Invalid unit.</span>")
 		goto reenter_bantime
 
 	var/duration_in_deciseconds = duration_in_days * 86400 * 10
@@ -282,7 +228,7 @@ var/datum/quickBan_handler/quickBan_handler = null
 
 	fields["ban_date"] = replacetext(time2text(world.realtime, "DDD MMM DD hh:mm:ss YYYY"), ":", ".")
 
-	reenter_reason
+	reenter_reason:
 	fields["reason"] = input(src, "Provide a reason for the ban.") as text
 	if (!fields["reason"])
 		goto reenter_reason
@@ -333,7 +279,7 @@ var/datum/quickBan_handler/quickBan_handler = null
 	fields["test"] = "test"
 
 /* the actual banning procedure */
-/proc/quickBan_ban(var/list/fields, var/client/banner)
+/proc/quickBan_ban(var/list/fields, var/client/banner = null)
 
 	if (!fields)
 		fields = list()
@@ -345,12 +291,15 @@ var/datum/quickBan_handler/quickBan_handler = null
 
 	//txt database
 	text2file("[fields["type"]];[fields["type_specific_info"]];[fields["UID"]];[fields["reason"]];[fields["banned_by"]];[fields["ban_date"]];[fields["expire_realtime"]];[fields["expire_info"]];[banckey];[bancID];[banip];|||","SQL/bans.txt")
-
+	var/M = ""
 	if (banner)
-		banner << "<span class = 'notice'>You have successfully banned [banckey]/[bancID]/[banip]. This ban [lowertext(expire_info)]."
-	var/M = "[key_name(banner)] banned [banckey]/[bancID]/[banip] (bantype = [fields["type"]] ([fields["type_specific_info"]])) for reason '[fields["reason"]]'. This ban [lowertext(expire_info)]."
+		to_chat(banner, "<span class = 'notice'>You have successfully banned [banckey]/[bancID]/[banip]. This ban [lowertext(expire_info)].")
+		M = "[key_name(banner)] banned [banckey]/[bancID]/[banip] (bantype = [fields["type"]] ([fields["type_specific_info"]])) for reason '[fields["reason"]]'. This ban [lowertext(expire_info)]."
+		message_admins(M, key_name(banner))
+	else
+		M = "An admin on Discord banned [banckey]/[bancID]/[banip] (bantype = [fields["type"]] ([fields["type_specific_info"]])) for reason '[fields["reason"]]'. This ban [lowertext(expire_info)]."
+		message_admins(M, "Admin on Discord")
 	log_admin(M)
-	message_admins(M, key_name(banner))
 	// kick whoever got banned if they're on
 	if (lowertext(fields["type"]) == "server")
 		for (var/client/C in clients)
@@ -361,12 +310,12 @@ var/datum/quickBan_handler/quickBan_handler = null
 		if (fields["type_specific_info"])
 			for (var/client/C in clients)
 				if (C.ckey == banckey)
-					C << "<span class = 'userdanger'>You have been [lowertext(fields["type"])]-banned ([fields["type_specific_info"]]). Reason: '[fields["reason"]]'. This ban [lowertext(expire_info)]."
+					to_chat(C, "<span class = 'userdanger'>You have been [lowertext(fields["type"])]-banned ([fields["type_specific_info"]]). Reason: '[fields["reason"]]'. This ban [lowertext(expire_info)].")
 					break
 		else
 			for (var/client/C in clients)
 				if (C.ckey == banckey)
-					C << "<span class = 'userdanger'>You have been [fields["type"]]-banned. Reason: '[fields["reason"]]'. This ban [lowertext(expire_info)]."
+					to_chat(C, "<span class = 'userdanger'>You have been [fields["type"]]-banned. Reason: '[fields["reason"]]'. This ban [lowertext(expire_info)].")
 					break
 
 /* checking if we're banned */
@@ -403,15 +352,15 @@ var/datum/quickBan_handler/quickBan_handler = null
 
 	if (reason)
 		if (bantype == "Server")
-			src << "<span class = 'userdanger'>You're banned. Reason: '[reason]'. This ban was assigned on [date] and [expire_info] (after assigned date)</span>"
+			to_chat(src, "<span class = 'userdanger'>You're banned. Reason: '[reason]'. This ban was assigned on [date] and [expire_info] (after assigned date)</span>")
 			return TRUE
 		else
-			src << "<span class = 'userdanger'>You're [lowertext(bantype)]-banned. Reason: '[reason]'. This ban was assigned on [date] and [expire_info] (after assigned date)</span>"
+			to_chat(src, "<span class = 'userdanger'>You're [lowertext(bantype)]-banned. Reason: '[reason]'. This ban was assigned on [date] and [expire_info] (after assigned date)</span>")
 	return FALSE
 
 /* kick us if we just got banned */
 /client/proc/quickBan_kicked(var/bantype, var/reason, var/expire_info)
-	src << "<span class = 'userdanger'>You have been given a [lowertext(bantype)]-ban. Reason: '[reason]'. [expire_info].</span>"
+	to_chat(src, "<span class = 'userdanger'>You have been given a [lowertext(bantype)]-ban. Reason: '[reason]'. [expire_info].</span>")
 	del src
 
 /* check if we're an admin trying to quickBan another admin */
@@ -424,7 +373,7 @@ var/datum/quickBan_handler/quickBan_handler = null
 			for(var/i in admincheck)
 				var/list/admincheck_two = splittext(i, ";")
 				if (admincheck_two.len && admincheck_two[1] == "[_ckey]")
-					src << "<span class = 'danger'>You can't ban admins!</span>"
+					to_chat(src, "<span class = 'danger'>You can't ban admins!</span>")
 					return TRUE
 	return FALSE
 
@@ -504,6 +453,6 @@ var/datum/quickBan_handler/quickBan_handler = null
 
 	fields["banned_by"] = banner
 
-	quickBan_ban(fields, src)
+	quickBan_ban(fields, null)
 
 	return "successful."

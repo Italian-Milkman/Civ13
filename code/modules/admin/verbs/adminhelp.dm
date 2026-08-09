@@ -5,12 +5,12 @@
 	set name = "Adminhelp"
 
 	if (say_disabled)	//This is here to try to identify lag problems
-		usr << "<span class = 'red'>Speech is currently admin-disabled.</span>"
+		to_chat(usr, "<span class = 'red'>Speech is currently admin-disabled.</span>")
 		return
 
 	//handle muting and automuting
 	if (prefs.muted & MUTE_ADMINHELP)
-		src << "<span class = 'red'>Error: Admin-PM: You cannot send adminhelps (Muted).</span>"
+		to_chat(src, "<span class = 'red'>Error: Admin-PM: You cannot send adminhelps (Muted).</span>")
 		return
 
 	if (!showed_adminhelp_popup)
@@ -36,9 +36,9 @@
 		return
 
 	//show it to the person adminhelping too
-	src << "<span class = 'notice'>PM to-<b>Admins </b>: [msg]</span>"
+	to_chat(src, "<span class = 'notice'>PM to-<b>Admins </b>: [msg]</span>")
 	if (config.discordurl)
-		src << "<i>If no admins are online, please ping @Admin <a href = '[config.discordurl]'>in the discord</a>.</i>"
+		to_chat(src, "<i>If no admins are online, please ping @Admin <a href = '[config.discordurl]'>in the discord</a>.</i>")
 	log_admin("HELP: [key_name(src)]: [msg]")
 	discord_ahelp_log(key_name(src),msg)
 	msg = "<span class = 'notice'><b><font color=red>Request for Help: </span>[get_options_bar(mob, 2, TRUE, TRUE)]:</b> [msg]</span>"
@@ -49,8 +49,8 @@
 
 			if (X.is_preference_enabled(/datum/client_preference/holder/play_adminhelp_ping))
 				X << 'sound/effects/adminhelp.ogg'
-			X << msg
+			to_chat(X,msg)
 		else if (R_MENTOR & X.holder.rights)
 			if (X.is_preference_enabled(/datum/client_preference/holder/play_adminhelp_ping))
 				X << 'sound/effects/adminhelp.ogg'
-			X << mentormsg
+			to_chat(X,mentormsg)

@@ -10,8 +10,6 @@ var/global/datum/lobby_music_player/lobby_music_player = null
 
 //	var/hide_mode = FALSE
 //	var/datum/game_mode/mode = null
-	var/post_game = FALSE
-	var/event_time = null
 	var/event = FALSE
 
 	var/login_music			// music played in pregame lobby
@@ -20,7 +18,6 @@ var/global/datum/lobby_music_player/lobby_music_player = null
 
 	var/random_players = FALSE 	// if set to nonzero, ALL players who latejoin or declare-ready join will have random appearances/genders
 
-	var/list/syndicate_coalition = list() // list of traitor-compatible factions
 	var/list/factions = list()			  // list of all factions
 	var/list/availablefactions = list()	  // list of factions with openings
 
@@ -29,11 +26,6 @@ var/global/datum/lobby_music_player/lobby_music_player = null
 	var/delay_end = FALSE	//if set to nonzero, the round will not restart on it's own
 
 //	var/triai = FALSE//Global holder for Triumvirate
-
-	var/round_end_announced = FALSE // Spam Prevention. Announce round end only once.
-
-	var/can_latejoin_ruforce = TRUE
-	var/can_latejoin_geforce = TRUE
 
 	var/players_can_join = TRUE
 
@@ -127,8 +119,6 @@ var/global/datum/lobby_music_player/lobby_music_player = null
 
 	callHook("roundstart")
 
-	// shuttle_controller.initialize_shuttles()
-
 	spawn(0)//Forking here so we dont have to wait for this to finish
 
 	//	to_chat(world, SPAN_NOTICE("<b>Enjoy the game!</b>")
@@ -142,14 +132,7 @@ var/global/datum/lobby_music_player/lobby_music_player = null
 	//start_events() //handles random events and space dust.
 	//new random event system is handled from the MC.
 
-	/* TODO: discord bot - Kachnov
-	var/admins_number = 0
-	for (var/client/C)
-		if (C.holder)
-			admins_number++
 
-	if (admins_number == 0)
-		send2adminirc("Round has started with no admins online.")*/
 
 	return TRUE
 
@@ -179,6 +162,11 @@ var/global/datum/lobby_music_player/lobby_music_player = null
 		//	if (!player_is_antag(player.mind, only_offstation_roles = TRUE))
 			job_master.EquipRank(player, player.mind.assigned_role, FALSE)
 		//		equip_custom_items(player)
+	if (map && map.ID == MAP_WIZARD_BOY)
+		var/obj/map_metadata/wizard_boy/WB = map
+		for (var/mob/living/human/player in player_list)
+			if (player && player.ckey)
+				WB.give_sticker_pack(player)
 
 /datum/controller/gameticker/proc/process()
 	if (current_state != GAME_STATE_PLAYING)

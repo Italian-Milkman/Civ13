@@ -205,7 +205,53 @@ var/list/global_huds = list(
 /datum/hud
 	var/mob/mymob
 	var/list/obj/screen/plane_master/plane_masters = list()
-/datum/hud/New(mob/owner)
+	var/list/obj/screen/vehicle/vehicle_hud = list()
+	var/list/wizard_hud = list()
+	var/obj/screen/spell_selector/spell_selector = null
+
+/datum/hud/proc/add_vehicle_hud(var/mob/living/human/H)
+	if (vehicle_hud.len)
+		return
+	var/obj/screen/vehicle/V
+	V = new /obj/screen/vehicle/direction()
+	V.screen_loc = "14,15"
+	V.parentmob = H
+	vehicle_hud += V
+	H.HUDprocess += V
+	V = new /obj/screen/vehicle/turn_left()
+	V.screen_loc = "13,15"
+	V.parentmob = H
+	vehicle_hud += V
+	V = new /obj/screen/vehicle/turn_right()
+	V.screen_loc = "15,15"
+	V.parentmob = H
+	vehicle_hud += V
+	V = new /obj/screen/vehicle/gear_down()
+	V.screen_loc = "13,14"
+	V.parentmob = H
+	vehicle_hud += V
+	V = new /obj/screen/vehicle/current_gear()
+	V.screen_loc = "14,14"
+	V.parentmob = H
+	vehicle_hud += V
+	H.HUDprocess += V
+	V = new /obj/screen/vehicle/gear_up()
+	V.screen_loc = "15,14"
+	V.parentmob = H
+	vehicle_hud += V
+	if (mymob && mymob.client)
+		mymob.client.screen |= vehicle_hud
+
+/datum/hud/proc/remove_vehicle_hud(var/mob/living/human/H)
+	if (!vehicle_hud.len)
+		return
+	if (H && H.client)
+		H.client.screen -= vehicle_hud
+	for (var/obj/screen/vehicle/V in vehicle_hud)
+		if (H)
+			H.HUDprocess -= V
+		qdel(V)
+	vehicle_hud.Cut()
 
 /datum/hud/New(mob/owner)
 	mymob = owner
@@ -217,9 +263,267 @@ var/list/global_huds = list(
 		if (mymob)
 			mymob.client.screen |= instance
 	..()
+
 /datum/hud/Destroy()
 	if(plane_masters.len)
 		for(var/thing in plane_masters)
 			qdel(plane_masters[thing])
 		plane_masters.Cut()
+	if(vehicle_hud.len)
+		remove_vehicle_hud()
+	if(wizard_hud.len)
+		remove_wizard_hud(mymob)
 	return ..()
+
+/obj/screen/spell_selector
+	icon = 'icons/obj/magic_icon.dmi'
+	icon_state = "selected"
+	layer = 21
+	mouse_opacity = FALSE
+
+/obj/screen/spell
+	icon = 'icons/obj/magic_icon.dmi'
+	layer = 20
+	var/spell_path = null
+
+/obj/screen/spell/Click()
+	if(!parentmob || !ishuman(parentmob))
+		return
+	var/mob/living/human/H = parentmob
+
+	// Only allow interaction if holding a wand
+	var/obj/item/weapon/material/magic/wand/W = null
+	
+	if (!istype(H.get_active_hand(), /obj/item/weapon/material/magic/wand))
+		return
+	W = H.get_active_hand()
+	if(spell_path)
+		var/list/spell_list = W.get_usable_spells(H)
+		for (var/datum/spell/SP in spell_list)
+			if (SP.type == spell_path)
+				W.active_spell = SP
+				to_chat(H, SPAN_NOTICE("Spell set to <b>[W.active_spell.name]</b>!"))
+				if (H.hud_used)
+					H.hud_used.update_spell_selector(H)
+					H.hud_used.update_spellshow(H)
+				return
+/obj/screen/spell/zappus
+	name = "Zappus"
+	icon_state = "zappus"
+	screen_loc = "1,15"
+	spell_path = /datum/spell/zappus
+
+/obj/screen/spell/blockum
+	name = "Blockum"
+	icon_state = "blockum"
+	screen_loc = "2,15"
+	spell_path = /datum/spell/blockum
+
+/obj/screen/spell/lightus
+	name = "Lightus"
+	icon_state = "lightus"
+	screen_loc = "3,15"
+	spell_path = /datum/spell/lightus
+
+/obj/screen/spell/dropus
+	name = "Dropus"
+	icon_state = "dropus"
+	screen_loc = "4,15"
+	spell_path = /datum/spell/dropus
+
+/obj/screen/spell/stinkaeum
+	name = "Stinkaeum"
+	icon_state = "stinkaeum"
+	screen_loc = "5,15"
+	spell_path = /datum/spell/stinkaeum
+
+/// Below Top Left (Row 14) ///
+/obj/screen/spell/pushum
+	name = "Pushum"
+	icon_state = "pushum"
+	screen_loc = "1,14"
+	spell_path = /datum/spell/pushum
+
+/obj/screen/spell/pullus
+	name = "Pullus"
+	icon_state = "pullus"
+	screen_loc = "2,14"
+	spell_path = /datum/spell/pullus
+
+/obj/screen/spell/wallus
+	name = "Wallus"
+	icon_state = "wallus"
+	screen_loc = "3,14"
+	spell_path = /datum/spell/wallus
+
+/obj/screen/spell/floatus
+	name = "Floatus"
+	icon_state = "floatus"
+	screen_loc = "4,14"
+	spell_path = /datum/spell/floatus
+
+/// Top Right Spells (Row 15) ///
+/obj/screen/spell/freezum
+	name = "Freezum"
+	icon_state = "freezeum"
+	screen_loc = "15,15"
+	spell_path = /datum/spell/freezum
+
+/obj/screen/spell/blinkae
+	name = "Blinkae"
+	icon_state = "blinkae"
+	screen_loc = "14,15"
+	spell_path = /datum/spell/blinkae
+
+/obj/screen/spell/burnus
+	name = "Burnus"
+	icon_state = "burnus"
+	screen_loc = "13,15"
+	spell_path = /datum/spell/burnus
+
+/obj/screen/spell/barrelus
+	name = "Barrelus"
+	icon_state = "barrelus"
+	screen_loc = "12,15"
+	spell_path = /datum/spell/barrelus
+
+/obj/screen/spell/sliceum
+	name = "Sliceum"
+	icon_state = "sliceum"
+	screen_loc = "11,15"
+	spell_path = /datum/spell/sliceum
+
+/// Below Top Right (Row 14) ///
+/obj/screen/spell/fixae
+	name = "Fixae"
+	icon_state = "fixae"
+	screen_loc = "15,14"
+	spell_path = /datum/spell/fixae
+
+/obj/screen/spell/explodus
+	name = "Explodus"
+	icon_state = "explodus"
+	screen_loc = "14,14"
+	spell_path = /datum/spell/explodus
+
+/obj/screen/spell/painum
+	name = "Painum"
+	icon_state = "painum"
+	screen_loc = "13,14"
+	spell_path = /datum/spell/painum
+
+/obj/screen/spell/deadum
+	name = "Deadum"
+	icon_state = "deadum"
+	screen_loc = "12,14"
+	spell_path = /datum/spell/deadum
+
+/datum/hud/proc/add_wizard_hud(mob/living/human/H)
+	if (!H)
+		return
+	if (wizard_hud.len)
+		remove_wizard_hud(H)
+
+	var/obj/item/weapon/material/magic/wand/W = H.get_active_hand()
+	if (!istype(W))
+		return
+
+	for (var/datum/spell/SP in W.get_usable_spells(H))
+
+		// Only show spells the user has learned and meets the skill requirement for
+		if(H.getStat("magic") < SP.skill_level)
+			continue
+		if (!SP.screen_obj)
+			continue
+		var/obj/screen/spell/S = new SP.screen_obj
+		S.parentmob = H
+		wizard_hud += S
+
+	if (!spell_selector)
+		spell_selector = new()
+		spell_selector.parentmob = H
+	wizard_hud += spell_selector
+
+	if (mymob && mymob.client)
+		mymob.client.screen |= wizard_hud
+
+	update_spell_selector(H)
+
+/datum/hud/proc/remove_wizard_hud(mob/living/human/H)
+	if (!wizard_hud.len)
+		return
+	if (H && H.client)
+		H.client.screen -= wizard_hud
+	for (var/obj/screen/S in wizard_hud)
+		qdel(S)
+	spell_selector = null
+	wizard_hud.Cut()
+
+/datum/hud/proc/update_spell_selector(mob/living/human/H)
+	if (!spell_selector)
+		return
+
+	var/obj/item/weapon/material/magic/wand/W = null
+	if (H)
+		if (istype(H.get_active_hand(), /obj/item/weapon/material/magic/wand))
+			W = H.get_active_hand()
+
+	if (!W || !W.active_spell)
+		spell_selector.screen_loc = null
+		return
+
+	var/found = FALSE
+	for (var/obj/screen/spell/S in wizard_hud)
+		if (S.spell_path == W.active_spell.type)
+			spell_selector.screen_loc = S.screen_loc
+			found = TRUE
+			break
+
+	if (!found)
+		spell_selector.screen_loc = null
+
+/datum/hud/proc/update_spellshow(mob/living/human/H)
+	if (!H || !H.client)
+		return
+	for (var/obj/screen/spellshow/S in H.client.screen)
+		S.update()
+
+
+//////////////////SCREEN HELPERS////////////////////////////
+/obj/screen/spellshow
+	maptext = "<center><font color='red'>No Spell</font></center>"
+	maptext_width = 32*8
+	maptext_x = (32*8 * -0.5)+32
+	maptext_y = 32*0.75
+	icon_state = "blank"
+
+/obj/screen/spellshow/New(var/name, var/screen_loc, var/mob/M)
+	src.name = name
+	src.screen_loc = screen_loc
+	src.parentmob = M
+	..()
+	if (parentmob)
+		var/obj/item/weapon/material/magic/wand/W
+		if (istype(parentmob.l_hand, /obj/item/weapon/material/magic/wand))
+			W = parentmob.l_hand
+		else if (istype(parentmob.r_hand, /obj/item/weapon/material/magic/wand))
+			W = parentmob.r_hand
+		if (W && W.active_spell)
+			maptext = "<center><font color='yellow'><b>[W.active_spell.name]</b></font></center>"
+		else
+			maptext = "<center><font color='red'>No Spell</font></center>"
+	icon_state = "blank"
+
+/obj/screen/spellshow/proc/update(loop = FALSE)
+	if (!parentmob || !src)
+		return
+	if (parentmob)
+		var/obj/item/weapon/material/magic/wand/W
+		if (istype(parentmob.l_hand, /obj/item/weapon/material/magic/wand))
+			W = parentmob.l_hand
+		else if (istype(parentmob.r_hand, /obj/item/weapon/material/magic/wand))
+			W = parentmob.r_hand
+		if (W && W.active_spell)
+			maptext = "<center><font color='yellow'><b>[W.active_spell.name]</b></font></center>"
+		else
+			maptext = "<center><font color='red'>No Spell</font></center>"

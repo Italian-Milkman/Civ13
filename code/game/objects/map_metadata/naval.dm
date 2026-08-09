@@ -2,7 +2,8 @@
 /obj/map_metadata/naval
 	ID = MAP_NAVAL
 	title = "Naval Battle"
-	lobby_icon = 'icons/lobby/imperial.png'
+	description = "Battle on the Naval Battle map."
+	lobby_icon = "icons/lobby/imperial.png"
 	no_winner ="No ship has been captured."
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall/)
 	respawn_delay = 300
@@ -24,31 +25,6 @@
 	faction1 = FRENCH
 	faction2 = PIRATES
 	grace_wall_timer = 3000
-
-/obj/map_metadata/naval/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_RP == TRUE)
-		. = FALSE
-	else if (J.is_army == TRUE)
-		. = FALSE
-	else if (J.is_ww1 == TRUE)
-		. = FALSE
-	else if (J.is_coldwar == TRUE)
-		. = FALSE
-	else if (J.is_medieval)
-		. = FALSE
-	else if (J.is_marooned == TRUE)
-		. = FALSE
-	else if (J.is_event == TRUE)
-		. = FALSE
-	else if (istype(J, /datum/job/pirates/battleroyale))
-		. = FALSE
-	else if (istype(J, /datum/job/indians/tribes))
-		. = FALSE
-	else if (J.is_twotribes)
-		. = FALSE
-	else
-		. = TRUE
 
 /obj/map_metadata/naval/cross_message(faction)
 	return "<font size = 4>All factions may cross the grace wall now!</font>"

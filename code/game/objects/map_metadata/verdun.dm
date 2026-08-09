@@ -2,7 +2,8 @@
 /obj/map_metadata/verdun
 	ID = MAP_VERDUN
 	title = "Battle of Verdun"
-	lobby_icon = 'icons/lobby/ww1.png'
+	description = "The German and the Allied forces are facing eachother at the Douaumont Fort in Verdun! It will start in 5 minutes. The French Army must defend for 20 minutes!"
+	lobby_icon = "icons/lobby/ww1.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall, /area/caribbean/no_mans_land/invisible_wall/one)
 	respawn_delay = 300
 	no_hardcore = TRUE
@@ -26,7 +27,7 @@
 	faction2 = FRENCH
 	grace_wall_timer = 3000
 	songs = list(
-		"Argonnerwaldlied:1" = 'sound/music/argonnerwaldlied.ogg')
+		"Argonnerwaldlied:1" = "sound/music/argonnerwaldlied.ogg")
 
 	valid_weather_types = list(WEATHER_WET, WEATHER_EXTREME)
 
@@ -78,7 +79,7 @@
 			british_toggled = TRUE
 			french_toggled = FALSE
 	spawn(30)
-		world << "<font size=3>This battle will feature <b>[faction1]</b> and <b>[faction2]</b> troops.</font>"
+		to_chat(world, "<font size=3>This battle will feature <b>[faction1]</b> and <b>[faction2]</b> troops.</font>")
 
 	spawn(101)
 		if (season == "SPRING")
@@ -93,13 +94,6 @@
 		if (istype(A, /area/caribbean/nomads/forest))
 			A.weather = 3
 			A.icon_state = "monsoon"
-/obj/map_metadata/verdun/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_ww1 == TRUE)
-		. = TRUE
-	else
-		. = FALSE
-
 /obj/map_metadata/verdun/roundend_condition_def2name(define)
 	..()
 	switch (define)
@@ -147,14 +141,14 @@ var/no_loop_verdun = FALSE
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The <b>French Army</b> has successfuly defended Fort Douaumont! The Imperial German Army has halted the attack!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_verdun == FALSE)
 		ticker.finished = TRUE
 		var/message = "The <b>Imperial German Army</b> has captured Fort Douaumont's Command! The battle for Fort Douaumont is over!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_verdun = TRUE
@@ -234,7 +228,7 @@ var/no_loop_verdun = FALSE
 				current_loser = roundend_condition_def2army(roundend_condition_sides[2][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The [current_winner] has lost control of the [army2name(current_loser)] base!</font>"
+			to_chat(world, "<font size = 3>The [current_winner] has lost control of the [army2name(current_loser)] base!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1

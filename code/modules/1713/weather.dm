@@ -46,7 +46,7 @@
 			switch (A.climate)
 				if ("tundra")
 					switch (season)
-						if ("Wet Season" || "WINTER" || "FALL" || "SPRING")
+						if ("Wet Season", "WINTER", "FALL", "SPRING")
 							switch (weather)
 								if (WEATHER_EXTREME)
 									A.icon_state = "snow_storm"
@@ -60,7 +60,7 @@
 									A.icon_state = ""
 									A.weather = WEATHER_NONE
 									A.weather_intensity = weather_intensity
-						if ("Dry Season" || "SUMMER")
+						if ("Dry Season", "SUMMER")
 							switch (weather)
 								if (WEATHER_EXTREME)
 									A.icon_state = "snow1"
@@ -77,7 +77,7 @@
 
 				if ("taiga")
 					switch (season)
-						if ("Wet Season" || "WINTER" || "FALL")
+						if ("Wet Season", "WINTER", "FALL")
 							switch (weather)
 								if (WEATHER_EXTREME)
 									A.icon_state = "snow_storm"
@@ -92,7 +92,7 @@
 									A.weather = WEATHER_NONE
 									A.weather_intensity = weather_intensity
 
-						if ("Dry Season" || "SUMMER" || "SPRING")
+						if ("Dry Season", "SUMMER", "SPRING")
 							switch (weather)
 								if (WEATHER_EXTREME)
 									A.icon_state = "snow1"
@@ -108,7 +108,7 @@
 									A.weather_intensity = weather_intensity
 				if ("jungle")
 					switch (season)
-						if ("Wet Season" || "WINTER" || "SPRING")
+						if ("Wet Season", "WINTER", "SPRING")
 							switch (weather)
 								if (WEATHER_EXTREME)
 									A.icon_state = "monsoon"
@@ -122,7 +122,7 @@
 									A.icon_state = ""
 									A.weather = weather
 									A.weather_intensity = weather_intensity
-						if ("Dry Season" || "SUMMER" || "FALL")
+						if ("Dry Season", "SUMMER", "FALL")
 							switch (weather)
 								if (WEATHER_EXTREME)
 									A.icon_state = ""
@@ -135,7 +135,7 @@
 
 				if ("savanna")
 					switch (season)
-						if ("Wet Season" || "WINTER" || "SPRING")
+						if ("Wet Season", "WINTER", "SPRING")
 							switch (weather)
 								if (WEATHER_EXTREME)
 									A.icon_state = "rain3"
@@ -149,7 +149,7 @@
 									A.icon_state = ""
 									A.weather = weather
 									A.weather_intensity = weather_intensity
-						if ("Dry Season" || "SUMMER" || "FALL")
+						if ("Dry Season", "SUMMER", "FALL")
 							switch (weather)
 								if (WEATHER_EXTREME)
 									A.icon_state = ""
@@ -162,7 +162,7 @@
 
 				if ("desert")
 					switch (season)
-						if ("Dry Season" || "SUMMER" || "FALL")
+						if ("Dry Season", "SUMMER", "FALL")
 							switch (weather)
 								if (WEATHER_EXTREME)
 									A.icon_state = "sandstorm"
@@ -176,30 +176,13 @@
 									A.icon_state = ""
 									A.weather = weather
 									A.weather_intensity = weather_intensity
-							if ("Wet Season" || "WINTER" || "SPRING")
-								switch (weather)
-									if (WEATHER_EXTREME)
-										A.icon_state = ""
-										A.weather = WEATHER_NONE
-										A.weather_intensity = weather_intensity
-									if (WEATHER_WET)
-										A.icon_state = "rain1"
-										A.weather = WEATHER_WET
-										A.weather_intensity = weather_intensity
-									else
-										A.icon_state = ""
-										A.weather = weather
-										A.weather_intensity = weather_intensity
-
-				if ("sea")
-					switch (season)
-						if ("Wet Season" || "WINTER" ||  "FALL")
+						if ("Wet Season", "WINTER", "SPRING")
 							switch (weather)
 								if (WEATHER_EXTREME)
-									A.icon_state = "monsoon"
-									A.weather = WEATHER_EXTREME
+									A.icon_state = ""
+									A.weather = WEATHER_NONE
 									A.weather_intensity = weather_intensity
-								else if (WEATHER_WET)
+								if (WEATHER_WET)
 									A.icon_state = "rain1"
 									A.weather = WEATHER_WET
 									A.weather_intensity = weather_intensity
@@ -207,7 +190,24 @@
 									A.icon_state = ""
 									A.weather = weather
 									A.weather_intensity = weather_intensity
-						if ("Dry Season" || "SUMMER" || "SPRING")
+
+				if ("sea")
+					switch (season)
+						if ("Wet Season", "WINTER", "FALL")
+							switch (weather)
+								if (WEATHER_EXTREME)
+									A.icon_state = "monsoon"
+									A.weather = WEATHER_EXTREME
+									A.weather_intensity = weather_intensity
+								if (WEATHER_WET)
+									A.icon_state = "rain1"
+									A.weather = WEATHER_WET
+									A.weather_intensity = weather_intensity
+								else
+									A.icon_state = ""
+									A.weather = weather
+									A.weather_intensity = weather_intensity
+						if ("Dry Season", "SUMMER", "SPRING")
 							switch (weather)
 								if (WEATHER_EXTREME)
 									A.icon_state = "rain2"
@@ -223,7 +223,7 @@
 									A.weather_intensity = weather_intensity
 				if ("semiarid")
 					switch (season)
-						if ("Wet Season" || "WINTER" ||  "FALL")
+						if ("Wet Season", "WINTER", "FALL")
 							switch (weather)
 								if (WEATHER_EXTREME)
 									A.icon_state = "rain3"
@@ -237,7 +237,7 @@
 									A.icon_state = ""
 									A.weather = weather
 									A.weather_intensity = weather_intensity
-						if ("Dry Season" || "SUMMER" || "SPRING")
+						if ("Dry Season", "SUMMER", "SPRING")
 							switch (weather)
 								if (WEATHER_EXTREME)
 									A.icon_state = ""
@@ -253,7 +253,7 @@
 									A.weather_intensity = weather_intensity
 				if ("temperate")
 					switch (season)
-						if ("Wet Season" || "WINTER")
+						if ("Wet Season", "WINTER")
 							switch (weather)
 								if (WEATHER_EXTREME)
 									A.icon_state = "snow_storm"
@@ -267,7 +267,7 @@
 									A.icon_state = ""
 									A.weather = WEATHER_NONE
 									A.weather_intensity = weather_intensity
-						if ("Dry Season"|| "FALL" || "SPRING")
+						if ("Dry Season", "FALL", "SPRING")
 							switch (weather)
 								if (WEATHER_EXTREME)
 									A.icon_state = "rain2"
@@ -302,6 +302,16 @@
 	if (old_weather != weather)
 		announce_weather_change(old_weather, weather)
 */
+/// Returns TRUE if the given area icon_state represents precipitation
+/// (rain, snow, monsoon) that would soak an MDF wand.
+/proc/is_wet_weather_icon(var/icon_state_str)
+	if (copytext(icon_state_str, 1, 5) == "rad_")
+		icon_state_str = copytext(icon_state_str, 5)
+	switch (icon_state_str)
+		if ("rain", "rain1", "rain2", "rain3", "monsoon", "snow1", "snow2", "snow_storm")
+			return TRUE
+	return FALSE
+
 /proc/modify_weather_somehow()
 	if (weather == WEATHER_NONE)
 		return
@@ -474,25 +484,31 @@
 			loc_temp = (min(10,loc_temp+40))
 		if (mob_area.weather == WEATHER_EXTREME && season == "WINTER" && (mob_area.climate == "temperate" || mob_area.climate == "taiga" || mob_area.climate == "tundra"))
 			loc_temp = -10
-
-	for (var/obj/structure/brazier/BR in range(3, src))
+		if (map && map.ID == MAP_ANTARCTICA)
+			for (var/obj/structure/oven/big/FN in range(5, A))
+				if (FN.on)
+					if (loc_temp < 19)
+						loc_temp = 19
+						break
+	for (var/obj/structure/brazier/BR in range(3, A))
 		if (BR.on)
 			if (loc_temp < 22)
 				loc_temp = 22
 				break
-	for (var/obj/structure/heatsource/HS in range(3, src))
+	for (var/obj/structure/heatsource/HS in range(3, A))
 		if (HS.on)
 			if (loc_temp < 22)
 				loc_temp = 22
 				break
-	for (var/obj/structure/oven/fireplace/FP in range(1, src))
+	for (var/obj/structure/oven/fireplace/FP in range(1, A))
 		if (FP.on)
 			if (loc_temp < 22)
 				loc_temp = 22
 				break
-	for (var/obj/structure/engine/EN in range(1, src))
+	for (var/obj/structure/engine/EN in range(1, A))
 		if (EN.on)
 			if (loc_temp < 22)
 				loc_temp = 22
 				break
+
 	return loc_temp

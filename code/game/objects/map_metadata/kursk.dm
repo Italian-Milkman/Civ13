@@ -2,7 +2,8 @@
 /obj/map_metadata/kursk
 	ID = MAP_KURSK
 	title = "Kursk"
-	lobby_icon = 'icons/lobby/kursk.png'
+	description = "Battle on the Kursk map."
+	lobby_icon = "icons/lobby/kursk.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall/temperate)
 	respawn_delay = 1200
 
@@ -24,24 +25,7 @@
 	grace_wall_timer = 3600
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET)
 	songs = list(
-		"Red Army Choir - Katyusha:1" = 'sound/music/katyusha.ogg',)
-
-/obj/map_metadata/kursk/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_ww2 == TRUE && J.is_tanker == TRUE)
-		. = TRUE
-	else if (J.is_ss_panzer == TRUE)
-		. = TRUE
-	else if (istype(J, /datum/job/german/mediziner) || istype(J, /datum/job/russian/doctor_soviet))
-		. = TRUE
-	else if (istype(J, /datum/job/russian/sniper_soviet))
-		. = TRUE
-	else if (istype(J, /datum/job/russian/antitank_soldier_soviet) || istype(J, /datum/job/russian/antitank_assistant_soldier_soviet))
-		. = TRUE
-	else if (istype(J, /datum/job/german/german_antitank) || istype(J, /datum/job/german/german_antitankassitant))
-		. = TRUE
-	else
-		. = FALSE
+		"Red Army Choir - Katyusha:1" = "sound/music/katyusha.ogg",)
 
 /obj/map_metadata/kursk/roundend_condition_def2name(define)
 	..()

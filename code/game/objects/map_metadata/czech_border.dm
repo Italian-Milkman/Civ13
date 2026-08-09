@@ -2,7 +2,7 @@
 /obj/map_metadata/czech_border
 	ID = MAP_CZECH_BORDER
 	title = "Battle On the Czech border"
-	lobby_icon = 'icons/lobby/modern.png'
+	lobby_icon = "icons/lobby/modern.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall/temperate,/area/caribbean/no_mans_land/invisible_wall/temperate/one,/area/caribbean/no_mans_land/invisible_wall/temperate/one)
 	respawn_delay = 1200
 	no_winner ="The Village is under Czech control."
@@ -76,14 +76,14 @@ obj/map_metadata/czech_border/roundend_condition_def2name(define)
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The <b>Czechs</b> have sucessfuly defended The Village! NATO forces have halted the attack!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_r == FALSE) //Needs to be looked into to prevent the bug of Germans "winning" by getting wiped and not respawning after 10 seconds.
 		ticker.finished = TRUE
 		var/message = "<b>NATO</b> has Captured the Village! The battle is over!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_r = TRUE
@@ -126,7 +126,7 @@ obj/map_metadata/czech_border/roundend_condition_def2name(define)
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The <b>Czechs</b> have recaptured the Planning center!</font>"
+			to_chat(world, "<font size = 3>The <b>Czechs</b> have recaptured the Planning center!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1
@@ -145,5 +145,4 @@ obj/map_metadata/czech_border/roundend_condition_def2name(define)
 				return TRUE
 		else
 			return !faction1_can_cross_blocks()
-			return !faction2_can_cross_blocks()
 	return FALSE

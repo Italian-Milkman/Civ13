@@ -2,8 +2,9 @@
 /obj/map_metadata/voyage
 	ID = MAP_VOYAGE
 	title = "Voyage"
+	description = "Your crew of pirates assembles for the first voyage. Will you get rich, or perish like the others?"
 	no_winner ="The ship is on the way."
-	lobby_icon = 'icons/lobby/imperial.png'
+	lobby_icon = "icons/lobby/imperial.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall/)
 	faction_organization = list(PIRATES)
 	roundend_condition_sides = list(list(PIRATES) = /area/caribbean/no_mans_land)
@@ -74,15 +75,15 @@
 				tally += M.value*M.amount
 			for(var/obj/item/stack/money/M1 in S.loc)
 				tally += M1.value*M1.amount
-	world << "<font size=4 color='yellow'>Total Treasure: [tally]</font>"
-	world << "<font size=4 color='yellow'>Islands Visited: [statistics[2]]</font>"
-	world << "<font size=4 color='yellow'>Ships Defeated:</font>"
-	world << "<font size=4 color='yellow'>	Xebecs (lvl 1): [statistics[3][1]]</font>"
-	world << "<font size=4 color='yellow'>	Schooners (lvl 2): [statistics[3][2]]</font>"
-	world << "<font size=4 color='yellow'>	Flutes (lvl 3): [statistics[3][3]]</font>"
-	world << "<font size=4 color='yellow'>	Brigs (lvl 4): [statistics[3][4]]</font>"
-	world << "<font size=4 color='yellow'>	Galleons (lvl 5): [statistics[3][5]]</font>"
-	world << "<font size=4 color='yellow'>	Man-O-Wars (lvl 6): [statistics[3][6]]</font>"
+	to_chat(world, "<font size=4 color='yellow'>Total Treasure: [tally]</font>")
+	to_chat(world, "<font size=4 color='yellow'>Islands Visited: [statistics[2]]</font>")
+	to_chat(world, "<font size=4 color='yellow'>Ships Defeated:</font>")
+	to_chat(world, "<font size=4 color='yellow'>	Xebecs (lvl 1): [statistics[3][1]]</font>")
+	to_chat(world, "<font size=4 color='yellow'>	Schooners (lvl 2): [statistics[3][2]]</font>")
+	to_chat(world, "<font size=4 color='yellow'>	Flutes (lvl 3): [statistics[3][3]]</font>")
+	to_chat(world, "<font size=4 color='yellow'>	Brigs (lvl 4): [statistics[3][4]]</font>")
+	to_chat(world, "<font size=4 color='yellow'>	Galleons (lvl 5): [statistics[3][5]]</font>")
+	to_chat(world, "<font size=4 color='yellow'>	Man-O-Wars (lvl 6): [statistics[3][6]]</font>")
 	no_spam = TRUE
 /obj/map_metadata/voyage/proc/nav()
 	check_roundend_conditions()
@@ -131,7 +132,7 @@
 /obj/map_metadata/voyage/proc/check_ships()
 	for(var/list/L in ships)
 		if (L[3] == latitude && L[4] == longitude)
-			world << "<font size=4 color='yellow'>A ship approaches!</font>"
+			to_chat(world, "<font size=4 color='yellow'>A ship approaches!</font>")
 			navmoving = FALSE
 			for(var/obj/effect/sailing_effect/S in world)
 				S.icon_state = "sailing_effect_stopped"
@@ -187,7 +188,7 @@
 	ship_anchored = TRUE
 	for(var/obj/structure/voyage/anchor_capstan/AC in world)
 		AC.update_icon()
-	world << "<font size=4 color='yellow'>The ship arrives at the destination.</font>"
+	to_chat(world, "<font size=4 color='yellow'>The ship arrives at the destination.</font>")
 	if (navdirection == "island")
 		if (prob(50))
 			load_map(pick("island1","island2","island3","piratetown","cursed_island"),"north")
@@ -209,13 +210,13 @@
 	ship_anchored = FALSE
 	for(var/obj/structure/voyage/anchor_capstan/AC in world)
 		AC.update_icon()
-	world << "<font size=4 color='yellow'>The ship returns to the high seas.</font>"
+	to_chat(world, "<font size=4 color='yellow'>The ship returns to the high seas.</font>")
 	for(var/obj/structure/grapplehook/G in world)
 		G.undeploy()
 	clear_map()
 	//convert looted autofire cannons to normal cannons and looted grappling hooks to normal hooks
-	for(var/obj/structure/cannon/modern/tank/voyage/autofire/C in world)
-		new/obj/structure/cannon/modern/tank/voyage(C.loc)
+	for(var/obj/structure/cannon/modern/voyage/autofire/C in world)
+		new/obj/structure/cannon/modern/voyage(C.loc)
 		qdel(C)
 	for(var/obj/structure/grapplehook/auto/D in world)
 		new/obj/structure/grapplehook(D.loc)
@@ -309,7 +310,7 @@
 		if (win_condition_spam_check)
 			return FALSE
 		ticker.finished = TRUE
-		world << "<font size=4>[roundend_msg]</font>"
+		to_chat(world, "<font size=4>[roundend_msg]</font>")
 		win_condition_spam_check = TRUE
 		return FALSE
 
@@ -360,7 +361,7 @@
 		return "OBJECT;[nx];[ny];[nz];[A.type];[list2text(.)]"
 
 /obj/map_metadata/voyage/proc/do_export(saveloc = "maps/test")
-	world << "<i><b>Saving the game... Might lag for a few seconds.</b></i>"
+	to_chat(world, "<i><b>Saving the game... Might lag for a few seconds.</b></i>")
 	world.log << "Started saving at [time2text(world.realtime,"YYYY-MM-DD-(hh-mm-ss)")]."
 	var/F = file("[saveloc]/mobs.txt")
 	if (fexists(F))
@@ -393,38 +394,11 @@
 						text2file(list2text_assoc(O),F2)
 	sleep(1)
 	world.log << "Finished saving at [time2text(world.realtime,"YYYY-MM-DD-(hh-mm-ss)")]."
-	world << "<i><b>Finished saving.</b></i>"
+	to_chat(world, "<i><b>Finished saving.</b></i>")
 	return saveloc
 
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
-
-/obj/map_metadata/voyage/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_RP == TRUE)
-		. = FALSE
-	else if (J.is_army == TRUE)
-		. = FALSE
-	else if (J.is_prison == TRUE)
-		. = FALSE
-	else if (J.is_ww1 == TRUE)
-		. = FALSE
-	else if (J.is_coldwar == TRUE)
-		. = FALSE
-	else if (J.is_medieval == TRUE)
-		. = FALSE
-	else if (J.is_marooned == TRUE)
-		. = FALSE
-	else if (J.is_event == TRUE)
-		. = FALSE
-	else if (J.is_event_role == TRUE)
-		. = FALSE
-	else if (istype(J, /datum/job/pirates/battleroyale))
-		. = FALSE
-	else if (istype(J, /datum/job/pirates/captain) || istype(J, /datum/job/pirates/boatswain) || istype(J, /datum/job/pirates/qm) || istype(J, /datum/job/pirates/cook) || istype(J, /datum/job/pirates/carpenter) || istype(J, /datum/job/pirates/midshipman))
-		. = FALSE
-	else
-		. = TRUE
 
 /obj/map_metadata/voyage/New()
 	..()
@@ -514,7 +488,7 @@
 					return
 /obj/structure/voyage/tablemap
 	name = "map"
-	desc = "A map of the regeion. Used by the captain to plan the next moves."
+	desc = "A map of the region. Used by the captain to plan the next moves."
 	icon = 'icons/obj/items.dmi'
 	icon_state = "table_map"
 	layer = 3.2
@@ -528,39 +502,28 @@
 			img = image(icon = 'icons/minimaps.dmi', icon_state = "voyage")
 			get_updated_img()
 	proc/get_updated_img()
-		img.overlays.Cut()
+		img_flattened = new /icon('icons/minimaps.dmi', "voyage")
 		if(map.ID == MAP_VOYAGE)
 			var/obj/map_metadata/voyage/nmap = map
 			for(var/list/L in nmap.islands)
-				var/image/newisland = image(icon='icons/minimap_effects.dmi', icon_state=L[1],layer=src.layer+1)
-				newisland.pixel_x = 49+((L[3]-71)*69)
-				newisland.pixel_y = 81+((L[2]-21)*68)
-				img.overlays+=newisland
+				var/icon/newisland = new /icon('icons/minimap_effects.dmi', L[1])
+				img_flattened.Blend(newisland, ICON_OVERLAY, 1 + 49+((L[3]-71)*69), 1 + 81+((L[2]-21)*68))
 			for(var/list/L in nmap.forts)
-				var/image/newfort = image(icon='icons/minimap_effects.dmi', icon_state=L[1],layer=src.layer+1)
-				newfort.pixel_x = 49+((L[3]-71)*69)
-				newfort.pixel_y = 81+((L[2]-21)*68)
-				img.overlays+=newfort
+				var/icon/newfort = new /icon('icons/minimap_effects.dmi', L[1])
+				img_flattened.Blend(newfort, ICON_OVERLAY, 1 + 49+((L[3]-71)*69), 1 + 81+((L[2]-21)*68))
 			for(var/list/L in nmap.ships)
-				var/image/newship = image(icon='icons/minimap_effects.dmi', icon_state="ship[L[1]]",layer=src.layer+1.1)
-				newship.pixel_x = 49+((L[4]-71)*69)
-				newship.pixel_y = 81+((L[3]-21)*68)
-				var/image/newship_s = image(icon='icons/minimap_effects.dmi', icon_state="size[L[1]]",layer=src.layer+1.11)
-				newship_s.pixel_x = 49+((L[4]-71)*69)
-				newship_s.pixel_y = 81+((L[3]-21)*68)
-				var/image/newship_f = image(icon='icons/minimap_effects.dmi', icon_state=L[2],layer=src.layer+1.12)
-				newship_f.pixel_x = 49+((L[4]-71)*69)
-				newship_f.pixel_y = 81+((L[3]-21)*68)
-				img.overlays+=newship
-				img.overlays+=newship_s
-				img.overlays+=newship_f
+				var/icon/newship = new /icon('icons/minimap_effects.dmi', "ship[L[1]]")
+				img_flattened.Blend(newship, ICON_OVERLAY, 1 + 49+((L[4]-71)*69), 1 + 81+((L[3]-21)*68))
+				var/icon/newship_s = new /icon('icons/minimap_effects.dmi', "size[L[1]]")
+				img_flattened.Blend(newship_s, ICON_OVERLAY, 1 + 49+((L[4]-71)*69), 1 + 81+((L[3]-21)*68))
+				var/icon/newship_f = new /icon('icons/minimap_effects.dmi', L[2])
+				img_flattened.Blend(newship_f, ICON_OVERLAY, 1 + 49+((L[4]-71)*69), 1 + 81+((L[3]-21)*68))
 
 	examine(mob/user)
-		update_icon()
-		user << browse(getFlatIcon(img),"window=popup;size=630x630")
+		get_updated_img()
+		user << browse(img_flattened,"window=popup;size=630x630")
 
 	attack_hand(mob/user)
-		update_icon()
 		examine(user)
 
 /obj/structure/voyage/boatswain_book
@@ -711,11 +674,11 @@
 		if (map.ID == MAP_VOYAGE)
 			var/obj/map_metadata/voyage/nmap = map
 			if (nmap)
-				H << "The ship is currently at <b>[nmap.latitude]</b>°N, <b>[nmap.longitude]</b>°W."
-				H << "The ship is heading to the <b>[nmap.navdirection]</b>, progress: <b>[nmap.navprogress]%</b>"
-				H << "Sinking progress: <b>[nmap.get_sink()]%</b>"
+				to_chat(H, "The ship is currently at <b>[nmap.latitude]</b>°N, <b>[nmap.longitude]</b>°W.")
+				to_chat(H, "The ship is heading to the <b>[nmap.navdirection]</b>, progress: <b>[nmap.navprogress]%</b>")
+				to_chat(H, "Sinking progress: <b>[nmap.get_sink()]%</b>")
 				if(nmap.ship_anchored)
-					H << "The ship is <font color='red'><b>anchored</b></font>."
+					to_chat(H, "The ship is <font color='red'><b>anchored</b></font>.")
 
 /obj/structure/voyage/shipbell
 	name = "ship's bell"
@@ -736,8 +699,8 @@
 	proc/play()
 		if (world.time >= cooldown_bell_stand)
 			for (var/mob/M in player_list)
-				M.client << sound('sound/effects/bell_stand.ogg', repeat = FALSE, wait = TRUE, channel = 777)
-			world << "<font size=4 color='yellow'>You hear the ship's bell!</font>"
+				M.client << sound("sound/effects/bell_stand.ogg", repeat = FALSE, wait = TRUE, channel = 777)
+			to_chat(world, "<font size=4 color='yellow'>You hear the ship's bell!</font>")
 			cooldown_bell_stand = world.time+50
 			icon_state = "bell_stand_ringing"
 			spawn(15)
@@ -786,7 +749,7 @@
 	proc/raise_anchor()
 		if(map.ID == MAP_VOYAGE)
 			var/obj/map_metadata/voyage/nmap = map
-			world << "<font size=3 color='yellow'>The ship starts moving.</font>"
+			to_chat(world, "<font size=3 color='yellow'>The ship starts moving.</font>")
 			nmap.ship_anchored = FALSE
 			nmap.navmoving = TRUE
 			for(var/obj/effect/sailing_effect/S in world)
@@ -811,25 +774,25 @@
 					if (resp == "No")
 						return
 					else
-						world << "<font size=4 color='yellow'>The ship is getting ready to leave, ALL crew outside must return within <b>2</b> minutes or be left behind!</font>"
+						to_chat(world, "<font size=4 color='yellow'>The ship is getting ready to leave, ALL crew outside must return within <b>2</b> minutes or be left behind!</font>")
 						spawn(600) // 1 minute
-							world << "<font size=4 color='yellow'>The ship is leaving, ALL crew outside must return within <b>1</b> minute or be left behind!</font>"
+							to_chat(world, "<font size=4 color='yellow'>The ship is leaving, ALL crew outside must return within <b>1</b> minute or be left behind!</font>")
 						spawn(1200)
 							raise_anchor()
 							nmap.abandon_event()
 				else
-					user << "You start [nmap.ship_anchored ? "raising" : "lowering"] the anchor..."
+					to_chat(user, "You start [nmap.ship_anchored ? "raising" : "lowering"] the anchor...")
 					if (do_after(user, 60, src))
-						user << "You lower the anchor."
+						to_chat(user, "You lower the anchor.")
 						lower_anchor()
 			else
-				user << "You start [nmap.ship_anchored ? "raising" : "lowering"] the anchor..."
+				to_chat(user, "You start [nmap.ship_anchored ? "raising" : "lowering"] the anchor...")
 				if (do_after(user, 60, src))
 					if (nmap.ship_anchored)
-						user << "You raise the anchor."
+						to_chat(user, "You raise the anchor.")
 						raise_anchor()
 					else
-						user << "You lower the anchor."
+						to_chat(user, "You lower the anchor.")
 						lower_anchor()
 
 /obj/structure/voyage/ropeladder/thin
@@ -899,7 +862,7 @@
 			if(istype(S.loc, /turf/floor/broken_floor) && S.opened)
 				for(var/atom/movable/AT in S.loc)
 					S.loc.Entered(AT)
-		playsound(loc, 'sound/effects/lever.ogg',100, TRUE)
+		playsound(loc, "sound/effects/lever.ogg",100, TRUE)
 		return
 
 /obj/structure/voyage/voicepipe
@@ -997,7 +960,7 @@
 /obj/effect/flooding
 	name = "flooded floor"
 	desc = "The water seems to be about 50cm deep."
-	icon = 'icons/misc/beach.dmi'
+	icon = 'icons/turf/beach.dmi'
 	icon_state = "flood_overlay1"
 	layer = 2.3
 	density = FALSE
@@ -1011,7 +974,7 @@
 				if (src != FLD)
 					flood_level = min(3,flood_level+FLD.flood_level)
 					qdel(FLD)
-					update_icon()
+			update_icon()
 		spawn(6000)
 			if (src)
 				flood_level--
@@ -1020,6 +983,34 @@
 	update_icon()
 		icon_state = "flood_overlay[flood_level]"
 		desc = "The water seems to be about [flood_level*50]cm deep."
+		// Set overlay directly on the turf
+		var/turf/T = get_turf(src)
+		if(T)
+			T.overlays.Cut()
+			var/image/water_img = image(icon, icon_state)
+			water_img.layer = MOB_LAYER + 0.1
+			T.overlays += water_img
+			// Edge borders matching flood level
+			var/edge_state = "flood_overlay[flood_level]_edges"
+			var/list/cardinal_dirs = list(NORTH, SOUTH, EAST, WEST)
+			for(var/dir in cardinal_dirs)
+				var/turf/neighbor = get_step(T, dir)
+				var/has_edge = FALSE
+				if(!neighbor)
+					has_edge = TRUE
+				else if(neighbor.type == T.type)
+					var/has_flood = FALSE
+					for(var/obj/effect/flooding/F in neighbor)
+						has_flood = TRUE
+						break
+					if(!has_flood)
+						has_edge = TRUE
+				else
+					has_edge = TRUE
+				if(has_edge)
+					var/image/edge_img = image('icons/turf/beach.dmi', edge_state, dir=dir)
+					edge_img.layer = MOB_LAYER + 0.2
+					T.overlays += edge_img
 
 	attackby(obj/item/I, mob/living/human/user)
 		if(istype(I, /obj/item/weapon/reagent_containers/glass))
@@ -1030,7 +1021,7 @@
 						I.reagents.add_reagent("sodiumchloride", 8)
 						I.reagents.add_reagent("water", 42)
 						user.visible_message(SPAN_NOTICE("[user] fills \the [I] with water."), SPAN_NOTICE("You fill \the [I] with water."))
-						playsound(loc, 'sound/effects/watersplash.ogg', 100, TRUE)
+						playsound(loc, "sound/effects/watersplash.ogg", 100, TRUE)
 						flood_level--
 						if (flood_level <= 0)
 							qdel(src)

@@ -1,11 +1,13 @@
 /obj/map_metadata/battleroyale
 	ID = MAP_BATTLEROYALE_IMPERIAL
 	title = "Battle Royale: Imperial"
-	lobby_icon = 'icons/lobby/battleroyale.png'
+	description = "The map will shrink with time. Only one can survive! Last player standing wins!"
+	lobby_icon = "icons/lobby/battleroyale.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall)
 	respawn_delay = 0
 	is_singlefaction = TRUE
 	battleroyale = TRUE
+	gamemode_vote = FALSE
 
 	no_winner ="The fighting is still going."
 
@@ -48,7 +50,7 @@
 			return FALSE
 		ticker.finished = TRUE
 		message = "30 minutes have passed! The battle has ended in a draw!"
-		world << "<font size = 4>[message]</font>"
+		to_chat(world, "<font size = 4>[message]</font>")
 		win_condition_spam_check = TRUE
 		return FALSE
 	if (processes.ticker.playtime_elapsed >= 2 MINUTES)
@@ -61,11 +63,11 @@
 						winner_name =  H.name
 						winner_ckey = H.ckey
 						give_award(winner_ckey,winner_name,1)
-						var/warning_sound = sound('sound/effects/siren_once.ogg', repeat = FALSE, wait = TRUE, channel = 777)
+						var/warning_sound = sound("sound/effects/siren_once.ogg", repeat = FALSE, wait = TRUE, channel = 777)
 						for (var/mob/M in player_list)
 							M.client << warning_sound
 						message = "Winner winner chicken dinner!<br><b>[winner_ckey] has won!</b>"
-						world << "<font size = 4 color='yellow'>[message]</font>"
+						to_chat(world, "<font size = 4 color='yellow'>[message]</font>")
 			ticker.finished = TRUE
 			win_condition_spam_check = TRUE
 			return FALSE
@@ -196,7 +198,7 @@
 			if ("none")
 				ar_to_close_string = "None"
 		ar_to_close_timeleft = 30
-		world << "<big><b>The [ar_to_close_string] Area will close in 60 seconds!</big></b>"
+		to_chat(world, "<big><b>The [ar_to_close_string] Area will close in 60 seconds!</b></big>")
 		spawn(275)
 			warn_closing_areas(ar_to_close,30)
 			spawn(100)
@@ -205,11 +207,10 @@
 					warn_closing_areas(ar_to_close,10)
 		spawn(300)
 			ar_to_close_timeleft = 15
-			world << "<big><b>The [ar_to_close_string] Area will close in 30 seconds!</big></b>"
+			to_chat(world, "<big><b>The [ar_to_close_string] Area will close in 30 seconds!</b></big>")
 			spawn(300)
 				close_area(ar_to_close)
 				closing_areas()
-				return ar_to_close_string
 	else
 		return "too many areas closed"
 
@@ -218,12 +219,12 @@
 
 	// Define corresponding sounds to the map parts
 	var/area_sound_map = list(
-		"one"   = 'sound/voice/battleroyale/close_nw.ogg',
-		"two"   = 'sound/voice/battleroyale/close_ne.ogg',
-		"three" = 'sound/voice/battleroyale/close_w.ogg',
-		"four"  = 'sound/voice/battleroyale/close_e.ogg',
-		"five"  = 'sound/voice/battleroyale/close_sw.ogg',
-		"six"   = 'sound/voice/battleroyale/close_se.ogg'
+		"one"   = "sound/voice/battleroyale/close_nw.ogg",
+		"two"   = "sound/voice/battleroyale/close_ne.ogg",
+		"three" = "sound/voice/battleroyale/close_w.ogg",
+		"four"  = "sound/voice/battleroyale/close_e.ogg",
+		"five"  = "sound/voice/battleroyale/close_sw.ogg",
+		"six"   = "sound/voice/battleroyale/close_se.ogg"
 		)
 
 	// Define corresponding area names to the map parts
@@ -258,7 +259,7 @@
 /obj/map_metadata/battleroyale/proc/close_area(var/artc = null)
 	if (closed_areas.len >= 5)
 		return
-	if (!artc || artc in closed_areas)
+	if (!artc || (artc in closed_areas))
 		return
 
 	switch(artc)
@@ -276,7 +277,7 @@
 						H.crush()
 					else if (istype(A, /area/caribbean/no_mans_land/invisible_wall) && A.name == "North-Western Area")
 						H.crush()
-			world << "<big>The <b>North-Western</b> Area has been closed!</big>"
+			to_chat(world, "<big>The <b>North-Western</b> Area has been closed!</big>")
 			closed_areas += list("one")
 			return
 		if ("two")
@@ -293,7 +294,7 @@
 						H.crush()
 					else if (istype(A, /area/caribbean/no_mans_land/invisible_wall) && A.name == "North-Eastern Area")
 						H.crush()
-			world << "<big>The <b>North-Eastern</b> Area has been closed!</big>"
+			to_chat(world, "<big>The <b>North-Eastern</b> Area has been closed!</big>")
 			closed_areas += list("two")
 			return
 		if ("three")
@@ -310,7 +311,7 @@
 						H.crush()
 					else if (istype(A, /area/caribbean/no_mans_land/invisible_wall) && A.name == "Western Area")
 						H.crush()
-			world << "<big>The <b>Western</b> Area has been closed!</big>"
+			to_chat(world, "<big>The <b>Western</b> Area has been closed!</big>")
 			closed_areas += list("three")
 			return
 		if ("four")
@@ -327,7 +328,7 @@
 						H.crush()
 					else if (istype(A, /area/caribbean/no_mans_land/invisible_wall) && A.name == "Eastern Area")
 						H.crush()
-			world << "<big>The <b>Eastern</b> Area has been closed!</big>"
+			to_chat(world, "<big>The <b>Eastern</b> Area has been closed!</big>")
 			closed_areas += list("four")
 			return
 		if ("five")
@@ -344,7 +345,7 @@
 						H.crush()
 					else if (istype(A,/area/caribbean/no_mans_land/invisible_wall) && A.name == "South-Western Area")
 						H.crush()
-			world << "<big>The <b>South-Western</b> Area has been closed!</big>"
+			to_chat(world, "<big>The <b>South-Western</b> Area has been closed!</big>")
 			closed_areas += list("five")
 			return
 		if ("six")
@@ -361,7 +362,7 @@
 						H.crush()
 					else if (istype(A, /area/caribbean/no_mans_land/invisible_wall) && A.name == "South-Eastern Area")
 						H.crush()
-			world << "<big>The <b>South-Eastern</b> Area has been closed!</big>"
+			to_chat(world, "<big>The <b>South-Eastern</b> Area has been closed!</big>")
 			closed_areas += list("six")
 			return
 //////////////////SCREEN HELPERS////////////////////////////
@@ -453,7 +454,7 @@
 /obj/map_metadata/battleroyale/two
 	ID = MAP_BATTLEROYALE_MODERN
 	title = "Battle Royale: Modern"
-	lobby_icon = 'icons/lobby/battleroyale_arab.png'
+	lobby_icon = "icons/lobby/battleroyale_arab.png"
 
 	age = "2013"
 	ordinal_age = 8
@@ -463,7 +464,7 @@
 
 /obj/map_metadata/battleroyale/two/job_enabled_specialcheck(var/datum/job/J)
 	..()
-	if (J.is_deathmatch && J.is_modernday)
+	if (istype(J, /datum/job/pirates/battleroyale/modern))
 		J.total_positions = 32
 		J.min_positions = 32
 		J.max_positions = 32
@@ -482,7 +483,7 @@
 	mission_start_message = "<font size=4><b>Last player standing wins!</b><br>TWO MINUTES UNTIL THE INVISIBLE WALL DISAPPEARS!</font>"
 
 /obj/map_metadata/battleroyale/three/job_enabled_specialcheck(var/datum/job/J)
-	if (J.is_deathmatch && J.is_medieval)
+	if (istype(J, /datum/job/pirates/battleroyale/medieval))
 		J.total_positions = 32
 		J.min_positions = 32
 		J.max_positions = 32
@@ -501,7 +502,7 @@
 	mission_start_message = "<font size=4><b>Last player standing wins!</b><br>TWO MINUTES UNTIL THE INVISIBLE WALL DISAPPEARS!</font>"
 
 /obj/map_metadata/battleroyale/four/job_enabled_specialcheck(var/datum/job/J)
-	if (J.is_deathmatch && J.is_cowboy)
+	if (istype(J, /datum/job/pirates/battleroyale/wildwest))
 		J.total_positions = 32
 		J.min_positions = 32
 		J.max_positions = 32
@@ -528,7 +529,7 @@
 				place2text = "3rd"
 			else
 				place2text = "[awards[i][3]]th"
-			world << "[awards[i][2]] ([awards[i][1]]) placed <b>[place2text]</b>!"
+			to_chat(world, "[awards[i][2]] ([awards[i][1]]) placed <b>[place2text]</b>!")
 	return TRUE
 
 /obj/map_metadata/battleroyale/give_award(var/_ckey, var/charname, var/place)

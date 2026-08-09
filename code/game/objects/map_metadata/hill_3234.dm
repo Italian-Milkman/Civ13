@@ -1,8 +1,9 @@
 /obj/map_metadata/hill_3234
 	ID = MAP_HILL_3234
 	title = "Battle for Hill 3234"
+	description = "The Soviets will win if they hold out the hill for 40 minutes.The Mujahideen will win if they manage to capture the radio station on the top of the hill!"
 	no_winner = "Hill 3234 is still under Soviet control."
-	lobby_icon = 'icons/lobby/sovafghan.png'
+	lobby_icon = "icons/lobby/sovafghan.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall, /area/caribbean/no_mans_land/invisible_wall/one, /area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 600 // 1 minute.
 	victory_time = 24000 // 40 minutes to hold out for soviets.
@@ -24,7 +25,7 @@
 	faction2 = ARAB
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET)
 	songs = list(
-		"Kino - Gruppa Krovi (Blood Group):1" = 'sound/music/gruppakrovi.ogg',)
+		"Kino - Gruppa Krovi (Blood Group):1" = "sound/music/gruppakrovi.ogg",)
 	gamemode = "Siege"
 	artillery_count = 3
 	grace_wall_timer = 4800 // 8 minutes.
@@ -40,64 +41,32 @@
 	var/turf/locationt = pick(supplydrop_turfs)
 	switch(droptype)
 		if("supplies")
-			world << "<font size=3 color='red'><center>SOVIET LOGISTICAL CENTER BROADCAST<br>Ammo has been dropped in the area!</center></font>"
+			to_chat(world, "<font size=3 color='red'><center>SOVIET LOGISTICAL CENTER BROADCAST<br>Ammo has been dropped in the area!</center></font>")
 			new/obj/structure/closet/crate/airdrops/soviet/ammo(locationt)
 			new/obj/item/flashlight/flare/white/on(locationt)
 
 		if("pkm")
-			world << "<font size=3 color='red'><center>SOVIET LOGISTICAL CENTER BROADCAST<br>A PKM crate has been dropped in the area!</center></font>"
+			to_chat(world, "<font size=3 color='red'><center>SOVIET LOGISTICAL CENTER BROADCAST<br>A PKM crate has been dropped in the area!</center></font>")
 			new/obj/structure/closet/crate/airdrops/soviet/pkm(locationt)
 			new/obj/item/flashlight/flare/white/on(locationt)
 
 		if("defense")
-			world << "<font size=3 color='red'><center>SOVIET LOGISTICAL CENTER BROADCAST<br>Defensive Supplies have been dropped in the area!</center></font>"
+			to_chat(world, "<font size=3 color='red'><center>SOVIET LOGISTICAL CENTER BROADCAST<br>Defensive Supplies have been dropped in the area!</center></font>")
 			new/obj/structure/closet/crate/airdrops/soviet/defense(locationt)
 			new/obj/item/flashlight/flare/white/on(locationt)
 
 		if("med")
-			world << "<font size=3 color='red'><center>SOVIET LOGISTICAL CENTER BROADCAST<br>Medical Equipment has been dropped in the area!</center></font>"
+			to_chat(world, "<font size=3 color='red'><center>SOVIET LOGISTICAL CENTER BROADCAST<br>Medical Equipment has been dropped in the area!</center></font>")
 			new/obj/structure/closet/crate/airdrops/soviet/medical(locationt)
 			new/obj/item/flashlight/flare/white/on(locationt)
 
 		if("explo")
-			world << "<font size=3 color='red'><center>SOVIET LOGISTICAL CENTER BROADCAST<br>Defensive Explosives have been dropped in the area!</center></font>"
+			to_chat(world, "<font size=3 color='red'><center>SOVIET LOGISTICAL CENTER BROADCAST<br>Defensive Explosives have been dropped in the area!</center></font>")
 			new/obj/structure/closet/crate/airdrops/soviet/explo(locationt)
 			new/obj/item/flashlight/flare/white/on(locationt)
 
 	spawn(rand(3000, 6000))
 		supplydrop_proc()
-
-/obj/map_metadata/hill_3234/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_afghan)
-		. = TRUE
-		if (J.title == "Soviet Army Tanker")
-			. = FALSE
-		if (J.title == "Soviet Army Tank Commander")
-			. = FALSE
-		if (J.title == "Soviet Army Captain")
-			. = FALSE
-		if (J.title == "Soviet Army Lieutenant")
-			J.max_positions = 1
-			J.total_positions = 1
-			J.is_commander = TRUE
-		if (J.title == "Soviet Army Sergeant")
-			J.max_positions = 5
-			J.total_positions = 5
-		if (J.title == "Soviet Army Field Medic")
-			J.max_positions = 4
-			J.total_positions = 4
-		if (J.title == "Soviet Army Radio Operator")
-			J.max_positions = 4
-			J.total_positions = 4
-		if (J.title == "Soviet Army Private")
-			J.max_positions = 60
-			J.total_positions = 60
-		if (J.title == "Spetznaz GRU")
-			J.max_positions = 2
-			J.total_positions = 2
-	else
-		. = FALSE
 
 /obj/map_metadata/hill_3234/short_win_time(faction)
 	if (!(alive_n_of_side(faction1)) || !(alive_n_of_side(faction2)))
@@ -158,14 +127,14 @@
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The <font color = 'red'>Soviets</font> have sucessfuly defended Hill 3234! The Mujahideen halted their attack!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_o == FALSE)
 		ticker.finished = TRUE
 		var/message = "The <font color = 'black'>Mujahideen</font> have captured Hill 3234! The Soviets have been wiped out!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_o = TRUE
@@ -204,7 +173,7 @@
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3><font color = 'red'>The Soviets</font> have recaptured Hill 3234!</font>"
+			to_chat(world, "<font size = 3><font color = 'red'>The Soviets</font> have recaptured Hill 3234!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1

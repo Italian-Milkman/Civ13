@@ -2,7 +2,8 @@
 /obj/map_metadata/tsaritsyn
 	ID = MAP_TSARITSYN
 	title = "Tsaritsyn"
-	lobby_icon = 'icons/lobby/rcw.png'
+	description = "The Soviets will win if they hold out for 40 minutes. The White Army will win if they manage to capture the centre of the church."
+	lobby_icon = "icons/lobby/rcw.png"
 	no_winner ="The church is under Soviet control."
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/one,/area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 600
@@ -26,23 +27,8 @@
 	ordinal_age = 5
 	grace_wall_timer = 4200
 	songs = list(
-		"Korobushka:1" = 'sound/music/korobushka.ogg')
+		"Korobushka:1" = "sound/music/korobushka.ogg")
 	gamemode = "Siege"
-
-obj/map_metadata/tsaritsyn/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (istype(J, /datum/job/russian))
-		if (J.is_rcw == TRUE)
-			. = TRUE
-		else
-			. = FALSE
-	else if (istype(J, /datum/job/civilian))
-		if (J.is_rcw == TRUE)
-			. = TRUE
-		else
-			. = FALSE
-	else
-		. = FALSE
 
 /obj/map_metadata/tsaritsyn/roundend_condition_def2name(define)
 	..()
@@ -94,14 +80,14 @@ var/no_loop_t = FALSE
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The <b>Red Army</b> has sucessfuly defended the church! The whites halted the attack!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_t == FALSE)
 		ticker.finished = TRUE
 		var/message = "The <b>White Army</b> has captured the church! The battle for is over!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_t = TRUE
@@ -144,7 +130,7 @@ var/no_loop_t = FALSE
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The <b>Soviets</b> have recaptured the church!</font>"
+			to_chat(world, "<font size = 3>The <b>Soviets</b> have recaptured the church!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1

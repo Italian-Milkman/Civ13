@@ -1,7 +1,8 @@
 /obj/map_metadata/long_march
 	ID = MAP_LONG_MARCH
 	title = "The Long March"
-	lobby_icon = 'icons/lobby/longmarch.png'
+	description = "The Red Army will win if they manage to reach their destination up North, in the Mountains."
+	lobby_icon = "icons/lobby/longmarch.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall/tundra/one,/area/caribbean/no_mans_land/invisible_wall/inside,/area/caribbean/no_mans_land/invisible_wall/two)
 	no_hardcore = TRUE
 	respawn_delay = 1200
@@ -22,17 +23,8 @@
 	faction2 = CIVILIAN
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET)
 	songs = list(
-		"Red Sun Up in the Sky:1" = 'sound/music/redsun.ogg',)
+		"Red Sun Up in the Sky:1" = "sound/music/redsun.ogg",)
 	grace_wall_timer = 4800
-
-/obj/map_metadata/long_march/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (istype(J, /datum/job/chinese/captain) || istype(J, /datum/job/chinese/lieutenant) || istype(J, /datum/job/chinese/sergeant) || istype(J, /datum/job/chinese/doctor) || istype(J, /datum/job/chinese/infantry) || istype(J, /datum/job/chinese/sniper))
-		. = TRUE
-	else if (J.is_ccw == TRUE)
-		. = TRUE
-	else
-		. = FALSE
 
 /obj/map_metadata/long_march/roundend_condition_def2name(define)
 	..()
@@ -80,14 +72,14 @@ var/no_loop_lm = FALSE
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The <b>National Army</b> have sucessfuly stopped the Red Army's retreat into the mountains."
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_lm == TRUE)
 		ticker.finished = TRUE
 		var/message = "The <b>Red Army</b> managed to reach their destination in time! The retreat has been succesful!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_nk = TRUE
@@ -130,7 +122,7 @@ var/no_loop_lm = FALSE
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The <b>National Army</b> has pushed back the Red Army!</font>"
+			to_chat(world, "<font size = 3>The <b>National Army</b> has pushed back the Red Army!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1
@@ -152,5 +144,4 @@ var/no_loop_lm = FALSE
 				return TRUE
 		else
 			return !faction1_can_cross_blocks()
-			return !faction2_can_cross_blocks()
 	return FALSE

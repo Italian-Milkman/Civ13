@@ -1,8 +1,4 @@
 var/roundstart_time = 0
-var/grace_period = TRUE
-var/game_started = FALSE
-var/train_checked = FALSE
-var/secret_ladder_message = null
 var/GRACE_PERIOD_LENGTH = 7
 
 /hook/roundstart/proc/game_start()
@@ -24,12 +20,14 @@ var/GRACE_PERIOD_LENGTH = 7
 						time_of_day = "Night"
 					if (MAP_DRUG_BUST)
 						time_of_day = "Night"
+					if (MAP_LIGHTS_OUT)
+						time_of_day = "Dark Night"
 			update_lighting(time_of_day, null, FALSE)
 			if (!map || !map.no_time_of_day_cycle)
 				spawn (0)
 					while (!processes.time_of_day_change || !processes.time_of_day_change.setup_lighting)
 						sleep(1)
-					world << "<br><font size=3><span class = 'notice'>It's <b>[lowertext(processes.time_of_day_change.changeto)]</b>, and the season is <b>[get_season()]</b>.</span></font>"
+					to_chat(world, "<br><font size=3><span class = 'notice'>It's <b>[lowertext(processes.time_of_day_change.changeto)]</b>, and the season is <b>[get_season()]</b>.</span></font>")
 
 	// open squad preparation doors
 	for (var/obj/structure/simple_door/key_door/keydoor in door_list)
@@ -81,11 +79,10 @@ var/GRACE_PERIOD_LENGTH = 7
 			new/obj/structure/anthill(areaspawn)
 // ditto
 /hook/roundstart/proc/do_seasonal_stuff()
-	spawn (1)
-//		world << "<span class = 'notice'>Setting up seasons.</span>"
-	if (map.ID == MAP_NOMADS_DESERT || map.ID == MAP_NOMADS_JUNGLE || map.ID == MAP_ROAD_TO_DAK_TO || map.ID == MAP_ALLEYWAY)
+//		to_chat(world, "<span class = 'notice'>Setting up seasons.</span>")
+	if (map.ID == MAP_NOMADS_DESERT || map.ID == MAP_NOMADS_JUNGLE || map.ID == MAP_ROAD_TO_DAK_TO || map.ID == MAP_ALLEYWAY || map.ID == MAP_BAGNE13)
 		season = "Wet Season"
-	else if (map.ID == MAP_NOMADS_ICE_AGE || map.ID == MAP_GULAG13)
+	else if (map.ID == MAP_NOMADS_ICE_AGE || map.ID == MAP_GULAG13 || map.ID == MAP_ANTARCTICA)
 		season = "WINTER"
 	else if (map.ID == MAP_HILL_203)
 		season = "FALL"
@@ -94,7 +91,7 @@ var/GRACE_PERIOD_LENGTH = 7
 	else
 		season = "SPRING"
 
-	return TRUE
+	//return TRUE
 
 	for (var/grass in grass_turf_list)
 

@@ -365,84 +365,78 @@
 	return full_name
 
 /datum/language/proc/get_random_sioux_name(var/gender, name_count=1, syllable_count=4, syllable_divisor=2)
-    if (!syllables || !syllables.len)
-        if (gender == FEMALE)
-            return capitalize(pick(first_names_female_sioux))
-        else
-            return capitalize(pick(first_names_male_sioux))
+	if (!syllables || !syllables.len)
+		if (gender == FEMALE)
+			return capitalize(pick(first_names_female_sioux))
+		else
+			return capitalize(pick(first_names_male_sioux))
 
-    var/full_name = "Tatanka"
-    return full_name
+	var/full_name = "Tatanka"
+	return full_name
 
 /datum/language/proc/get_random_apache_name(var/gender, name_count=1, syllable_count=4, syllable_divisor=2)
-    if (!syllables || !syllables.len)
-        if (gender == FEMALE)
-            return capitalize(pick(first_names_female_apache))
-        else
-            return capitalize(pick(first_names_male_apache))
+	if (!syllables || !syllables.len)
+		return capitalize(pick(first_names_male_apache))
 
-    var/full_name = "Cochise"
-    return full_name
+	var/full_name = "Cochise"
+	return full_name
 
 /datum/language/proc/get_random_navajo_name(var/gender, name_count=1, syllable_count=4, syllable_divisor=2)
-    if (!syllables || !syllables.len)
-        if (gender == FEMALE)
-            return capitalize(pick(first_names_female_navajo))
-        else
-            return capitalize(pick(first_names_male_navajo))
+	if (!syllables || !syllables.len)
+		if (gender == FEMALE)
+			return capitalize(pick(first_names_female_navajo))
+		else
+			return capitalize(pick(first_names_male_navajo))
 
-    var/full_name = "Ashkii"
-    return full_name
+	var/full_name = "Ashkii"
+	return full_name
 
 /datum/language/proc/get_random_chinook_name(var/gender, name_count=1, syllable_count=4, syllable_divisor=2)
-    if (!syllables || !syllables.len)
-        if (gender == FEMALE)
-            return capitalize(pick(first_names_female_chinook))
-        else
-            return capitalize(pick(first_names_male_chinook))
+	if (!syllables || !syllables.len)
+		if (gender == FEMALE)
+			return capitalize(pick(first_names_female_chinook))
+		else
+			return capitalize(pick(first_names_male_chinook))
 
-    var/full_name = "Chikamin"
-    return full_name
+	var/full_name = "Chikamin"
+	return full_name
 
 /datum/language/proc/get_random_comanche_name(var/gender, name_count=1, syllable_count=4, syllable_divisor=2)
-    if (!syllables || !syllables.len)
-        if (gender == FEMALE)
-            return capitalize(pick(first_names_female_comanche))
-        else
-            return capitalize(pick(first_names_male_comanche))
+	if (!syllables || !syllables.len)
+		if (gender == FEMALE)
+			return capitalize(pick(first_names_female_comanche))
+		else
+			return capitalize(pick(first_names_male_comanche))
 
-    var/full_name = "Quanah"
-    return full_name
+	var/full_name = "Quanah"
+	return full_name
 
 /datum/language/proc/get_random_mayan_name(var/gender, name_count=1, syllable_count=4, syllable_divisor=2)
-    if (!syllables || !syllables.len)
-        if (gender == FEMALE)
-            return capitalize(pick(first_names_female_mayan))
-        else
-            return capitalize(pick(first_names_male_mayan))
+	if (!syllables || !syllables.len)
+		if (gender == FEMALE)
+			return capitalize(pick(first_names_female_mayan))
+		else
+			return capitalize(pick(first_names_male_mayan))
 
-    var/full_name = "Balam"
-    return full_name
+	var/full_name = "Balam"
+	return full_name
 
 /datum/language/proc/get_random_aztec_name(var/gender, name_count=1, syllable_count=4, syllable_divisor=2)
-    if (!syllables || !syllables.len)
-        if (gender == FEMALE)
-            return capitalize(pick(first_names_female_aztec))
-        else
-            return capitalize(pick(first_names_male_aztec))
+	if (!syllables || !syllables.len)
+		if (gender == FEMALE)
+			return capitalize(pick(first_names_female_aztec))
+		else
+			return capitalize(pick(first_names_male_aztec))
 
-    var/full_name = "Cuauhtemoc"
-    return full_name
+	var/full_name = "Cuauhtemoc"
+	return full_name
 
 /datum/language/proc/get_random_hawaiian_name(var/gender, name_count=1, syllable_count=4, syllable_divisor=2)
-    if (!syllables || !syllables.len)
-        if (gender == FEMALE)
-            return capitalize(pick(first_names_female_hawaiian))
-        else
-            return capitalize(pick(first_names_male_hawaiian))
+	if (!syllables || !syllables.len)
+		return capitalize(pick(first_names_male_hawaiian))
 
-    var/full_name = "Kamehameha"
-    return full_name
+	var/full_name = "Kamehameha"
+	return full_name
 
 /datum/language/proc/get_random_filipino_name(var/gender, name_count=2, syllable_count=4, syllable_divisor=2)
 	if (!syllables || !syllables.len)
@@ -526,7 +520,7 @@
 		return stars(input)
 
 	// If the input is cached already, move it to the end of the cache and return it
-	if (input in scramble_cache && !hearer)
+	if ((input in scramble_cache) && !hearer)
 		var/n = scramble_cache[input]
 		scramble_cache -= input
 		scramble_cache[input] = n
@@ -631,16 +625,16 @@
 /mob/proc/hear_broadcast(var/datum/language/language, var/mob/speaker, var/speaker_name, var/message)
 	if ((language in languages) && language.check_special_condition(src))
 		var/msg = "<i><span class='game say'>[language.name], <span class='name'>[speaker_name]</span> [message]</span></i>"
-		src << msg
+		to_chat(src, msg)
 
 /mob/new_player/hear_broadcast(var/datum/language/language, var/mob/speaker, var/speaker_name, var/message)
 	return
 
 /mob/observer/ghost/hear_broadcast(var/datum/language/language, var/mob/speaker, var/speaker_name, var/message)
 	if (speaker.name == speaker_name)
-		src << "<i><span class='game say'>[language.name], <span class='name'>[speaker_name]</span> ([ghost_follow_link(speaker, src)]) [message]</span></i>"
+		to_chat(src, "<i><span class='game say'>[language.name], <span class='name'>[speaker_name]</span> ([ghost_follow_link(speaker, src)]) [message]</span></i>")
 	else
-		src << "<i><span class='game say'>[language.name], <span class='name'>[speaker_name]</span> [message]</span></i>"
+		to_chat(src, "<i><span class='game say'>[language.name], <span class='name'>[speaker_name]</span> [message]</span></i>")
 
 /datum/language/proc/check_special_condition(var/mob/other)
 	return TRUE
@@ -927,7 +921,7 @@
 
 // Can we speak this language, as opposed to just understanding it?
 /mob/proc/can_speak(datum/language/speaking)
-	return (universal_speak || (speaking && speaking.flags & INNATE) || speaking in languages)
+	return (universal_speak || (speaking && speaking.flags & INNATE) || (speaking in languages))
 
 /mob/proc/get_language_prefix()
 	return config.language_prefixes[1]
@@ -977,11 +971,5 @@
 		return TRUE
 	else
 		return ..()
-
-/proc/transfer_languages(var/mob/source, var/mob/target, var/except_flags)
-	for (var/datum/language/L in source.languages)
-		if (L.flags & except_flags)
-			continue
-		target.add_language(L.name)
 
 #undef SCRAMBLE_CACHE_LEN

@@ -1,7 +1,7 @@
 /obj/map_metadata/holdmadrid
 	ID = MAP_HOLDMADRID
 	title = "Siege of Madrid"
-	lobby_icon = 'icons/lobby/madrid.png'
+	lobby_icon = "icons/lobby/madrid.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/one,/area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 1200
 	no_winner ="The Radio stays under Republican control."
@@ -24,15 +24,9 @@
 	grace_wall_timer = 3000
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET)
 	songs = list(
-		"Banda Bassotti - Luna rossa:1" = 'sound/music/lunarossa.ogg',)
+		"Banda Bassotti - Luna rossa:1" = "sound/music/lunarossa.ogg",)
 	gamemode = "Siege"
 
-obj/map_metadata/holdmadrid/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_spainciv == TRUE)
-		. = TRUE
-	else
-		. = FALSE
 
 /obj/map_metadata/holdmadrid/roundend_condition_def2name(define)
 	..()
@@ -81,14 +75,14 @@ obj/map_metadata/holdmadrid/job_enabled_specialcheck(var/datum/job/J)
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The <b>Republicans</b> Have successfully defended the Radio! The Nationalists were halted!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_r == FALSE)
 		ticker.finished = TRUE
 		var/message = "The <b>Nationalists</b> have captured the Radio! The battle for madrid is over!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_r = TRUE
@@ -131,7 +125,7 @@ obj/map_metadata/holdmadrid/job_enabled_specialcheck(var/datum/job/J)
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The <b>Republicans</b> have recaptured the Radio station!</font>"
+			to_chat(world, "<font size = 3>The <b>Republicans</b> have recaptured the Radio station!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1
@@ -153,5 +147,4 @@ obj/map_metadata/holdmadrid/job_enabled_specialcheck(var/datum/job/J)
 				return TRUE
 		else
 			return !faction1_can_cross_blocks()
-			return !faction2_can_cross_blocks()
 	return FALSE

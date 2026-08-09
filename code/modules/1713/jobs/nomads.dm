@@ -387,6 +387,7 @@
 				traits += "Heat Tolerance"
 			if (!f_sens)
 				traits += "Cold Sensitivity"
+			traits_dirty = TRUE
 		else if (mob_area.climate == "tundra" || mob_area.climate == "taiga")
 			var/f_res = FALSE
 			var/f_sens = FALSE
@@ -403,6 +404,7 @@
 				traits += "Cold Tolerance"
 			if (!f_sens)
 				traits += "Heat Sensitivity"
+			traits_dirty = TRUE
 
 ///////////////LANGUAGE PROC/////////////////////////
 
@@ -983,7 +985,7 @@
 	spawn_location = "JoinLateCivA"
 
 	is_civilizations = TRUE
-
+	allowed_maps = list(MAP_CIVILIZATIONS, MAP_NATIONSRP, MAP_NATIONSRPMED, MAP_NATIONSRP_COLDWAR, MAP_NATIONSRP_COLDWAR_CMP, MAP_NATIONSRP_TRIPLE, MAP_NATIONSRP_WW2)
 	min_positions = 9999
 	max_positions = 9999
 
@@ -1017,6 +1019,7 @@
 	spawn_location = "JoinLateCivB"
 	can_be_female = TRUE
 	is_civilizations = TRUE
+	allowed_maps = list(MAP_CIVILIZATIONS, MAP_NATIONSRP, MAP_NATIONSRPMED, MAP_NATIONSRP_COLDWAR, MAP_NATIONSRP_COLDWAR_CMP, MAP_NATIONSRP_TRIPLE, MAP_NATIONSRP_WW2)
 
 	min_positions = 9999
 	max_positions = 9999
@@ -1051,6 +1054,7 @@
 	spawn_location = "JoinLateCivC"
 	can_be_female = TRUE
 	is_civilizations = TRUE
+	allowed_maps = list(MAP_CIVILIZATIONS, MAP_NATIONSRP_TRIPLE)
 
 	min_positions = 9999
 	max_positions = 9999
@@ -1087,6 +1091,7 @@
 	spawn_location = "JoinLateCivD"
 
 	is_civilizations = TRUE
+	allowed_maps = list(MAP_CIVILIZATIONS)
 
 	min_positions = 9999
 	max_positions = 9999
@@ -1120,6 +1125,7 @@
 	spawn_location = "JoinLateCivE"
 	can_be_female = TRUE
 	is_civilizations = TRUE
+	allowed_maps = list(MAP_CIVILIZATIONS)
 
 	min_positions = 9999
 	max_positions = 9999
@@ -1151,9 +1157,8 @@
 	rank_abbreviation = ""
 	can_be_female = TRUE
 	spawn_location = "JoinLateCivF"
-
 	is_civilizations = TRUE
-
+	allowed_maps = list(MAP_CIVILIZATIONS)
 	min_positions = 9999
 	max_positions = 9999
 
@@ -1184,6 +1189,7 @@
 	rank_abbreviation = ""
 	can_be_female = TRUE
 	spawn_location = "JoinLateCiv"
+	allowed_maps = list(MAP_TESTING, MAP_NOMADS, MAP_JUNGLE_OF_THE_CHADS, MAP_PEPELSIBIRSK, MAP_NOMADS_AFRICA, MAP_NOMADS_ASIA, MAP_NOMADS_CONTINENTAL, MAP_NOMADS_DESERT, MAP_NOMADS_DIVIDE, MAP_NOMADS_EUROPE, MAP_NOMADS_EXTENDED, MAP_NOMADS_FROZEN_WASTELAND, MAP_NOMADS_GAIA, MAP_NOMADS_ICE_AGE, MAP_NOMADS_ISLAND, MAP_NOMADS_JUNGLE, MAP_NOMADS_KARAFUTO, MAP_NOMADS_MEDITERRANEAN, MAP_NOMADS_MOUNTAIN, MAP_NOMADS_NEW_WORLD, MAP_NOMADS_NORTH_AMERICA, MAP_NOMADS_OCEANIA, MAP_NOMADS_PANGEA, MAP_NOMADS_PERSISTENCE_BETA, MAP_NOMADS_STRANDED, MAP_NOMADS_UK, MAP_NOMADS_WASTELAND, MAP_NOMADS_WASTELAND_2, MAP_NOMADS_WASTELAND_3, MAP_COLONIA)
 
 	is_nomad = TRUE
 
@@ -1212,12 +1218,14 @@
 	return TRUE
 //////////////////////////////////////SPECIES/////////////////////////
 /datum/job/civilian/fantasy
+	allowed_maps = list(MAP_FOUR_KINGDOMS)
 
 /datum/job/civilian/fantasy/orc
 	title = "Orc tribesman"
 	rank_abbreviation = ""
 	can_be_female = TRUE
 	spawn_location = "JoinLateIND1"
+	allowed_maps = list(MAP_FOUR_KINGDOMS, MAP_TRIBES)
 
 
 	min_positions = 9999
@@ -1252,6 +1260,7 @@
 	rank_abbreviation = ""
 	can_be_female = TRUE
 	spawn_location = "JoinLateIND2"
+	allowed_maps = list(MAP_TRIBES)
 
 
 	min_positions = 9999
@@ -1287,6 +1296,7 @@
 	rank_abbreviation = ""
 	can_be_female = TRUE
 	spawn_location = "JoinLateIND3"
+	allowed_maps = list(MAP_TRIBES, MAP_THREE_TRIBES)
 
 
 	min_positions = 9999
@@ -1321,6 +1331,7 @@
 	rank_abbreviation = ""
 	can_be_female = TRUE
 	spawn_location = "JoinLateIND4"
+	allowed_maps = list(MAP_FOUR_KINGDOMS, MAP_TRIBES, MAP_THREE_TRIBES)
 
 
 	min_positions = 9999
@@ -1354,6 +1365,7 @@
 	rank_abbreviation = ""
 	can_be_female = TRUE
 	spawn_location = "JoinLateIND5"
+	allowed_maps = list(MAP_TRIBES)
 
 
 	min_positions = 9999
@@ -1388,6 +1400,7 @@
 	rank_abbreviation = ""
 	can_be_female = TRUE
 	spawn_location = "JoinLateIND6"
+	allowed_maps = list(MAP_FOUR_KINGDOMS, MAP_TRIBES)
 
 
 	min_positions = 9999
@@ -1420,6 +1433,7 @@
 	rank_abbreviation = ""
 	can_be_female = TRUE
 	spawn_location = "JoinLateIND7"
+	allowed_maps = list(MAP_FOUR_KINGDOMS, MAP_TRIBES, MAP_THREE_TRIBES)
 
 
 	min_positions = 9999

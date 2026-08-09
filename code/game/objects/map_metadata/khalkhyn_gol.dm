@@ -2,7 +2,8 @@
 /obj/map_metadata/khalkhyn
 	ID = MAP_KHALKHYN_GOL
 	title = "Khalkhyn Gol"
-	lobby_icon = 'icons/lobby/ww2.png'
+	description = "The Japanese will win if they capture the Soviet command. The Soviets will win if they manage to capture the Japanese command."
+	lobby_icon = "icons/lobby/ww2.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall/)
 	respawn_delay = 1200
 
@@ -25,19 +26,8 @@
 	grace_wall_timer = 4800
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET)
 	songs = list(
-		"Mugi to Heitai:1" = 'sound/music/mugi_to_heitai.ogg',
-		"I Hate These Classes:2" = 'sound/music/i_hate_these_classes.ogg',)
-
-/obj/map_metadata/khalkhyn/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (istype(J, /datum/job/russian/tank_crew) || istype(J, /datum/job/japanese/ija_ww2ATunit))
-		. = TRUE
-	else if (J.is_navy == TRUE || J.is_yakuza || J.is_tanker == TRUE || J.is_prison == TRUE || J.is_ss_panzer == TRUE || J.is_pacific == TRUE)
-		. = FALSE
-	else if (J.is_ww2 == TRUE && !J.is_sovaprif == TRUE)
-		. = TRUE
-	else
-		. = FALSE
+		"Mugi to Heitai:1" = "sound/music/mugi_to_heitai.ogg",
+		"I Hate These Classes:2" = "sound/music/i_hate_these_classes.ogg",)
 
 /obj/map_metadata/khalkhyn/roundend_condition_def2name(define)
 	..()

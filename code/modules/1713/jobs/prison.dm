@@ -10,6 +10,7 @@
 	is_commander = TRUE
 	can_be_female = TRUE
 	is_prison = TRUE
+	allowed_maps = list(MAP_GULAG13)
 
 	min_positions = 1
 	max_positions = 1
@@ -61,7 +62,7 @@
 	whitelisted = TRUE
 	can_be_female = TRUE
 	is_prison = TRUE
-
+	allowed_maps = list(MAP_GULAG13)
 	min_positions = 2
 	max_positions = 10
 
@@ -111,6 +112,7 @@
 	can_be_female = TRUE
 	is_medic = TRUE
 	is_prison = TRUE
+	allowed_maps = list(MAP_GULAG13)
 
 	min_positions = 1
 	max_positions = 4
@@ -151,6 +153,7 @@
 	spawn_location = "JoinLateRU"
 	whitelisted = TRUE
 	is_prison = TRUE
+	allowed_maps = list(MAP_GULAG13)
 
 	min_positions = 10
 	max_positions = 50
@@ -196,6 +199,7 @@
 	var/original_eyes = "Black"
 	var/original_facial = "Shaved"
 	var/original_hair = "Short Hair"
+	allowed_maps = list()
 /datum/job/civilian/prisoner/equip(var/mob/living/human/H)
 	if (!H)	return FALSE
 	H.give_nationality()
@@ -318,17 +322,9 @@
 					src.remove_language("English")
 					src.name = species.get_random_ukrainian_name(gender)
 					src.real_name = name
-					src.add_note("Group", "You are a Ukrainian political prisoner. You are part of the <b>Ukrainian</b> faction. Try to escape and/or keep your faction powerful!")
-					src.nationality = "Ukrainian"
-					src.add_language("Ukrainian",FALSE)
-/*
-			if (3)
-				if (src.nationality == "none")
-					src.remove_language("English")
-					src.name = species.get_random_russian_name(gender)
-					src.real_name = name
-					src.add_note("Group", "You are a Vor, a Soviet criminal. You are part of the <b>Vory</b> faction. Try to escape and/or keep your faction powerful!")
-					src.nationality = "Vory" */
+				src.add_note("Group", "You are a Ukrainian political prisoner. You are part of the <b>Ukrainian</b> faction. Try to escape and/or keep your faction powerful!")
+				src.nationality = "Ukrainian"
+				src.add_language("Ukrainian",FALSE)
 			if (3)
 				if (src.nationality == "none")
 					src.add_note("Known Languages", "German")
@@ -488,6 +484,7 @@
 /datum/job/civilian/prisoner/janitor
 	title = "Janitor"
 	en_meaning = ""
+	allowed_maps = list(MAP_GULAG13)
 
 
 	min_positions = 2
@@ -508,6 +505,7 @@
 /datum/job/civilian/prisoner/miner
 	title = "Miner"
 	en_meaning = ""
+	allowed_maps = list(MAP_GULAG13)
 
 
 	min_positions = 10
@@ -567,6 +565,7 @@
 /datum/job/civilian/prisoner/nurse
 	title = "Nurse Helper"
 	en_meaning = ""
+	allowed_maps = list(MAP_GULAG13)
 
 
 	min_positions = 3
@@ -588,6 +587,7 @@
 /datum/job/civilian/prisoner/kitchen
 	title = "Kitchen Duty"
 	en_meaning = ""
+	allowed_maps = list(MAP_GULAG13)
 
 
 	min_positions = 3
@@ -648,6 +648,7 @@
 /datum/job/civilian/abashiri/prisoner/wing1
 	title = "Wing1 Prisoner"
 	en_meaning = ""
+	allowed_maps = list(MAP_ABASHIRI)
 
 
 	spawn_location = "JoinLateCivB"
@@ -662,10 +663,11 @@
 		H.equip_to_slot_or_del(new /obj/item/clothing/suit/storage/jacket/haori_jacket/abashiri/wing1(H), slot_wear_suit)
 		if (H.nationality == "Ainu")
 			H.equip_to_slot_or_del(new /obj/item/clothing/head/ainu_bandana(H), slot_head)
-		world << "A <b>Wing 1</b> Prisoner has arrived"
+		to_chat(world, "A <b>Wing 1</b> Prisoner has arrived")
 /datum/job/civilian/abashiri/prisoner/wing2
 	title = "Wing2 Prisoner"
 	en_meaning = ""
+	allowed_maps = list(MAP_ABASHIRI)
 
 
 	spawn_location = "JoinLateCivC"
@@ -680,7 +682,7 @@
 		H.equip_to_slot_or_del(new /obj/item/clothing/suit/storage/jacket/haori_jacket/abashiri/wing2(H), slot_wear_suit)
 		if (H.nationality == "Ainu")
 			H.equip_to_slot_or_del(new /obj/item/clothing/head/ainu_bandana(H), slot_head)
-		world << "A <b>Wing 2</b> Prisoner has arrived"
+		to_chat(world, "A <b>Wing 2</b> Prisoner has arrived")
 /datum/job/civilian/abashiri/prisoner/wing3
 	title = "Wing3 Prisoner"
 	en_meaning = ""
@@ -697,10 +699,11 @@
 		H.equip_to_slot_or_del(new /obj/item/clothing/suit/storage/jacket/haori_jacket/abashiri/wing3(H), slot_wear_suit)
 		if (H.nationality == "Ainu")
 			H.equip_to_slot_or_del(new /obj/item/clothing/head/ainu_bandana(H), slot_head)
-		world << "A <b>Wing 3</b> Prisoner has arrived"
+		to_chat(world, "A <b>Wing 3</b> Prisoner has arrived")
 /datum/job/civilian/abashiri/prisoner/wing3_danger
 	title = "Maximum Security Inmate"
 	en_meaning = ""
+	allowed_maps = list(MAP_ABASHIRI)
 
 
 	spawn_location = "JoinLateCiv"
@@ -718,7 +721,7 @@
 		H.equip_to_slot_or_del(new /obj/item/clothing/suit/storage/jacket/haori_jacket/abashiri/wing3(H), slot_wear_suit)
 		if (H.nationality == "Ainu")
 			H.equip_to_slot_or_del(new /obj/item/clothing/head/ainu_bandana(H), slot_head)
-		world << "A <b>Wing 3</b> Prisoner has arrived"
+		to_chat(world, "A <b>Wing 3</b> Prisoner has arrived")
 ///////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////ABASHIRI///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -727,6 +730,7 @@
 	title = "Abashiri Kanshi-in"
 	en_meaning = "Abashiri Warden"
 	rank_abbreviation = "Kan."
+	allowed_maps = list(MAP_ABASHIRI)
 
 
 	spawn_location = "JoinLateCivD"
@@ -778,6 +782,7 @@
 	title = "Abashiri Shocho Keimu-kan"
 	en_meaning = "Abashiri Head Guard"
 	rank_abbreviation = "Sho."
+	allowed_maps = list(MAP_ABASHIRI)
 
 	is_abashiri = TRUE
 	spawn_location = "JoinLateJPCap"
@@ -833,6 +838,7 @@
 	is_abashiri = TRUE
 	is_medic = TRUE
 	is_prison = TRUE
+	allowed_maps = list(MAP_ABASHIRI)
 
 	min_positions = 1
 	max_positions = 2
@@ -877,6 +883,7 @@
 	spawn_location = "JoinLateJP"
 	whitelisted = TRUE
 	is_prison = TRUE
+	allowed_maps = list(MAP_ABASHIRI)
 
 	min_positions = 8
 	max_positions = 10

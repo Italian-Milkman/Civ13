@@ -14,6 +14,12 @@
  * to slow down dramatically. The forest area reached this limit, but only
  * when there were snow objects, so its been split into 9 separate areas.
 */
+
+/area/caribbean/dark
+	base_turf = /turf/floor/dirt
+	icon_state = "blue4"
+	climate = "temperate"
+
 /area/caribbean/roofed
 	name = "Roofed Area"
 	base_turf = /turf/floor/dirt
@@ -138,14 +144,14 @@
 	name = "Grassland"
 	base_turf = /turf/floor/grass
 	icon_state = "red2"
-	ambience = list("sound/ambience/jungle1.ogg")
+	ambience = list("sound/ambience/woodland1.ogg")
 	climate = "temperate"
 
 /area/caribbean/nomads/sand
 	name = "Beach"
 	base_turf = /turf/floor/beach/sand
 	icon_state = "blue1"
-	ambience = list("sound/ambience/jungle1.ogg")
+	ambience = list("sound/ambience/shore.ogg")
 	climate = "temperate"
 
 /area/caribbean/nomads/desert
@@ -167,30 +173,47 @@
 	base_turf = /turf/floor/beach/water/jungle
 	icon_state = "blue1"
 	climate = "jungle"
+	ambience = list("sound/ambience/jungle1.ogg")
 
 /area/caribbean/nomads/forest
 	name = "Forest"
 	base_turf = /turf/floor/dirt/burned
 	icon_state = "green1"
 	climate = "temperate"
+	ambience = list("sound/ambience/woodland1.ogg")
 
 /area/caribbean/nomads/semiarid
 	name = "Semi-Arid"
 	base_turf = /turf/floor/dirt/dust
 	icon_state = "red1"
 	climate = "semiarid"
+	ambience = list("sound/ambience/woodland1.ogg")
 
 /area/caribbean/nomads/forest/snow
 	name = "Snowy Forest"
 	base_turf = /turf/floor/winter/grass
 	icon_state = "green1"
 	climate = "tundra"
+	ambience = list("sound/ambience/winter.ogg")
 
 /area/caribbean/nomads/forest/Jungle
 	name = "Jungle"
 	base_turf = /turf/floor/dirt/jungledirt
 	icon_state = "green1"
 	climate = "jungle"
+	ambience = list("sound/ambience/jungle1.ogg")
+
+/area/caribbean/nomads/forest/Jungle/extraction1
+	name = "Extraction Point 1"
+	icon_state = "red1"
+
+/area/caribbean/nomads/forest/Jungle/extraction2
+	name = "Extraction Point 2"
+	icon_state = "red2"
+
+/area/caribbean/nomads/forest/Jungle/extraction3
+	name = "Extraction Point 3"
+	icon_state = "red3"
 
 /area/caribbean/nomads/forest/Jungle/sea
 	base_turf = /turf/floor/beach/water/deep/saltwater
@@ -223,6 +246,7 @@
 	base_turf = /turf/floor/grass/jungle/savanna
 	icon_state = "blue3"
 	climate = "savanna"
+	ambience = list("sound/ambience/jungle1.ogg")
 
 /area/caribbean/nomads/forest/Jungle/river
 	name = "Jungle River"
@@ -235,18 +259,28 @@
 	base_turf = /turf/floor/winter
 	icon_state = "red1"
 	climate = "tundra"
+	ambience = list("sound/ambience/winter.ogg")
 
 /area/caribbean/nomads/taiga
 	name = "Taiga"
 	base_turf = /turf/floor/dirt
-	icon_state = "red3"
+	icon_state = "blue2"
 	climate = "taiga"
+	ambience = list("sound/ambience/winter.ogg")
+
+/area/caribbean/nomads/tundra
+	name = "Tundra"
+	base_turf = /turf/floor/winter
+	icon_state = "blue1"
+	climate = "tundra"
+	ambience = list("sound/ambience/winter.ogg")
 
 /area/caribbean/nomads/ice
 	name = "Ice"
 	base_turf = /turf/floor/beach/water/ice
 	icon_state = "blue1"
 	climate = "tundra"
+	ambience = list("sound/ambience/winter.ogg")
 
 /area/caribbean/nomads/ice/target
 	name = "Ice"
@@ -259,6 +293,7 @@
 	base_turf = /turf/floor/dirt/winter
 	icon_state = "blue2"
 	climate = "tundra"
+	ambience = list("sound/ambience/winter.ogg")
 
 /area/caribbean/prison/jail
 	name = "Jail"
@@ -300,6 +335,14 @@
 	icon_state = "purple1"
 	ambience = list("sound/ambience/ship1.ogg")
 	climate = "sea"
+
+/area/caribbean/sea/underwater
+	name = "Ocean"
+	base_turf = /turf/floor/beach/water/deep/saltwater/underwater
+	icon_state = "purple1"
+	ambience = list("sound/ambience/underwater.ogg")
+	climate = "sea"
+	location = AREA_INSIDE
 
 /area/caribbean/sea/top
 	name = "sea"
@@ -519,16 +562,21 @@
 	icon_state = "purple1"
 	climate = "tundra"
 	base_turf = /turf/floor/dirt/winter
+	ambience = list("sound/ambience/winter.ogg")
+
 /area/caribbean/no_mans_land/taiga
 	name = "No Man's Land"
 	icon_state = "purple1"
 	climate = "taiga"
 	base_turf = /turf/floor/dirt/winter
+	ambience = list("sound/ambience/winter.ogg")
+
 /area/caribbean/no_mans_land/temperate
 	name = "No Man's Land"
 	icon_state = "purple1"
 	climate = "temperate"
 	base_turf = /turf/floor/dirt
+	ambience = list("sound/ambience/woodland1.ogg")
 
 /area/caribbean/no_mans_land/temperate/two
 	name = "No Man's Land 2"
@@ -580,6 +628,7 @@
 	climate = "tundra"
 	base_turf = /turf/floor/dirt/winter
 	icon_state = "purple1"
+	ambience = list("sound/ambience/winter.ogg")
 
 /area/caribbean/no_mans_land/invisible_wall/tundra/one
 	name = "grace wall 1"
@@ -593,6 +642,8 @@
 /area/caribbean/no_mans_land/invisible_wall/taiga
 	climate = "taiga"
 	base_turf = /turf/floor/dirt/winter
+	ambience = list("sound/ambience/winter.ogg")
+
 /area/caribbean/no_mans_land/invisible_wall/taiga/one
 	icon_state = "green1"
 	name = "I grace wall"
@@ -602,6 +653,7 @@
 /area/caribbean/no_mans_land/invisible_wall/temperate
 	climate = "temperate"
 	base_turf = /turf/floor/dirt
+	ambience = list("sound/ambience/woodland1.ogg")
 /area/caribbean/no_mans_land/invisible_wall/temperate/one
 	icon_state = "green1"
 	name = "I grace wall"
@@ -635,6 +687,7 @@
 
 /area/caribbean/no_mans_land/invisible_wall/sea/temperate
 	climate = "temperate"
+	ambience = list("sound/ambience/woodland1.ogg")
 
 /area/caribbean/no_mans_land/invisible_wall/one
 	icon_state = "green1"
@@ -685,6 +738,7 @@
 	icon_state = "purple1"
 	base_turf = /turf/floor/grass
 	climate = "temperate"
+	ambience = list("sound/ambience/woodland1.ogg")
 
 /area/caribbean/forest/one
 /area/caribbean/forest/two
@@ -969,8 +1023,10 @@
 
 /area/caribbean/russian/land/outside
 	icon_state = "red3"
+
 /area/caribbean/russian/land/outside/tundra
 	climate = "tundra"
+	ambience = list("sound/ambience/winter.ogg")
 
 /area/caribbean/british
 	icon_state = "blue1"

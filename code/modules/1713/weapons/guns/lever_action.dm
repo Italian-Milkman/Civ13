@@ -27,8 +27,6 @@
 //	scoped_accuracy = 2
 	gun_type = GUN_TYPE_RIFLE
 	attachment_slots = ATTACH_IRONSIGHTS | ATTACH_BARREL
-	accuracy_increase_mod = 2.00
-	accuracy_decrease_mod = 6.00
 	KD_chance = KD_CHANCE_HIGH
 	stat = "rifle"
 	move_delay = 2
@@ -38,7 +36,6 @@
 	equiptimer = 15
 	gtype = "rifle"
 	load_delay = 8
-	aim_miss_chance_divider = 2.50
 
 	var/recentpump = FALSE
 
@@ -52,21 +49,21 @@
 /obj/item/weapon/gun/projectile/leveraction/special_check(mob/user)
 //	var/mob/living/human/H = user
 	if (gun_safety && safetyon)
-		user << "<span class='warning'>You can't fire \the [src] while the safety is on!</span>"
+		to_chat(user, "<span class='warning'>You can't fire \the [src] while the safety is on!</span>")
 		return FALSE
 /*
 	if (loaded.len <= 0)
-		user << "<span class='warning'>\the [src] is empty.</span>"
+		to_chat(user, "<span class='warning'>\the [src] is empty.</span>")
 		return FALSE
 	if (empty_casing)
-		user << "<span class='warning'>You can't fire \the [src] without cycling it first!</span>"
+		to_chat(user, "<span class='warning'>You can't fire \the [src] without cycling it first!</span>")
 		return FALSE
 	if (!cocked)
-		user << "<span class='warning'>You can't fire \the [src] while the chamber is empty!</span>"
+		to_chat(user, "<span class='warning'>You can't fire \the [src] while the chamber is empty!</span>")
 		return FALSE
 */
 	if (!(user.has_empty_hand(both = FALSE)))
-		user << "<span class='warning'>You need both hands to fire \the [src]!</span>"
+		to_chat(user, "<span class='warning'>You need both hands to fire \the [src]!</span>")
 		return FALSE
 	return ..()
 
@@ -119,7 +116,7 @@
 			visible_message("[user] removes \a [C] from [src].", "<span class='notice'>You remove \a [C] from [src].</span>")
 			if (load_shell_sound) playsound(loc, load_shell_sound, 75, TRUE)
 	else
-		user << "<span class='warning'>\the [src] is empty.</span>"
+		to_chat(user, "<span class='warning'>\the [src] is empty.</span>")
 	update_icon()
 
 */

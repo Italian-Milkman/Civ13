@@ -39,7 +39,7 @@
 		affected.createwound(CUT, 20)
 
 /datum/surgery_step/cavity/make_space
-	allowed_tools = list(
+	allowed_tools = alist(
 		1 = list("/obj/item/weapon/surgery/scalpel",100),
 		2 = list("/obj/item/weapon/surgery/scalpel/bronze",100),
 		3 = list("/obj/item/weapon/pen",75),
@@ -69,7 +69,7 @@
 
 /datum/surgery_step/cavity/close_space
 	priority = TRUE
-	allowed_tools = list(
+	allowed_tools = alist(
 		1 = list("/obj/item/weapon/surgery/cautery",100),
 		2 = list("/obj/item/weapon/surgery/cautery/bronze",85),
 		3 = list("/obj/item/clothing/mask/smokable/cigarette/cigar",60),
@@ -99,7 +99,7 @@
 
 /datum/surgery_step/cavity/place_item
 	priority = 0
-	allowed_tools = list(
+	allowed_tools = alist(
 		1 = list("/obj/item",100),
 	)
 
@@ -131,7 +131,7 @@
 		user.visible_message("<span class = 'notice'>[user] puts \the [tool] inside [target]'s [get_cavity(affected)] cavity.</span>", \
 		"<span class = 'notice'>You put \the [tool] inside [target]'s [get_cavity(affected)] cavity.</span>" )
 		if (tool.w_class > get_max_wclass(affected)/2 && prob(50))
-			user << "<span class = 'red'>You tear some blood vessels trying to fit such a big object in this cavity.</span>"
+			to_chat(user, "<span class = 'red'>You tear some blood vessels trying to fit such a big object in this cavity.</span>")
 			var/datum/wound/internal_bleeding/I = new (10)
 			affected.wounds += I
 			affected.owner.custom_pain("You feel something rip in your [affected.name]!", TRUE)
@@ -145,7 +145,7 @@
 //////////////////////////////////////////////////////////////////
 
 /datum/surgery_step/internal/implant_removal
-	allowed_tools = list(
+	allowed_tools = alist(
 		1 = list("/obj/item/weapon/surgery/hemostat",100),
 		2 = list("/obj/item/weapon/wirecutters",75),
 		3 = list("/obj/item/weapon/material/kitchen/utensil/fork",35),

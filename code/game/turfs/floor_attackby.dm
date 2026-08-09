@@ -211,7 +211,7 @@
 						else
 							H.shoveling = FALSE
 					else
-						user << "<span class='notice'>All the loose dirt has been shoveled out of this spot already.</span>"
+						to_chat(user, "<span class='notice'>All the loose dirt has been shoveled out of this spot already.</span>")
 				else if (istype(T, /turf/floor/beach/sand) && istype(H))
 					if (T.available_sand > 0)
 						H.shoveling = TRUE
@@ -706,7 +706,9 @@
 			if (istype(get_area(src), /area/caribbean/void/caves/special))
 				mineral.amount *= 2
 			if (H)
-				to_chat(H, SPAN_GREEN_BOLD("You found some <font color=[get_material_by_name("copper").icon_colour]><b>copper</font></b> ore!"))
+				var/material/M = get_material_by_name("copper")
+				var/ore_colour = M ? M.icon_colour : "#b87333"
+				to_chat(H, SPAN_GREEN_BOLD("You found some <font color=[ore_colour]><b>copper</font></b> ore!"))
 				H.adaptStat("strength", 1)
 		else
 			var/obj/item/stack/ore/tin/mineral = new/obj/item/stack/ore/tin(src)
@@ -716,7 +718,8 @@
 			if (istype(get_area(src), /area/caribbean/void/caves/special))
 				mineral.amount *= 2
 			if (H)
-				to_chat(H, SPAN_GREEN_BOLD("You found some <font color=[get_material_by_name("tin").icon_colour]><b>tin</font></b> ore!"))
+				var/material/M = get_material_by_name("tin")
+				to_chat(H, SPAN_GREEN_BOLD("You found some <font color=[M.icon_colour]><b>tin</font></b> ore!"))
 				H.adaptStat("strength", 1)
 		change_the_turf()
 		return
@@ -728,11 +731,12 @@
 		if (istype(get_area(src), /area/caribbean/void/caves/special))
 			mineral.amount *= 2
 		if (H)
-			to_chat(H, SPAN_GREEN_BOLD("You found some <font color=[get_material_by_name("iron").icon_colour]><b>iron</font></b> ore!"))
+			var/material/M = get_material_by_name("iron")
+			to_chat(H, SPAN_GREEN_BOLD("You found some <font color=[M.icon_colour]><b>iron</font></b> ore!"))
 			H.adaptStat("strength", 1)
 		change_the_turf()
 		return
-	if (prob(25))
+	if (prob(25) && map.ID != MAP_ANTARCTICA)
 		if (map.ordinal_age >= 2)
 			var/pickperc = pick(1,2,3,4)
 			switch (pickperc)
@@ -776,7 +780,8 @@
 					if (istype(get_area(src), /area/caribbean/void/caves/special))
 						mineral.amount *= 2
 					if (H)
-						to_chat(H, SPAN_GREEN_BOLD("You found some <font color=[get_material_by_name("lead").icon_colour]><b>lead</font> ore</b>!"))
+						var/material/M = get_material_by_name("lead")
+						to_chat(H, SPAN_GREEN_BOLD("You found some <font color=[M.icon_colour]><b>lead</font> ore</b>!"))
 						H.adaptStat("strength", 1)
 			change_the_turf()
 			return
@@ -809,7 +814,8 @@
 		if (istype(get_area(src), /area/caribbean/void/caves/special))
 			mineral.amount *= 2
 		if (H)
-			to_chat(H, SPAN_GREEN_BOLD("You found some <font color=[get_material_by_name("silver").icon_colour]><b>silver</font> ore</b>!"))
+			var/material/M = get_material_by_name("silver")
+			to_chat(H, SPAN_GREEN_BOLD("You found some <font color=[M.icon_colour]><b>silver</font> ore</b>!"))
 			H.adaptStat("strength", 1)
 		change_the_turf()
 		return
@@ -819,7 +825,8 @@
 		if (istype(get_area(src), /area/caribbean/void/caves/special))
 			mineral.amount *= 2
 		if (H)
-			to_chat(H, SPAN_GREEN_BOLD("You found some <font color=[get_material_by_name("gold").icon_colour]><b>gold</font> ore</b>!"))
+			var/material/M = get_material_by_name("gold")
+			to_chat(H, SPAN_GREEN_BOLD("You found some <font color=[M.icon_colour]><b>gold</font> ore</b>!"))
 			H.adaptStat("strength", 1)
 		change_the_turf()
 		return
@@ -829,7 +836,8 @@
 		if (istype(get_area(src), /area/caribbean/void/caves/special))
 			mineral.amount *= 2
 		if (H)
-			to_chat(H, SPAN_GREEN_BOLD("You found some raw <font color=[get_material_by_name("diamond").icon_colour]><b>diamonds</b></font>!"))
+			var/material/M = get_material_by_name("diamond")
+			to_chat(H, SPAN_GREEN_BOLD("You found some raw <font color=[M.icon_colour]><b>diamonds</b></font>!"))
 			H.adaptStat("strength", 1)
 		change_the_turf()
 		return
@@ -840,7 +848,8 @@
 			if (istype(get_area(src), /area/caribbean/void/caves/special))
 				new/obj/item/stack/material/fossil(src)
 			if (H)
-				to_chat(H, SPAN_GREEN_BOLD("You found a <font color=[get_material_by_name("bone").icon_colour]><b>fossil</font></b>!"))
+				var/material/M = get_material_by_name("bone")
+				to_chat(H, SPAN_GREEN_BOLD("You found a <font color=[M.icon_colour]><b>fossil</font></b>!"))
 				H.adaptStat("strength", 1)
 			change_the_turf()
 			return
@@ -850,11 +859,12 @@
 		if (istype(get_area(src), /area/caribbean/void/caves/special))
 			mineral.amount *= 2
 		if (H)
-			to_chat(H, SPAN_GREEN_BOLD("You found some <font color=[get_material_by_name("sandstone").icon_colour]><b>sandstone</font> rocks</b>!"))
+			var/material/M = get_material_by_name("sandstone")
+			to_chat(H, SPAN_GREEN_BOLD("You found some <font color=[M.icon_colour]><b>sandstone</font> rocks</b>!"))
 			H.adaptStat("strength", 1)
 		change_the_turf()
 		return
-	if(prob(20) && (map.ID != MAP_NOMADS_PANGEA || map.ID != MAP_NOMADS_CONTINENTAL || map.ID != MAP_NOMADS_NEW_WORLD && map.ID != MAP_NOMADS_MEDITERRANEAN && map.ID != MAP_GULAG13 && map.ID != MAP_RIVER_KWAI) && map.ordinal_age >=1)
+	if(prob(20) && (map.ID != MAP_NOMADS_PANGEA && map.ID != MAP_NOMADS_CONTINENTAL && map.ID != MAP_NOMADS_NEW_WORLD && map.ID != MAP_NOMADS_MEDITERRANEAN && map.ID != MAP_GULAG13 && map.ID != MAP_BAGNE13 && map.ID != MAP_RIVER_KWAI) && map.ordinal_age >=1)
 		var/obj/item/stack/material/marble/mineral = new/obj/item/stack/material/marble(src)
 		var/obj/item/stack/material/stone/bonusstone = new/obj/item/stack/material/stone(src)
 		bonusstone.amount = rand(8,12)
@@ -862,7 +872,8 @@
 		if (istype(get_area(src), /area/caribbean/void/caves/special))
 			mineral.amount *= 2
 		if (H)
-			to_chat(H, SPAN_GREEN_BOLD("You found some <font color=[get_material_by_name("marble").icon_colour]><b>marble</font> rocks</b>!"))
+			var/material/M = get_material_by_name("marble")
+			to_chat(H, SPAN_GREEN_BOLD("You found some <font color=[M.icon_colour]><b>marble</font> rocks</b>!"))
 			H.adaptStat("strength", 1)
 		change_the_turf()
 		return
@@ -884,7 +895,8 @@
 		if (istype(get_area(src), /area/caribbean/void/caves/special))
 			mineral.amount *= 2
 		if (H)
-			to_chat(H, SPAN_GREEN_BOLD("You found some <font color=[get_material_by_name("marble").icon_colour]><b>marble</font> rocks</b>!"))
+			var/material/M = get_material_by_name("marble")
+			to_chat(H, SPAN_GREEN_BOLD("You found some <font color=[M.icon_colour]><b>marble</font> rocks</b>!"))
 			H.adaptStat("strength", 1)
 		change_the_turf()
 		return
@@ -894,7 +906,8 @@
 		if (istype(get_area(src), /area/caribbean/void/caves/special))
 			mineral.amount *= 2
 		if (H)
-			to_chat(H, SPAN_GREEN_BOLD("You found some usable <font color=[get_material_by_name("stone").icon_colour]><b>stone</font> rocks</b>!"))
+			var/material/M = get_material_by_name("stone")
+			to_chat(H, SPAN_GREEN_BOLD("You found some usable <font color=[M.icon_colour]><b>stone</font> rocks</b>!"))
 			H.adaptStat("strength", 1)
 	change_the_turf()
 	return
@@ -967,7 +980,7 @@
 					else
 						H.shoveling = FALSE
 				else
-					user << "<span class='notice'>All the loose dirt has been shoveled out of this spot already.</span>"
+					to_chat(user, "<span class='notice'>All the loose dirt has been shoveled out of this spot already.</span>")
 			else if (istype(T, /turf/floor/beach/sand) && istype(H) && !H.shoveling)
 				if (T.available_sand > 0)
 					H.shoveling = TRUE
@@ -1021,7 +1034,7 @@
 					return
 				new/obj/structure/multiz/ladder/ww2/tunneltop(locate(user.x, user.y, user.z+1))
 				new/obj/structure/multiz/ladder/ww2/tunnelbottom(user.loc)
-				user.visible_message("<span class='danger'>[user] finishes digging \the tunnel entrance.</span>", "<span class='danger'>You finish digging \the tunnel entrance.</span>")
+				user.visible_message("<span class='danger'>[user] finishes digging the tunnel entrance.</span>", "<span class='danger'>You finish digging the tunnel entrance.</span>")
 				if (ishuman(user))
 					var/mob/living/human/H = user
 					H.adaptStat("crafting", 1)
@@ -1029,7 +1042,7 @@
 			return
 		else
 			if (user.z <= 1)
-				user << "<span class='notice'>You can't dig a tunnel here, the bedrock is right below.</span>"
+				to_chat(user, "<span class='notice'>You can't dig a tunnel here, the bedrock is right below.</span>")
 				return
 			var/digging_tunnel_time = 200
 			digging_tunnel_time /= user.getStatCoeff("strength")
@@ -1043,17 +1056,17 @@
 				var/turf/BL = get_turf(locate(user.x, user.y, user.z-1))
 				if (istype(BL, /turf/floor/dirt/underground))
 					BL.ChangeTurf(/turf/floor/dirt)
-				user.visible_message("<span class='danger'>[user] finishes digging \the tunnel entrance.</span>", "<span class='danger'>You finish digging \the tunnel entrance.</span>")
+				user.visible_message("<span class='danger'>[user] finishes digging the tunnel entrance.</span>", "<span class='danger'>You finish digging the tunnel entrance.</span>")
 				if (ishuman(user))
 					var/mob/living/human/H = user
 					H.adaptStat("crafting", 1)
 					H.adaptStat("strength", 1)
 			return
 	else if (locate(/obj/structure/multiz/) in user.loc)
-		user << "<span class='warning'>There already is something here.</span>"
+		to_chat(user, "<span class='warning'>There already is something here.</span>")
 		return
 	else if (!TO.is_diggable)
-		user << "<span class='warning'>You cannot dig a hole here!</span>"
+		to_chat(user, "<span class='warning'>You cannot dig a hole here!</span>")
 		return
 
 /turf/floor/beach/water/attack_hand(var/mob/living/human/H)

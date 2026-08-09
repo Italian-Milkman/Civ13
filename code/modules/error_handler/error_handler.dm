@@ -1,7 +1,7 @@
 GLOBAL_VAR_INIT(total_runtimes, 0)
 GLOBAL_VAR_INIT(total_runtimes_skipped, 0)
 
-#ifdef DEBUG
+#ifdef USE_CUSTOM_ERROR_HANDLER
 #define ERROR_USEFUL_LEN 2
 
 /world/Error(exception/e, datum/e_src)
@@ -89,19 +89,5 @@ GLOBAL_VAR_INIT(total_runtimes_skipped, 0)
 		GLOB.error_cache.log_error(e, desclines, e_src = e_src)
 		
 #endif
-
-/proc/log_runtime(exception/e, datum/e_src, extra_info)
-	if(!istype(e))
-		world.Error(e, e_src)
-		return
-
-	if(extra_info)
-		// Adding extra info adds two newlines, because parsing runtimes is funky
-		if(islist(extra_info))
-			e.desc = "  [jointext(extra_info, "\n  ")]\n\n" + e.desc
-		else
-			e.desc = "  [extra_info]\n\n" + e.desc
-
-	world.Error(e, e_src)
 
 #undef ERROR_USEFUL_LEN

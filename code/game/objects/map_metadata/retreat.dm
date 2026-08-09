@@ -1,7 +1,8 @@
 /obj/map_metadata/retreat
 	ID = MAP_RETREAT
 	title = "Retreat"
-	lobby_icon = 'icons/lobby/retreat.png'
+	description = "The Chinese Army will win if they hold out for 30 minutes. The Americans will win if they manage to cross the bridge to friendly territory!"
+	lobby_icon = "icons/lobby/retreat.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/one,/area/caribbean/no_mans_land/invisible_wall/two,/area/caribbean/no_mans_land/invisible_wall/inside)
 	respawn_delay = 1200
 	no_hardcore = TRUE
@@ -22,22 +23,9 @@
 	faction2 = AMERICAN
 	valid_weather_types = list(WEATHER_WET, WEATHER_NONE, WEATHER_EXTREME)
 	songs = list(
-		"Fortunate Son:1" = 'sound/music/fortunate_son.ogg',)
+		"Fortunate Son:1" = "sound/music/fortunate_son.ogg",)
 	artillery_count = 5
 	grace_wall_timer = 4800
-
-/obj/map_metadata/retreat/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (istype(J, /datum/job/american))
-		if (J.is_korean_war == TRUE)
-			. = TRUE
-		else
-			. = FALSE
-	if (istype(J, /datum/job/chinese))
-		if (J.is_korean_war == TRUE)
-			. = TRUE
-		else
-			. = FALSE
 
 /obj/map_metadata/retreat/roundend_condition_def2name(define)
 	..()
@@ -89,14 +77,14 @@ var/no_loop_ret = FALSE
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The <b>Chinese</b> have successfuly deterred the withdrawal! The Americans have halted their retreat!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_ret == FALSE)
 		ticker.finished = TRUE
 		var/message = "The <b>Americans</b> have crossed the bridge into friendly territory and made it to their HQ! The retreat is completed!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_ret = TRUE
@@ -139,7 +127,7 @@ var/no_loop_ret = FALSE
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The <b>Americans</b> have oddly retreated back into enemy territory!</font>"
+			to_chat(world, "<font size = 3>The <b>Americans</b> have oddly retreated back into enemy territory!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1

@@ -2,7 +2,7 @@
 	ID = MAP_ABASHIRI
 	title = "Abashiri Prison"
 	no_winner ="The round is proceeding normally."
-	lobby_icon = 'icons/lobby/abashiri.png'
+	lobby_icon = "icons/lobby/abashiri.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall)
 	respawn_delay = 3600
 	has_hunger = TRUE
@@ -23,9 +23,9 @@
 	faction1 = JAPANESE
 	faction2 = CIVILIAN
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET, WEATHER_EXTREME)
-	ambience = list('sound/ambience/ship1.ogg')
+	ambience = list("sound/ambience/ship1.ogg")
 	songs = list(
-		"The Great Escape:1" = 'sound/music/the_great_escape.ogg')
+		"The Great Escape:1" = "sound/music/the_great_escape.ogg")
 	gamemode = "Prison Simulation"
 	var/list/points = list(
 		list("Guards",0,0),
@@ -36,23 +36,6 @@
 	is_RP = TRUE
 	var/gracedown1 = TRUE
 	var/siren = FALSE
-/obj/map_metadata/abashiri/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (istype(J, /datum/job/civilian/fantasy))
-		. = FALSE
-	if (J.is_civil_war == TRUE)
-		. = FALSE
-	if (istype(J, /datum/job/japanese/abashiri))
-		if (J.is_abashiri)
-			. = TRUE
-		else
-			. = FALSE
-	else
-		if (J.is_abashiri && J.title != "DO NOT USE")
-			. = TRUE
-		else
-			. = FALSE
-
 /obj/map_metadata/abashiri/faction2_can_cross_blocks()
 	return (processes.ticker.playtime_elapsed >= 12000 || admin_ended_all_grace_periods)
 
@@ -163,7 +146,7 @@
 
 /obj/map_metadata/abashiri/proc/alarm_proc()
 	if (siren)
-		var/warning_sound = sound('sound/misc/siren.ogg', repeat = FALSE, wait = TRUE, channel = 777)
+		var/warning_sound = sound("sound/misc/siren.ogg", repeat = FALSE, wait = TRUE, channel = 777)
 		for (var/mob/M in player_list)
 			M.client << warning_sound
 		to_chat(world, "<font size=3 color='red'><center><b>ALARM</b><br>The alarm is still on!</center></font>")

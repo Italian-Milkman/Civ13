@@ -16,13 +16,6 @@
 //Call these procs to dump your world to a series of image files (!!)
 //NOTE: Does not explicitly support non 32x32 icons or stuff with large pixel_* values, so don't blame me if it doesn't work perfectly
 
-/client/proc/nanomapgen_DumpImage()
-	set name = "Generate NanoUI Map"
-	set category = "Server"
-
-	if (holder)
-		nanomapgen_DumpTile(1, TRUE, text2num(input(usr,"Enter the Z level to generate")))
-
 /client/proc/nanomapgen_DumpTile(var/startX = TRUE, var/startY = TRUE, var/currentZ = TRUE, var/endX = -1, var/endY = -1)
 
 	if (endX < 0 || endX > world.maxx)
@@ -32,19 +25,19 @@
 		endY = world.maxy
 
 	if (currentZ < 0 || currentZ > world.maxz)
-		usr << "NanoMapGen: <b>ERROR: currentZ ([currentZ]) must be between TRUE and [world.maxz]</b>"
+		to_chat(usr, "NanoMapGen: <b>ERROR: currentZ ([currentZ]) must be between TRUE and [world.maxz]</b>")
 
 		sleep(3)
 		return NANOMAP_TERMINALERR
 
 	if (startX > endX)
-		usr << "NanoMapGen: <b>ERROR: startX ([startX]) cannot be greater than endX ([endX])</b>"
+		to_chat(usr, "NanoMapGen: <b>ERROR: startX ([startX]) cannot be greater than endX ([endX])</b>")
 
 		sleep(3)
 		return NANOMAP_TERMINALERR
 
 	if (startY > endX)
-		usr << "NanoMapGen: <b>ERROR: startY ([startY]) cannot be greater than endY ([endY])</b>"
+		to_chat(usr, "NanoMapGen: <b>ERROR: startY ([startY]) cannot be greater than endY ([endY])</b>")
 		sleep(3)
 		return NANOMAP_TERMINALERR
 
@@ -55,8 +48,7 @@
 		return NANOMAP_TERMINALERR
 
 	world.log << "NanoMapGen: <b>GENERATE MAP ([startX],[startY],[currentZ]) to ([endX],[endY],[currentZ])</b>"
-	usr << "NanoMapGen: <b>GENERATE MAP ([startX],[startY],[currentZ]) to ([endX],[endY],[currentZ])</b>"
-
+	to_chat(usr, "NanoMapGen: <b>GENERATE MAP ([startX],[startY],[currentZ]) to ([endX],[endY],[currentZ])</b>")
 	var/count = FALSE;
 	for (var/WorldX = startX, WorldX <= endX, WorldX++)
 		for (var/WorldY = startY, WorldY <= endY, WorldY++)
@@ -82,7 +74,7 @@
 
 	world.log << "NanoMapGen: <b>Done.</b>"
 
-	usr << "NanoMapGen: <b>Done. File [mapFilename] uploaded to your cache.</b>"
+	to_chat(usr, "NanoMapGen: <b>Done. File [mapFilename] uploaded to your cache.</b>")
 
 	if (Tile.Width() != NANOMAP_MAX_ICON_DIMENSION || Tile.Height() != NANOMAP_MAX_ICON_DIMENSION)
 		return NANOMAP_BADOUTPUT

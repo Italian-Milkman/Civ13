@@ -59,7 +59,6 @@
 	parent_organ = "groin"
 	joint = "left knee"
 	amputation_point = "left hip"
-	can_stand = TRUE
 
 /obj/item/organ/external/leg/right
 	limb_name = "r_leg"
@@ -80,7 +79,6 @@
 	parent_organ = "l_leg"
 	joint = "left ankle"
 	amputation_point = "left ankle"
-	can_stand = TRUE
 
 /obj/item/organ/external/foot/removed()
 	if (owner) owner.u_equip(owner.shoes)
@@ -146,8 +144,8 @@
 				owner.update_hair()
 	..()
 
-/obj/item/organ/external/head/take_damage(brute, burn, sharp, edge, used_weapon = null, list/forbidden_limbs = list())
-	..(brute, burn, sharp, edge, used_weapon, forbidden_limbs)
+/obj/item/organ/external/head/take_damage(brute, burn, sharp, edge, used_weapon = null, silent = 0)
+	..(brute, burn, sharp, edge, used_weapon, silent)
 	if (!disfigured)
 		if (brute_dam > 40)
 			if (prob(50))

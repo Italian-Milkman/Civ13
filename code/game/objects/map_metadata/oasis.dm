@@ -1,7 +1,8 @@
 /obj/map_metadata/oasis
 	ID = MAP_OASIS
 	title = "Trouble at the Oasis"
-	lobby_icon = 'icons/lobby/medieval.png'
+	description = "The Crusader and Arabic Caliphate armies have found each other by chance in the desert as they searched for a water source."
+	lobby_icon = "icons/lobby/medieval.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/one,/area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 0
 	victory_time = 15000
@@ -20,22 +21,15 @@
 	ordinal_age = 2
 	faction_distribution_coeffs = list(FRENCH = 0.5, ARAB = 0.5)
 	songs = list(
-		"Crusaders:1" = 'sound/music/crusaders.ogg')
+		"Crusaders:1" = "sound/music/crusaders.ogg")
 	battle_name = "Trouble at the Oasis"
 	mission_start_message = "<font size=4>The <b>Crusader</b> and <b>Arabic Caliphate</b> armies have found each other by chance in the desert as they searched for a water source. Each group is thirsty and seeking to secure the valuable Oasis for themselves. Whichever army manages to hold onto the shores of the Oasis for 5 minutes will capture it. Grace wall will end in 4 minutes."
 	faction1 = FRENCH
 	faction2 = ARAB
-	ambience = list('sound/ambience/jungle1.ogg')
+	ambience = list("sound/ambience/jungle1.ogg")
 	gamemode = "King of the Oasis"
 	grace_wall_timer = 2400
 
-obj/map_metadata/oasis/job_enabled_specialcheck(var/datum/job/J)
-	if (J.is_crusader && J.is_medieval)
-		. = TRUE
-	else if (J.is_arabcaliph && J.is_medieval)
-		. = TRUE
-	else
-		. = FALSE
 
 /obj/map_metadata/oasis/short_win_time(faction)
 	if (!(alive_n_of_side(faction1)) || !(alive_n_of_side(faction2)))
@@ -88,7 +82,7 @@ obj/map_metadata/oasis/job_enabled_specialcheck(var/datum/job/J)
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The [battle_name ? battle_name : "battle"] has ended in a stalemate!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
@@ -99,7 +93,7 @@ obj/map_metadata/oasis/job_enabled_specialcheck(var/datum/job/J)
 		var/message = "The [battle_name ? battle_name : "battle"] has ended in a stalemate!"
 		if (current_winner && current_loser)
 			message = "The battle is over! The [current_winner] was victorious over the [current_loser][battle_name ? " in the [battle_name]" : ""]!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		win_condition_spam_check = TRUE
 		return FALSE
 	// German major
@@ -141,7 +135,7 @@ obj/map_metadata/oasis/job_enabled_specialcheck(var/datum/job/J)
 
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The [current_winner] has lost control of the Oasis!</font>"
+			to_chat(world, "<font size = 3>The [current_winner] has lost control of the Oasis!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1

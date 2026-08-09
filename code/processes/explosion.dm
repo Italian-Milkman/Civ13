@@ -7,7 +7,7 @@
 
 /process/explosion/setup()
 	name = "explosion"
-	schedule_interval = 0.5 SECONDS
+	schedule_interval = 0.1 SECONDS
 	work_queue = list()
 	fires_at_gamestates = list(GAME_STATE_PLAYING, GAME_STATE_FINISHED)
 	priority = PROCESS_PRIORITY_HIGH
@@ -202,16 +202,16 @@
 	T = get_step(s, turn(direction,90))
 	explosion_spread(T, spread_power, turn(direction,90))
 	T = get_step(s, turn(direction,-90))
-	explosion_spread(T, spread_power, turn(direction,90))
+	explosion_spread(T, spread_power, turn(direction,-90))
 
 /process/explosion/proc/queue(var/datum/explosiondata/data)
 	if (!data) return
 	if(islist(work_queue))
 		work_queue += data
 
-/process/explosion/statProcess()
-	..()
-	stat(null, "[work_queue.len] datums in explosion queue")
+/process/explosion/statProcess(client/C)
+	..(C)
+	C.add_stat("[work_queue.len] datums in explosion queue")
 
 /process/explosion/htmlProcess()
 	return ..() + "[work_queue.len] datums in explosion queue"

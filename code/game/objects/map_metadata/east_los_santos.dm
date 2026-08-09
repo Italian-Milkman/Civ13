@@ -1,7 +1,7 @@
 /obj/map_metadata/east_los_santos
 	ID = MAP_EAST_LOS_SANTOS
 	title = "East Los Santos"
-	lobby_icon = 'icons/lobby/east_los_santos.png'
+	lobby_icon = "icons/lobby/east_los_santos.png"
 	no_winner = "The fight for the hood is still going on."
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall, /area/caribbean/no_mans_land/invisible_wall/one, /area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 0
@@ -23,7 +23,7 @@
 	gamemode = "Turf War"
 	no_hardcore = TRUE
 	songs = list(
-		"Compton\'s Most Wanted - Hood Took Me Under:1" = 'sound/music/hood_took_me_under.ogg',)
+		"Compton\'s Most Wanted - Hood Took Me Under:1" = "sound/music/hood_took_me_under.ogg",)
 	var/grove_points = 0
 	var/ballas_points = 0
 	var/a1_control = "None"
@@ -69,9 +69,9 @@
 				ballas_points++
 			else
 				cust_color = "white"
-			world << "<big><font color='[cust_color]'><b>Basketball Court (South-West)</b>: [a1_control]</font></big>"
+			to_chat(world, "<big><font color='[cust_color]'><b>Basketball Court (South-West)</b>: [a1_control]</font></big>")
 		else
-			world << "<big><b>Basketball Court (South-West)</b>: Nobody</big>"
+			to_chat(world, "<big><b>Basketball Court (South-West)</b>: Nobody</big>")
 		c1 = 0
 		c2 = 0
 		for (var/mob/living/human/H in player_list)
@@ -99,9 +99,9 @@
 				ballas_points++
 			else
 				cust_color = "white"
-			world << "<big><font color='[cust_color]'><b>Abandoned Lot (South-East)</b>: [a2_control]</font></big>"
+			to_chat(world, "<big><font color='[cust_color]'><b>Abandoned Lot (South-East)</b>: [a2_control]</font></big>")
 		else
-			world << "<big><b>Abandoned Lot (South-East)</b>: Nobody</big>"
+			to_chat(world, "<big><b>Abandoned Lot (South-East)</b>: Nobody</big>")
 		c1 = 0
 		c2 = 0
 		for (var/mob/living/human/H in player_list)
@@ -129,9 +129,9 @@
 				ballas_points++
 			else
 				cust_color = "white"
-			world << "<big><font color='[cust_color]'><b>Rodriguez Steelworks</b>: [a3_control]</font></big>"
+			to_chat(world, "<big><font color='[cust_color]'><b>Rodriguez Steelworks</b>: [a3_control]</font></big>")
 		else
-			world << "<big><b>Rodriguez Steelworks</b>: Nobody</big>"
+			to_chat(world, "<big><b>Rodriguez Steelworks</b>: Nobody</big>")
 		c1 = 0
 		c2 = 0
 		for (var/mob/living/human/H in player_list)
@@ -159,20 +159,13 @@
 				ballas_points++
 			else
 				cust_color = "white"
-			world << "<big><font color='[cust_color]'><b>Pig Pen Parking Lot (North-East)</b>: [a4_control]</font></big>"
+			to_chat(world, "<big><font color='[cust_color]'><b>Pig Pen Parking Lot (North-East)</b>: [a4_control]</font></big>")
 		else
-			world << "<big><b>Pig Pen Parking Lot (North-East)</b>: Nobody</big>"
+			to_chat(world, "<big><b>Pig Pen Parking Lot (North-East)</b>: Nobody</big>")
 	spawn(300)
 		points_check()
-		world << "Ballas Influence: [ballas_points]/40"
-		world << "Grove Influence: [grove_points]/40"
-
-/obj/map_metadata/east_los_santos/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_gta == TRUE)
-		. = TRUE
-	else
-		. = FALSE
+		to_chat(world, "Ballas Influence: [ballas_points]/40")
+		to_chat(world, "Grove Influence: [grove_points]/40")
 
 /obj/map_metadata/east_los_santos/roundend_condition_def2name(define)
 	..()
@@ -223,7 +216,7 @@
 				return FALSE
 			ticker.finished = TRUE
 			var/message = "The <b><font color ='green'>Grove Street Families</font></b> have reached [grove_points] points and won! The hood is theirs!"
-			world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+			to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 			show_global_battle_report(null)
 			win_condition_spam_check = TRUE
 			return FALSE
@@ -232,7 +225,7 @@
 				return FALSE
 			ticker.finished = TRUE
 			var/message = "The <b><font color ='purple'>Ballas</font></b> have reached [ballas_points] points and won! The hood is theirs!"
-			world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+			to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 			show_global_battle_report(null)
 			win_condition_spam_check = TRUE
 			return FALSE
@@ -251,7 +244,6 @@
 				return TRUE
 		else
 			return !faction1_can_cross_blocks()
-			return !faction2_can_cross_blocks()
 	return FALSE
 
 /obj/map_metadata/east_los_santos/proc/rewards()
@@ -275,7 +267,7 @@
 						H.equip_to_slot_or_drop(new /obj/item/ammo_magazine/m9beretta(H), slot_l_store)
 						H.equip_to_slot_or_drop(new /obj/item/ammo_magazine/m9beretta(H), slot_r_store)
 				spam_check_g = 1
-				world << "The <b><font color = 'green'>Grove Street Families</font></b> are now strapped with <b>pistols</b>!"
+				to_chat(world, "The <b><font color = 'green'>Grove Street Families</font></b> are now strapped with <b>pistols</b>!")
 			else if ((grove_points >= 20 && grove_points < 30) && spam_check_g == 1)
 				var/rand_smg = rand(1,3)
 				switch(rand_smg)
@@ -292,7 +284,7 @@
 						H.equip_to_slot_or_drop(new /obj/item/ammo_magazine/mac10(H), slot_l_store)
 						H.equip_to_slot_or_drop(new /obj/item/ammo_magazine/mac10(H), slot_r_store)
 				spam_check_g = 2
-				world << "The <b><font color = 'green'> Grove Street Families</font></b> are now strapped with <b>SMGs</b>!"
+				to_chat(world, "The <b><font color = 'green'> Grove Street Families</font></b> are now strapped with <b>SMGs</b>!")
 			else if (grove_points >= 30 && spam_check_g == 2)
 				var/rand_rifle = pick(1,2)
 				switch(rand_rifle)
@@ -305,7 +297,7 @@
 						H.equip_to_slot_or_drop(new /obj/item/ammo_magazine/mp40/mp5(H), slot_l_store)
 						H.equip_to_slot_or_drop(new /obj/item/ammo_magazine/mp40/mp5(H), slot_r_store)
 				spam_check_g = 3
-				world << "The <b><font color = 'green'>Grove Street Families</font></b> are now strapped with <b>assault rifles</b>!"
+				to_chat(world, "The <b><font color = 'green'>Grove Street Families</font></b> are now strapped with <b>assault rifles</b>!")
 		else
 			if ((ballas_points >= 10 && ballas_points < 20) && spam_check_b == 0)
 				var/rand_pistol = rand(1,3)
@@ -323,7 +315,7 @@
 						H.equip_to_slot_or_drop(new /obj/item/ammo_magazine/m9beretta(H), slot_l_store)
 						H.equip_to_slot_or_drop(new /obj/item/ammo_magazine/m9beretta(H), slot_r_store)
 				spam_check_b = 1
-				world << "The <b><font color ='purple'>Ballas</font></b> are now strapped with <b>pistols</b>!"
+				to_chat(world, "The <b><font color ='purple'>Ballas</font></b> are now strapped with <b>pistols</b>!")
 			else if ((ballas_points >= 20 && ballas_points < 30) && spam_check_b == 1)
 				var/rand_smg = rand(1,3)
 				switch(rand_smg)
@@ -340,7 +332,7 @@
 						H.equip_to_slot_or_drop(new /obj/item/ammo_magazine/mac10(H), slot_l_store)
 						H.equip_to_slot_or_drop(new /obj/item/ammo_magazine/mac10(H), slot_r_store)
 				spam_check_b = 2
-				world << "The <b><font color ='purple'>Ballas</font></b> are now strapped with <b>SMGs</b>!"
+				to_chat(world, "The <b><font color ='purple'>Ballas</font></b> are now strapped with <b>SMGs</b>!")
 			else if (ballas_points >= 30 && spam_check_b == 2)
 				var/rand_rifle = pick(1,2)
 				switch(rand_rifle)
@@ -353,7 +345,7 @@
 						H.equip_to_slot_or_drop(new /obj/item/ammo_magazine/mp40/mp5(H), slot_l_store)
 						H.equip_to_slot_or_drop(new /obj/item/ammo_magazine/mp40/mp5(H), slot_r_store)
 				spam_check_b = 3
-				world << "The <b><font color ='purple'>Ballas</font></b> are now strapped with <b>assault rifles</b>!"
+				to_chat(world, "The <b><font color ='purple'>Ballas</font></b> are now strapped with <b>assault rifles</b>!")
 	spawn(300)
 		rewards()
 
@@ -364,7 +356,6 @@
 	desc = "An oversized white t-shirt and purple cargo shorts."
 	icon_state = "ballas1"
 	item_state = "ballas1"
-	worn_state = "ballas1"
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 
 /obj/item/clothing/under/ballas2
@@ -372,7 +363,6 @@
 	desc = "An oversized black outfit."
 	icon_state = "ballas2"
 	item_state = "ballas2"
-	worn_state = "ballas2"
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 
 /obj/item/clothing/under/ballas3
@@ -380,7 +370,6 @@
 	desc = "An oversized purple shirt and khaki cargo pants."
 	icon_state = "ballas3"
 	item_state = "ballas3"
-	worn_state = "ballas3"
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 
 /obj/item/clothing/under/grove1
@@ -388,7 +377,6 @@
 	desc = "An oversized green sweatshirt and jeans."
 	icon_state = "grove1"
 	item_state = "grove1"
-	worn_state = "grove1"
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 
 /obj/item/clothing/under/grove2
@@ -396,7 +384,6 @@
 	desc = "A green checkered shirt and beige pants."
 	icon_state = "grove2"
 	item_state = "grove2"
-	worn_state = "grove2"
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 
 /obj/item/clothing/under/grove3
@@ -404,7 +391,6 @@
 	desc = "A green basketball jersey and black jeans."
 	icon_state = "grove3"
 	item_state = "grove3"
-	worn_state = "grove3"
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 
 /obj/item/clothing/head/custom/custom_beanie/black
@@ -416,18 +402,15 @@
 	desc = "A purple bandana tied in the front."
 	icon_state = "bandana_ballas1"
 	item_state = "bandana_ballas1"
-	worn_state = "bandana_ballas1"
 	flags_inv = BLOCKHEADHAIR
 
 /obj/item/clothing/head/bandana_ballas/two
 	icon_state = "bandana_ballas2"
 	item_state = "bandana_ballas2"
-	worn_state = "bandana_ballas2"
 
 /obj/item/clothing/head/bandana_grove
 	name = "green bandana"
 	desc = "A green bandana tied in the front."
 	icon_state = "bandana_grove"
 	item_state = "bandana_grove"
-	worn_state = "bandana_grove"
 	flags_inv = BLOCKHEADHAIR

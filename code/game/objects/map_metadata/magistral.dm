@@ -1,8 +1,9 @@
 /obj/map_metadata/magistral
 	ID = MAP_MAGISTRAL
 	title = "Operation Magistral"
+	description = "The Soviets and the DRA will win if they capture the control room of the compound. The Mujahideen will win if they manage to hold out for 35 minutes!"
 	no_winner = "The compound is still under the Mujahideen's control."
-	lobby_icon = 'icons/lobby/magistral.png'
+	lobby_icon = "icons/lobby/magistral.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall, /area/caribbean/no_mans_land/invisible_wall/one, /area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 600 // 1 minute
 	victory_time = 21000
@@ -25,20 +26,10 @@
 	faction2 = ARAB
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET)
 	songs = list(
-		"Kaskad - Afgan:1" = 'sound/music/afgan.ogg',)
+		"Kaskad - Afgan:1" = "sound/music/afgan.ogg",)
 	gamemode = "Siege"
 	artillery_count = 3
 	grace_wall_timer = 3000
-
-/obj/map_metadata/magistral/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_afghan)
-		if (J.is_soviet || J.is_dra || J.is_muj)
-			. = TRUE
-		if (J.title == "DRA Governor")
-			. = FALSE
-	else
-		. = FALSE
 
 /obj/map_metadata/magistral/short_win_time(faction)
 	if (!(alive_n_of_side(faction1)) || !(alive_n_of_side(faction2)))
@@ -99,14 +90,14 @@
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The <font color = 'black'>Mujahideen</font> have successfully defended the compound! The Soviets and DRA have failed their assault!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_o == FALSE)
 		ticker.finished = TRUE
 		var/message = "The <font color = 'red'>Soviets</font> and the <font color = 'green'> DRA </font> have captured the compound! The Mujahideen have been wiped out!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_o = TRUE
@@ -145,7 +136,7 @@
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The <font color = 'black'>Mujahideen</font> have recaptured the Compound!</font>"
+			to_chat(world, "<font size = 3>The <font color = 'black'>Mujahideen</font> have recaptured the Compound!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1
@@ -167,5 +158,4 @@
 				return TRUE
 		else
 			return !faction1_can_cross_blocks()
-			return !faction2_can_cross_blocks()
 	return FALSE

@@ -1,7 +1,8 @@
 /obj/map_metadata/ruhr_uprising
 	ID = MAP_RUHR_UPRISING
 	title = "The Ruhr Uprising"
-	lobby_icon = 'icons/lobby/ruhr.png'
+	description = "The Ruhr Red Army will win if they hold out for 45 minutes.The Weimar Republic will win if they manage to capture the train station!"
+	lobby_icon = "icons/lobby/ruhr.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall)
 	respawn_delay = 1200
 	no_hardcore = TRUE
@@ -25,15 +26,8 @@
 	faction2 = GERMAN
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET)
 	songs = list(
-		"Argonnerwaldlied:1" = 'sound/music/argonnerwaldlied.ogg',)
+		"Argonnerwaldlied:1" = "sound/music/argonnerwaldlied.ogg",)
 	gamemode = "Siege"
-
-/obj/map_metadata/ruhr_uprising/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_interwar)
-		. = TRUE
-	else
-		. = FALSE
 
 /obj/map_metadata/ruhr_uprising/short_win_time(faction)
 	if (!(alive_n_of_side(faction1)) || !(alive_n_of_side(faction2)))
@@ -95,14 +89,14 @@
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The <b>Ruhr Red Army</b> has successfully defended the train station! The Weimar Republic has halted the attack!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_o == FALSE)
 		ticker.finished = TRUE
 		var/message = "The <b>Weimar Republic</b> has captured the train station! The Ruhr Uprising has been crushed!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_o = TRUE
@@ -145,7 +139,7 @@
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The <b>Ruhr Red Army</b> has recaptured the train station!</font>"
+			to_chat(world, "<font size = 3>The <b>Ruhr Red Army</b> has recaptured the train station!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1

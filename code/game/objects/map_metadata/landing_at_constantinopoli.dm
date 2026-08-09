@@ -24,20 +24,11 @@
 	faction2 = RUSSIAN
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET)
 	songs = list(
-		"Crusaders:1" = 'sound/music/crusaders.ogg')
+		"Crusaders:1" = "sound/music/crusaders.ogg")
 	gamemode = "Siege"
 	fob_spawns = TRUE
 	no_hardcore = TRUE
 	var/faction2_flag = "russian"
-
-/obj/map_metadata/landing_at_constantinopoli/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_grozny == TRUE)
-		. = TRUE
-	else if (J.is_latin == TRUE)
-		. = TRUE
-	else
-		. = FALSE
 
 /obj/map_metadata/landing_at_constantinopoli/faction2_can_cross_blocks()
 	return (processes.ticker.playtime_elapsed >= 4800 || admin_ended_all_grace_periods)
@@ -105,14 +96,14 @@
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The <b>Latin Empire</b> has successfully defended the city! The Russians have halted the attack!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_o == FALSE)
 		ticker.finished = TRUE
 		var/message = "The <b>Russians</b> have captured the city! The Landing at Constantinopoli is over!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_o = TRUE
@@ -155,7 +146,7 @@
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The <b>Latin Empire</b> has recaptured the city!</font>"
+			to_chat(world, "<font size = 3>The <b>Latin Empire</b> has recaptured the city!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1

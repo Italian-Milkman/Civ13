@@ -17,12 +17,11 @@ var/list/obj/effect/area_teleporter/AREA_TELEPORTERS = list()
 /obj/structure/teleporter_controller1/attackby(obj/item/C, mob/user)
 	if (do_once == FALSE)
 		for (var/obj/effect/area_teleporter/AT)
-			world << "<big>A ship will arrive at the island in 1 minute!</big>"
+			to_chat(world, "<big>A ship will arrive at the island in 1 minute!</big>")
 			do_once = TRUE
 			spawn(600) // 1 minute
 				AT.Simple_Down()
 				do_once = FALSE
-				return TRUE
 	else
 		return FALSE
 
@@ -43,12 +42,11 @@ var/list/obj/effect/area_teleporter/AREA_TELEPORTERS = list()
 /obj/structure/teleporter_controller2/attackby(obj/item/C, mob/user)
 	if (do_once == FALSE)
 		for (var/obj/effect/area_teleporter/AT)
-			world << "<big>A ship will arrive at the island in 1 minute!</big>"
+			to_chat(world, "<big>A ship will arrive at the island in 1 minute!</big>")
 			do_once = TRUE
 			spawn(600) // 1 minute
 				AT.Simple_Up()
 				do_once = FALSE
-				return TRUE
 	else
 		return FALSE
 
@@ -88,7 +86,6 @@ var/list/obj/effect/area_teleporter/AREA_TELEPORTERS = list()
 							O.updateturf()
 				for(var/mob/M in get_area(src))
 					M.z = BT.z	//Teleport to destination's z level.
-				return
 
 /obj/effect/area_teleporter/proc/Simple_Up()
 	if (movement_location == "UP")

@@ -1,7 +1,8 @@
 /obj/map_metadata/waco
 	ID = MAP_WACO
 	title = "Waco Siege"
-	lobby_icon = 'icons/lobby/waco.png'
+	description = "The ATF will win if they capture the North Third Story Tower. The Davidians will win if they manage to defend their home for 20 minutes!"
+	lobby_icon = "icons/lobby/waco.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/one,/area/caribbean/no_mans_land/invisible_wall/two, /area/caribbean/no_mans_land/invisible_wall/inside)
 	respawn_delay = 1200
 	no_hardcore = TRUE
@@ -26,7 +27,7 @@
 	grace_wall_timer = 3000
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET)
 	songs = list(
-		"Mad Man In Waco (David Koresh):1" = 'sound/music/mad_man_in_waco.ogg',)
+		"Mad Man In Waco (David Koresh):1" = "sound/music/mad_man_in_waco.ogg",)
 
 /obj/map_metadata/waco/New()
 	..()
@@ -34,13 +35,6 @@
 		if (gamemode == "Siege")
 			for (var/turf/T in get_area_turfs(/area/caribbean/british/land/inside/objective))
 				new /area/caribbean/no_mans_land/capturable(T)
-/obj/map_metadata/waco/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_waco == TRUE)
-		. = TRUE
-	else
-		. = FALSE
-
 /obj/map_metadata/waco/roundend_condition_def2name(define)
 	..()
 	switch (define)
@@ -96,7 +90,7 @@ var/no_loop_waco = FALSE
 				win_condition.hash = 0
 				last_win_condition = win_condition.hash
 				message = "20 minutes have passed! David Koresh is now safe!"
-				world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+				to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 				win_condition_spam_check = TRUE
 				return FALSE
 			if (processes.ticker.playtime_elapsed >= 1800)
@@ -107,7 +101,7 @@ var/no_loop_waco = FALSE
 							count++
 					if (count == 0)
 						message = "The battle is over! <b>David Koresh is dead</b>!"
-						world << "<font size = 4 color='yellow'><span class = 'notice'>[message]</span></font>"
+						to_chat(world, "<font size = 4 color='yellow'><span class = 'notice'>[message]</span></font>")
 						win_condition_spam_check = TRUE
 						ticker.finished = TRUE
 						next_win = -1
@@ -121,14 +115,14 @@ var/no_loop_waco = FALSE
 					return FALSE
 				ticker.finished = TRUE
 				message = "The Branch Davidians have managed to defend Mount Carmel!"
-				world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+				to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 				show_global_battle_report(null)
 				win_condition_spam_check = TRUE
 				return FALSE
 			if ((current_winner && current_loser && world.time > next_win) && no_loop_waco == FALSE)
 				ticker.finished = TRUE
 				message = "The ATF have captured Mount Carmel!"
-				world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+				to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 				show_global_battle_report(null)
 				win_condition_spam_check = TRUE
 				no_loop_waco = TRUE
@@ -171,7 +165,7 @@ var/no_loop_waco = FALSE
 						current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 			else
 				if (current_win_condition != no_winner && current_winner && current_loser)
-					world << "<font size = 3>The Davidians have recaptured Mount Carmel!</font>"
+					to_chat(world, "<font size = 3>The Davidians have recaptured Mount Carmel!</font>")
 					current_winner = null
 					current_loser = null
 				next_win = -1

@@ -1,7 +1,8 @@
 /obj/map_metadata/grozny
 	ID = MAP_GROZNY
 	title = "Retreat From Grozny"
-	lobby_icon = 'icons/lobby/grozny.png'
+	description = "The Chechen Militia will win if they hold out the retreat for 35 minutes."
+	lobby_icon = "icons/lobby/grozny.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/one,/area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 1200
 	no_hardcore = TRUE
@@ -23,12 +24,12 @@
 	faction1 = CHECHEN
 	valid_weather_types = list(WEATHER_WET, WEATHER_NONE, WEATHER_EXTREME)
 	songs = list(
-		"Just don't tell mom I'm in Chechnya:1" = 'sound/music/just_dont_tell_mom_im_in_chechnya.ogg',)
+		"Just don't tell mom I'm in Chechnya:1" = "sound/music/just_dont_tell_mom_im_in_chechnya.ogg",)
 	artillery_count = 3 //they really need it to get anywhere, but now it's some OP shit
 	artillery_timer = 2400 //and they need it just slightly quicker. It's artillery supposedly, not CAS.
 	valid_artillery = list("Explosive","Napalm","Creeping Barrage")
 	grace_wall_timer = 4800
-	ambience = list('sound/ambience/battle1.ogg')
+	ambience = list("sound/ambience/battle1.ogg")
 /obj/map_metadata/grozny/New()
 	..()
 	spawn(20)
@@ -43,13 +44,6 @@
 				NC.icon_state = "open"
 				NC.opacity = FALSE
 
-
-/obj/map_metadata/grozny/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_grozny == TRUE)
-		. = TRUE
-	else
-		. = FALSE
 
 /obj/map_metadata/grozny/roundend_condition_def2name(define)
 	..()
@@ -109,14 +103,14 @@ var/no_loop_groz = FALSE
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The <b>Chechens</b> have successfuly deterred the withdrawal! The Russian Federal Forces failed their retreat!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_groz == FALSE)
 		ticker.finished = TRUE
 		var/message = "The <b>Russian Federal Forces</b> have secured the bridge into friendly territory! The retreat is succesful!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_groz = TRUE
@@ -159,7 +153,7 @@ var/no_loop_groz = FALSE
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The <b>Russian Federal Forces</b> abandonned the bridge!</font>"
+			to_chat(world, "<font size = 3>The <b>Russian Federal Forces</b> abandonned the bridge!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1

@@ -5,7 +5,7 @@
 
 	if (usr && stat || !use_me && usr == src)
 		if (usr.stat != DEAD && usr.stat != UNCONSCIOUS) // fixes spam when you die? - Kachnov
-			src << "You are unable to emote."
+			to_chat(src, "You are unable to emote.")
 		return
 
 	var/muzzled = istype(wear_mask, /obj/item/clothing/mask/muzzle) || istype(wear_mask, /obj/item/weapon/grenade)
@@ -40,6 +40,7 @@
 				break
 			if (M.stat == DEAD && M.is_preference_enabled(/datum/client_preference/ghost_sight) && !(M in viewers(src,null)))
 				M.show_message(message, m_type)
+				M.show_chat_overlay(src, message, "#FFC0CB")
 
 		if (m_type & TRUE)
 			var/list/see = get_mobs_or_objects_in_view(7,src) | viewers(get_turf(src), null)
@@ -52,6 +53,7 @@
 				else if (ismob(I))
 					var/mob/M = I
 					M.show_message(message, TRUE)
+					M.show_chat_overlay(src, message, "#FFC0CB")
 
 		else if (m_type & 2)
 			var/list/hear = get_mobs_or_objects_in_view(7,src)
@@ -64,20 +66,21 @@
 				else if (ismob(I))
 					var/mob/M = I
 					M.show_message(message, 2)
+					M.show_chat_overlay(src, message, "#FFC0CB")
 
 /mob/proc/emote_dead(var/message)
 
 	if (client.prefs.muted & MUTE_DEADCHAT)
-		src << "<span class='danger'>You cannot send deadchat emotes (muted).</span>"
+		to_chat(src, "<span class='danger'>You cannot send deadchat emotes (muted).</span>")
 		return
 
 	if (!is_preference_enabled(/datum/client_preference/show_dsay))
-		src << "<span class='danger'>You have deadchat muted.</span>"
+		to_chat(src, "<span class='danger'>You have deadchat muted.</span>")
 		return
 
 	if (!client.holder)
 		if (!config.dsay_allowed)
-			src << "<span class='danger'>Deadchat is globally muted.</span>"
+			to_chat(src, "<span class='danger'>Deadchat is globally muted.</span>")
 			return
 
 

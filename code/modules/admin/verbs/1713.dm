@@ -4,7 +4,7 @@
 	set name = "Toggle Playing"
 
 	ticker.players_can_join = !ticker.players_can_join
-	world << "<big><b>You [(ticker.players_can_join) ? "can" : "can't"] join the game [(ticker.players_can_join) ? "now" : "anymore"].</b></big>"
+	to_chat(world, "<big><b>You [(ticker.players_can_join) ? "can" : "can't"] join the game [(ticker.players_can_join) ? "now" : "anymore"].</b></big>")
 	message_admins("[key_name(src)] changed the playing setting.", key_name(src))
 
 /client/proc/toggle_tts()
@@ -215,13 +215,15 @@ var/polish_toggled = TRUE
 var/italian_toggled = TRUE
 var/bluefaction_toggled = TRUE
 var/redfaction_toggled = TRUE
+var/cafr_toggled = TRUE
+var/tsfsr_toggled = TRUE
 
 /client/proc/toggle_factions()
 	set name = "Toggle Factions"
 	set category = "Special"
 
 	if (!check_rights(R_ADMIN))
-		src << "<span class = 'danger'>You don't have the permissions.</span>"
+		to_chat(src, "<span class = 'danger'>You don't have the permissions.</span>")
 		return
 
 	var/list/choices = list()
@@ -253,6 +255,8 @@ var/redfaction_toggled = TRUE
 	choices += "ITALIAN ([italian_toggled ? "ENABLED" : "DISABLED"])"
 	choices += "BLUEFACTION ([bluefaction_toggled ? "ENABLED" : "DISABLED"])"
 	choices += "REDFACTION ([redfaction_toggled ? "ENABLED" : "DISABLED"])"
+	choices += "CAFR ([cafr_toggled ? "ENABLED" : "DISABLED"])"
+	choices += "TSFSR ([tsfsr_toggled ? "ENABLED" : "DISABLED"])"
 	choices += "CANCEL"
 
 	var/choice = input("Enable/Disable what faction?") in choices
@@ -262,113 +266,120 @@ var/redfaction_toggled = TRUE
 
 	else if (findtext(choice, "CIVILIAN"))
 		civilians_toggled = !civilians_toggled
-		world << "<span class = 'warning'>The Civilian faction has been [civilians_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>"
+		to_chat(world, "<span class = 'warning'>The Civilian faction has been [civilians_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>")
 		message_admins("[key_name(src)] changed the Civilian faction 'enabled' setting to [civilians_toggled].", key_name(src))
 	else if (findtext(choice, "BRITISH"))
 		british_toggled = !british_toggled
-		world << "<span class = 'warning'>The British has been [british_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>"
+		to_chat(world, "<span class = 'warning'>The British has been [british_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>")
 		message_admins("[key_name(src)] changed the British faction 'enabled' setting to [british_toggled].", key_name(src))
 	else if (findtext(choice, "PIRATES"))
 		pirates_toggled = !pirates_toggled
-		world << "<span class = 'warning'>The Pirate faction has been [pirates_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>"
+		to_chat(world, "<span class = 'warning'>The Pirate faction has been [pirates_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>")
 		message_admins("[key_name(src)] changed the Pirate faction 'enabled' setting to [pirates_toggled].", key_name(src))
 	else if (findtext(choice, "INDIANS"))
 		indians_toggled = !indians_toggled
-		world << "<span class = 'warning'>The Native faction has been [indians_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>"
+		to_chat(world, "<span class = 'warning'>The Native faction has been [indians_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>")
 		message_admins("[key_name(src)] changed the Native faction 'enabled' setting to [indians_toggled].", key_name(src))
 	else if (findtext(choice, "PORTUGUESE"))
 		portuguese_toggled = !portuguese_toggled
-		world << "<span class = 'warning'>The Portuguese faction has been [portuguese_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>"
+		to_chat(world, "<span class = 'warning'>The Portuguese faction has been [portuguese_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>")
 		message_admins("[key_name(src)] changed the Portuguese faction 'enabled' setting to [portuguese_toggled].", key_name(src))
 	else if (findtext(choice, "SPANISH"))
 		spanish_toggled = !spanish_toggled
-		world << "<span class = 'warning'>The Spanish faction has been [spanish_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>"
+		to_chat(world, "<span class = 'warning'>The Spanish faction has been [spanish_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>")
 		message_admins("[key_name(src)] changed the Spanish faction 'enabled' setting to [spanish_toggled].", key_name(src))
 	else if (findtext(choice, "FRENCH"))
 		french_toggled = !french_toggled
-		world << "<span class = 'warning'>The French faction has been [french_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>"
+		to_chat(world, "<span class = 'warning'>The French faction has been [french_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>")
 		message_admins("[key_name(src)] changed the French faction 'enabled' setting to [french_toggled].", key_name(src))
 	else if (findtext(choice, "DUTCH"))
 		dutch_toggled = !dutch_toggled
-		world << "<span class = 'warning'>The Dutch faction has been [dutch_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>"
+		to_chat(world, "<span class = 'warning'>The Dutch faction has been [dutch_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>")
 		message_admins("[key_name(src)] changed the Dutch faction 'enabled' setting to [dutch_toggled].", key_name(src))
 	else if (findtext(choice, "JAPANESE"))
 		japanese_toggled = !japanese_toggled
-		world << "<span class = 'warning'>The Japanese faction has been [japanese_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>"
+		to_chat(world, "<span class = 'warning'>The Japanese faction has been [japanese_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>")
 		message_admins("[key_name(src)] changed the Japanese faction 'enabled' setting to [japanese_toggled].", key_name(src))
 	else if (findtext(choice, "RUSSIAN"))
 		russian_toggled = !russian_toggled
-		world << "<span class = 'warning'>The Russian faction has been [russian_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>"
+		to_chat(world, "<span class = 'warning'>The Russian faction has been [russian_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>")
 		message_admins("[key_name(src)] changed the Russian faction 'enabled' setting to [russian_toggled].", key_name(src))
 	else if (findtext(choice, "CHECHEN"))
 		chechen_toggled = !chechen_toggled
-		world << "<span class = 'warning'>The Chechen faction has been [chechen_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>"
+		to_chat(world, "<span class = 'warning'>The Chechen faction has been [chechen_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>")
 		message_admins("[key_name(src)] changed the Chechen faction 'enabled' setting to [chechen_toggled].", key_name(src))
 	else if (findtext(choice, "FINNISH"))
 		finnish_toggled = !finnish_toggled
-		world << "<span class = 'warning'>The Finnish faction has been [finnish_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>"
+		to_chat(world, "<span class = 'warning'>The Finnish faction has been [finnish_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>")
 		message_admins("[key_name(src)] changed the Finnish faction 'enabled' setting to [finnish_toggled].", key_name(src))
 	else if (findtext(choice, "NORWEGIAN"))
 		finnish_toggled = !finnish_toggled
-		world << "<span class = 'warning'>The Norwegian faction has been [norwegian_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>"
+		to_chat(world, "<span class = 'warning'>The Norwegian faction has been [norwegian_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>")
 		message_admins("[key_name(src)] changed the Norwegian faction 'enabled' setting to [norwegian_toggled].", key_name(src))
 	else if (findtext(choice, "SWEDISH"))
 		finnish_toggled = !finnish_toggled
-		world << "<span class = 'warning'>The Swedish faction has been [swedish_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>"
+		to_chat(world, "<span class = 'warning'>The Swedish faction has been [swedish_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>")
 		message_admins("[key_name(src)] changed the Swedish faction 'enabled' setting to [swedish_toggled].", key_name(src))
 	else if (findtext(choice, "DANISH"))
 		finnish_toggled = !finnish_toggled
-		world << "<span class = 'warning'>The Danish faction has been [danish_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>"
+		to_chat(world, "<span class = 'warning'>The Danish faction has been [danish_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>")
 		message_admins("[key_name(src)] changed the Finnish faction 'enabled' setting to [danish_toggled].", key_name(src))
 	else if (findtext(choice, "ROMAN"))
 		roman_toggled = !roman_toggled
-		world << "<span class = 'warning'>The Roman faction has been [roman_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>"
+		to_chat(world, "<span class = 'warning'>The Roman faction has been [roman_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>")
 		message_admins("[key_name(src)] changed the Roman faction 'enabled' setting to [roman_toggled].", key_name(src))
 	else if (findtext(choice, "GREEK"))
 		greek_toggled = !greek_toggled
-		world << "<span class = 'warning'>The Greek faction has been [greek_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>"
+		to_chat(world, "<span class = 'warning'>The Greek faction has been [greek_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>")
 		message_admins("[key_name(src)] changed the Greek faction 'enabled' setting to [greek_toggled].", key_name(src))
 	else if (findtext(choice, "ARAB"))
 		arab_toggled = !arab_toggled
-		world << "<span class = 'warning'>The Arabic faction has been [arab_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>"
+		to_chat(world, "<span class = 'warning'>The Arabic faction has been [arab_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>")
 		message_admins("[key_name(src)] changed the Arabic faction 'enabled' setting to [arab_toggled].", key_name(src))
 	else if (findtext(choice, "GERMAN"))
 		german_toggled = !german_toggled
-		world << "<span class = 'warning'>The German faction has been [german_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>"
+		to_chat(world, "<span class = 'warning'>The German faction has been [german_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>")
 		message_admins("[key_name(src)] changed the German faction 'enabled' setting to [german_toggled].", key_name(src))
 	else if (findtext(choice, "AMERICAN"))
 		american_toggled = !american_toggled
-		world << "<span class = 'warning'>The American faction has been [american_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>"
+		to_chat(world, "<span class = 'warning'>The American faction has been [american_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>")
 		message_admins("[key_name(src)] changed the American faction 'enabled' setting to [american_toggled].", key_name(src))
 	else if (findtext(choice, "VIETNAMESE"))
 		vietnamese_toggled = !vietnamese_toggled
-		world << "<span class = 'warning'>The Vietnamese faction has been [vietnamese_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>"
+		to_chat(world, "<span class = 'warning'>The Vietnamese faction has been [vietnamese_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>")
 		message_admins("[key_name(src)] changed the Vietnamese faction 'enabled' setting to [vietnamese_toggled].", key_name(src))
 	else if (findtext(choice, "CHINESE"))
 		chinese_toggled = !chinese_toggled
-		world << "<span class = 'warning'>The Chinese faction has been [chinese_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>"
+		to_chat(world, "<span class = 'warning'>The Chinese faction has been [chinese_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>")
 		message_admins("[key_name(src)] changed the Chinese faction 'enabled' setting to [chinese_toggled].", key_name(src))
 	else if (findtext(choice, "FILIPINO"))
 		filipino_toggled = !filipino_toggled
-		world << "<span class = 'warning'>The Filipino faction has been [filipino_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>"
+		to_chat(world, "<span class = 'warning'>The Filipino faction has been [filipino_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>")
 		message_admins("[key_name(src)] changed the Filipino faction 'enabled' setting to [filipino_toggled].", key_name(src))
 	else if (findtext(choice, "POLISH"))
 		polish_toggled = !polish_toggled
-		world << "<span class = 'warning'>The Polish faction has been [polish_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>"
+		to_chat(world, "<span class = 'warning'>The Polish faction has been [polish_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>")
 		message_admins("[key_name(src)] changed the Polish faction 'enabled' setting to [polish_toggled].", key_name(src))
 	else if (findtext(choice, "ITALIAN"))
 		italian_toggled = !italian_toggled
-		world << "<span class = 'warning'>The Italian faction has been [italian_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>"
+		to_chat(world, "<span class = 'warning'>The Italian faction has been [italian_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>")
 		message_admins("[key_name(src)] changed the Italian faction 'enabled' setting to [italian_toggled].", key_name(src))
 	else if (findtext(choice, "BLUEFACTION"))
 		bluefaction_toggled = !bluefaction_toggled
-		world << "<span class = 'warning'>The Bluefaction faction has been [bluefaction_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>"
+		to_chat(world, "<span class = 'warning'>The Bluefaction faction has been [bluefaction_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>")
 		message_admins("[key_name(src)] changed the Bluefaction faction 'enabled' setting to [bluefaction_toggled].", key_name(src))
 	else if (findtext(choice, "REDFACTION"))
 		redfaction_toggled = !redfaction_toggled
-		world << "<span class = 'warning'>The Redfaction faction has been [redfaction_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>"
+		to_chat(world, "<span class = 'warning'>The Redfaction faction has been [redfaction_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>")
 		message_admins("[key_name(src)] changed the Redfaction faction 'enabled' setting to [redfaction_toggled].", key_name(src))
-
+	else if (findtext(choice, "CAFR"))
+		cafr_toggled = !cafr_toggled
+		to_chat(world, "<span class = 'warning'>The CAFR faction has been [cafr_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>")
+		message_admins("[key_name(src)] changed the CAFR faction 'enabled' setting to [cafr_toggled].", key_name(src))
+	else if (findtext(choice, "TSFSR"))
+		tsfsr_toggled = !tsfsr_toggled
+		to_chat(world, "<span class = 'warning'>The TSFSR faction has been [tsfsr_toggled ? "<b><i>ENABLED</i></b>" : "<b><i>DISABLED</i></b>"].</span>")
+		message_admins("[key_name(src)] changed the TSFSR faction 'enabled' setting to [tsfsr_toggled].", key_name(src))
 var/civilians_forceEnabled = FALSE
 var/british_forceEnabled = FALSE
 var/pirates_forceEnabled = FALSE
@@ -396,13 +407,15 @@ var/polish_forceEnabled = FALSE
 var/italian_forceEnabled = FALSE
 var/bluefaction_forceEnabled = FALSE
 var/redfaction_forceEnabled = FALSE
+var/cafr_forceEnabled = FALSE
+var/tsfsr_forceEnabled = FALSE
 
 /client/proc/forcibly_enable_faction()
 	set name = "Forcibly Enable Faction"
 	set category = "Special"
 
 	if (!check_rights(R_ADMIN))
-		src << "<span class = 'danger'>You don't have the permissions.</span>"
+		to_chat(src, "<span class = 'danger'>You don't have the permissions.</span>")
 		return
 
 	var/list/choices = list()
@@ -434,6 +447,8 @@ var/redfaction_forceEnabled = FALSE
 	choices += "POLISH ([polish_forceEnabled ? "FORCIBLY ENABLED" : "NOT FORCIBLY ENABLED"])"
 	choices += "BLUEFACTION ([bluefaction_forceEnabled ? "FORCIBLY ENABLED" : "NOT FORCIBLY ENABLED"])"
 	choices += "REDFACTION ([redfaction_forceEnabled ? "FORCIBLY ENABLED" : "NOT FORCIBLY ENABLED"])"
+	choices += "CAFR ([cafr_forceEnabled ? "FORCIBLY ENABLED" : "NOT FORCIBLY ENABLED"])"
+	choices += "TSFSR ([tsfsr_forceEnabled ? "FORCIBLY ENABLED" : "NOT FORCIBLY ENABLED"])"
 	choices += "CANCEL"
 
 	var/choice = input("Enable/Disable what faction?") in choices
@@ -443,118 +458,118 @@ var/redfaction_forceEnabled = FALSE
 
 	else if (findtext(choice, "CIVILIAN"))
 		civilians_forceEnabled = !civilians_forceEnabled
-		world << "<span class = 'notice'>The Civilian faction [civilians_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>"
+		to_chat(world, "<span class = 'notice'>The Civilian faction [civilians_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>")
 		message_admins("[key_name(src)] changed the Civilian faction 'forceEnabled' setting to [civilians_forceEnabled].", key_name(src))
 	else if (findtext(choice, "BRITISH"))
 		british_forceEnabled = !british_forceEnabled
-		world << "<span class = 'notice'>The British faction [british_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>"
+		to_chat(world, "<span class = 'notice'>The British faction [british_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>")
 		message_admins("[key_name(src)] changed the British faction 'forceEnabled' setting to [british_forceEnabled].", key_name(src))
 	else if (findtext(choice, "PIRATES"))
 		pirates_forceEnabled = !pirates_forceEnabled
-		world << "<span class = 'notice'>The Pirate faction [pirates_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>"
+		to_chat(world, "<span class = 'notice'>The Pirate faction [pirates_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>")
 		message_admins("[key_name(src)] changed the Pirate faction 'forceEnabled' setting to [pirates_forceEnabled].", key_name(src))
 
 	else if (findtext(choice, "SPANISH"))
 		spanish_forceEnabled = !spanish_forceEnabled
-		world << "<span class = 'notice'>The Spanish faction [spanish_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>"
+		to_chat(world, "<span class = 'notice'>The Spanish faction [spanish_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>")
 		message_admins("[key_name(src)] changed the Spanish faction 'forceEnabled' setting to [spanish_forceEnabled].", key_name(src))
 	else if (findtext(choice, "PORTUGUESE"))
 		portuguese_forceEnabled = !portuguese_forceEnabled
-		world << "<span class = 'notice'>The Portuguese faction [portuguese_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>"
+		to_chat(world, "<span class = 'notice'>The Portuguese faction [portuguese_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>")
 		message_admins("[key_name(src)] changed the Portuguese faction 'forceEnabled' setting to [portuguese_forceEnabled].", key_name(src))
 	else if (findtext(choice, "FRENCH"))
 		french_forceEnabled = !french_forceEnabled
-		world << "<span class = 'notice'>The French faction [french_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>"
+		to_chat(world, "<span class = 'notice'>The French faction [french_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>")
 		message_admins("[key_name(src)] changed the French faction 'forceEnabled' setting to [french_forceEnabled].", key_name(src))
 	else if (findtext(choice, "DUTCH"))
 		dutch_forceEnabled = !dutch_forceEnabled
-		world << "<span class = 'notice'>The Dutch faction [dutch_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>"
+		to_chat(world, "<span class = 'notice'>The Dutch faction [dutch_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>")
 		message_admins("[key_name(src)] changed the Dutch faction 'forceEnabled' setting to [dutch_forceEnabled].", key_name(src))
 	else if (findtext(choice, "ITALIAN"))
 		italian_forceEnabled = !italian_forceEnabled
-		world << "<span class = 'notice'>The Italian faction [italian_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>"
+		to_chat(world, "<span class = 'notice'>The Italian faction [italian_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>")
 		message_admins("[key_name(src)] changed the Italian faction 'forceEnabled' setting to [italian_forceEnabled].", key_name(src))
 	else if (findtext(choice, "JAPANESE"))
 		japanese_forceEnabled = !japanese_forceEnabled
-		world << "<span class = 'notice'>The Japanese faction [japanese_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>"
+		to_chat(world, "<span class = 'notice'>The Japanese faction [japanese_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>")
 		message_admins("[key_name(src)] changed the Japanese faction 'forceEnabled' setting to [japanese_forceEnabled].", key_name(src))
 	else if (findtext(choice, "RUSSIAN"))
 		russian_forceEnabled = !russian_forceEnabled
-		world << "<span class = 'notice'>The Russian faction [russian_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>"
+		to_chat(world, "<span class = 'notice'>The Russian faction [russian_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>")
 		message_admins("[key_name(src)] changed the Russian faction 'forceEnabled' setting to [russian_forceEnabled].", key_name(src))
 
 	else if (findtext(choice, "CHECHEN"))
 		chechen_forceEnabled = !chechen_forceEnabled
-		world << "<span class = 'notice'>The Chechen faction [chechen_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>"
+		to_chat(world, "<span class = 'notice'>The Chechen faction [chechen_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>")
 		message_admins("[key_name(src)] changed the Chechen faction 'forceEnabled' setting to [chechen_forceEnabled].", key_name(src))
 
 	else if (findtext(choice, "FINNISH"))
 		finnish_forceEnabled = !finnish_forceEnabled
-		world << "<span class = 'notice'>The Finnish faction [finnish_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>"
+		to_chat(world, "<span class = 'notice'>The Finnish faction [finnish_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>")
 		message_admins("[key_name(src)] changed the Finnish faction 'forceEnabled' setting to [finnish_forceEnabled].", key_name(src))
 
 	else if (findtext(choice, "NORWEGIAN"))
 		norwegian_forceEnabled = !norwegian_forceEnabled
-		world << "<span class = 'notice'>The Norwegian faction [norwegian_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>"
+		to_chat(world, "<span class = 'notice'>The Norwegian faction [norwegian_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>")
 		message_admins("[key_name(src)] changed the Norwegian faction 'forceEnabled' setting to [norwegian_forceEnabled].", key_name(src))
 
 	else if (findtext(choice, "SWEDISH"))
 		swedish_forceEnabled = !swedish_forceEnabled
-		world << "<span class = 'notice'>The Swedish faction [swedish_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>"
+		to_chat(world, "<span class = 'notice'>The Swedish faction [swedish_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>")
 		message_admins("[key_name(src)] changed the Swedish faction 'forceEnabled' setting to [swedish_forceEnabled].", key_name(src))
 
 	else if (findtext(choice, "DANISH"))
 		danish_forceEnabled = !danish_forceEnabled
-		world << "<span class = 'notice'>The Danish faction [danish_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>"
+		to_chat(world, "<span class = 'notice'>The Danish faction [danish_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>")
 		message_admins("[key_name(src)] changed the Danish faction 'forceEnabled' setting to [danish_forceEnabled].", key_name(src))
 
 	else if (findtext(choice, "INDIANS"))
 		indians_forceEnabled = !indians_forceEnabled
-		world << "<span class = 'notice'>The Native faction [indians_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>"
+		to_chat(world, "<span class = 'notice'>The Native faction [indians_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>")
 		message_admins("[key_name(src)] changed the Native faction 'forceEnabled' setting to [indians_forceEnabled].", key_name(src))
 	else if (findtext(choice, "ROMAN"))
 		roman_forceEnabled = !roman_forceEnabled
-		world << "<span class = 'notice'>The Roman faction [roman_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>"
+		to_chat(world, "<span class = 'notice'>The Roman faction [roman_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>")
 		message_admins("[key_name(src)] changed the Roman faction 'forceEnabled' setting to [roman_forceEnabled].", key_name(src))
 	else if (findtext(choice, "GREEK"))
 		greek_forceEnabled = !greek_forceEnabled
-		world << "<span class = 'notice'>The Greek faction [greek_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>"
+		to_chat(world, "<span class = 'notice'>The Greek faction [greek_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>")
 		message_admins("[key_name(src)] changed the Greek faction 'forceEnabled' setting to [greek_forceEnabled].", key_name(src))
 	else if (findtext(choice, "ARAB"))
 		arab_forceEnabled = arab_forceEnabled
-		world << "<span class = 'notice'>The Arabic faction [arab_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>"
+		to_chat(world, "<span class = 'notice'>The Arabic faction [arab_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>")
 		message_admins("[key_name(src)] changed the Arabic faction 'forceEnabled' setting to [arab_forceEnabled].", key_name(src))
 	else if (findtext(choice, "GERMAN"))
 		german_forceEnabled = german_forceEnabled
-		world << "<span class = 'notice'>The German faction [german_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>"
+		to_chat(world, "<span class = 'notice'>The German faction [german_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>")
 		message_admins("[key_name(src)] changed the German faction 'forceEnabled' setting to [german_forceEnabled].", key_name(src))
 	else if (findtext(choice, "AMERICAN"))
 		american_forceEnabled = american_forceEnabled
-		world << "<span class = 'notice'>The American faction [american_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>"
+		to_chat(world, "<span class = 'notice'>The American faction [american_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>")
 		message_admins("[key_name(src)] changed the American faction 'forceEnabled' setting to [american_forceEnabled].", key_name(src))
 	else if (findtext(choice, "VIETNAMESE"))
 		vietnamese_forceEnabled = vietnamese_forceEnabled
-		world << "<span class = 'notice'>The Vietnamese faction [vietnamese_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>"
+		to_chat(world, "<span class = 'notice'>The Vietnamese faction [vietnamese_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>")
 		message_admins("[key_name(src)] changed the Vietnamese faction 'forceEnabled' setting to [vietnamese_forceEnabled].", key_name(src))
 	else if (findtext(choice, "CHINESE"))
 		chinese_forceEnabled = !chinese_forceEnabled
-		world << "<span class = 'notice'>The Chinese faction [chinese_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>"
+		to_chat(world, "<span class = 'notice'>The Chinese faction [chinese_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>")
 		message_admins("[key_name(src)] changed the Chinese faction 'forceEnabled' setting to [chinese_forceEnabled].", key_name(src))
 	else if (findtext(choice, "FILIPINO"))
 		filipino_forceEnabled = !filipino_forceEnabled
-		world << "<span class = 'notice'>The Filipino faction [filipino_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>"
+		to_chat(world, "<span class = 'notice'>The Filipino faction [filipino_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>")
 		message_admins("[key_name(src)] changed the Filipino faction 'forceEnabled' setting to [filipino_forceEnabled].", key_name(src))
 	else if (findtext(choice, "POLISH"))
 		polish_forceEnabled = !polish_forceEnabled
-		world << "<span class = 'notice'>The Polish faction [polish_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>"
+		to_chat(world, "<span class = 'notice'>The Polish faction [polish_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>")
 		message_admins("[key_name(src)] changed the Polish faction 'forceEnabled' setting to [polish_forceEnabled].", key_name(src))
 	else if (findtext(choice, "BLUEFACTION"))
 		bluefaction_forceEnabled = !bluefaction_forceEnabled
-		world << "<span class = 'notice'>The Bluefaction faction [polish_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>"
+		to_chat(world, "<span class = 'notice'>The Bluefaction faction [polish_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>")
 		message_admins("[key_name(src)] changed the Bluefaction faction 'forceEnabled' setting to [polish_forceEnabled].", key_name(src))
 	else if (findtext(choice, "REDFACTION"))
 		redfaction_forceEnabled = !redfaction_forceEnabled
-		world << "<span class = 'notice'>The Redfaction faction [polish_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>"
+		to_chat(world, "<span class = 'notice'>The Redfaction faction [polish_forceEnabled ? "has been forcibly <b>enabled</b>" : "<b>is no longer forcibly enabled</b>"].</span>")
 		message_admins("[key_name(src)] changed the Redfaction faction 'forceEnabled' setting to [polish_forceEnabled].", key_name(src))
 
 /client/proc/toggle_respawn_delays()
@@ -564,7 +579,7 @@ var/redfaction_forceEnabled = FALSE
 	var/M = "[key_name(src)] [config.no_respawn_delays ? "disabled" : "enabled"] respawn delays."
 	message_admins(M, key_name(src))
 	log_admin(M)
-	world << "<font size = 3><span class = 'notice'>Respawn delays are now <b>[config.no_respawn_delays ? "disabled" : "enabled"]</b>.</span></font>"
+	to_chat(world, "<font size = 3><span class = 'notice'>Respawn delays are now <b>[config.no_respawn_delays ? "disabled" : "enabled"]</b>.</span></font>")
 
 
 
@@ -573,7 +588,7 @@ var/redfaction_forceEnabled = FALSE
 	set name = "Show Battle Report"
 
 	if (!processes.battle_report || !processes.battle_report.fires_at_gamestates.Find(ticker.current_state))
-		src << "<span class = 'warning'>You can't send a battle report right now.</span>"
+		to_chat(src, "<span class = 'warning'>You can't send a battle report right now.</span>")
 		return
 
 	// to prevent showing multiple battle reports - Kachnov
@@ -587,7 +602,7 @@ var/redfaction_forceEnabled = FALSE
 	set category = "Special"
 	set name = "See Battle Report"
 	if (!processes.battle_report || !processes.battle_report.fires_at_gamestates.Find(ticker.current_state))
-		src << "<span class = 'warning'>You can't see the battle report right now.</span>"
+		to_chat(src, "<span class = 'warning'>You can't see the battle report right now.</span>")
 		return
 	show_global_battle_report(src, TRUE)
 
@@ -620,6 +635,8 @@ var/redfaction_forceEnabled = FALSE
 	var/total_italian = alive_italian.len + dead_italian.len + heavily_injured_italian.len
 	var/total_bluefaction = alive_bluefaction.len + dead_bluefaction.len + heavily_injured_bluefaction.len
 	var/total_redfaction = alive_redfaction.len + dead_redfaction.len + heavily_injured_redfaction.len
+	var/total_cafr = alive_cafr.len + dead_cafr.len + heavily_injured_cafr.len
+	var/total_tsfsr = alive_tsfsr.len + dead_tsfsr.len + heavily_injured_tsfsr.len
 
 	var/mortality_coefficient_pirates = 0
 	var/mortality_coefficient_british = 0
@@ -648,6 +665,8 @@ var/redfaction_forceEnabled = FALSE
 	var/mortality_coefficient_italian = 0
 	var/mortality_coefficient_bluefaction = 0
 	var/mortality_coefficient_redfaction = 0
+	var/mortality_coefficient_cafr = 0
+	var/mortality_coefficient_tsfsr = 0
 
 	if (dead_british.len > 0)
 		mortality_coefficient_british = dead_british.len/total_british
@@ -730,6 +749,12 @@ var/redfaction_forceEnabled = FALSE
 	if (dead_redfaction.len > 0)
 		mortality_coefficient_redfaction = dead_redfaction.len/total_redfaction
 
+	if (dead_cafr.len > 0)
+		mortality_coefficient_cafr = dead_cafr.len/total_cafr
+	
+	if (dead_tsfsr.len > 0)
+		mortality_coefficient_tsfsr = dead_tsfsr.len/total_tsfsr
+
 	var/mortality_british = round(mortality_coefficient_british*100)
 	var/mortality_pirates = round(mortality_coefficient_pirates*100)
 	var/mortality_civilian = round(mortality_coefficient_civilian*100)
@@ -757,6 +782,8 @@ var/redfaction_forceEnabled = FALSE
 	var/mortality_italian = round(mortality_coefficient_italian*100)
 	var/mortality_bluefaction = round(mortality_coefficient_bluefaction*100)
 	var/mortality_redfaction = round(mortality_coefficient_redfaction*100)
+	var/mortality_cafr = round(mortality_coefficient_cafr*100)
+	var/mortality_tsfsr = round(mortality_coefficient_tsfsr*100)
 
 	var/fact1 = "British"
 	var/fact2 = "Pirates"
@@ -785,6 +812,8 @@ var/redfaction_forceEnabled = FALSE
 	var/fact25 = "Italian"
 	var/fact26 = "Blugoslavia"
 	var/fact27 = "Redmenia"
+	var/fact28 = "CAFR"
+	var/fact29 = "Turkestan SFSR"
 
 	if (map.ID == MAP_WHITERUN)
 		fact3 = "Stormcloaks"
@@ -871,7 +900,9 @@ var/redfaction_forceEnabled = FALSE
 	var/msg25 = "[fact25]: [alive_italian.len] alive, [heavily_injured_italian.len] heavily injured or unconscious, [dead_italian.len] deceased. Mortality rate: [mortality_italian]%"
 	var/msg26 = "[fact26]: [alive_bluefaction.len] alive, [heavily_injured_bluefaction.len] heavily injured or unconscious, [dead_bluefaction.len] deceased. Mortality rate: [mortality_bluefaction]%"
 	var/msg27 = "[fact27]: [alive_redfaction.len] alive, [heavily_injured_redfaction.len] heavily injured or unconscious, [dead_redfaction.len] deceased. Mortality rate: [mortality_redfaction]%"
-	
+	var/msg28 = "[fact28]: [alive_cafr.len] alive, [heavily_injured_cafr.len] heavily injured or unconscious, [dead_cafr.len] deceased. Mortality rate: [mortality_cafr]%"
+	var/msg29 = "[fact29]: [alive_tsfsr.len] alive, [heavily_injured_tsfsr.len] heavily injured or unconscious, [dead_tsfsr.len] deceased. Mortality rate: [mortality_tsfsr]%"
+
 
 	var/msg_npcs = "NPCs: [faction1_npcs] americans alive, [faction2_npcs] japanese alive."
 
@@ -975,6 +1006,10 @@ var/redfaction_forceEnabled = FALSE
 		msg26 = null
 	if (map && !map.faction_organization.Find(REDFACTION))
 		msg27 = null
+	if (map && !map.faction_organization.Find(CAFR))
+		msg28 = null
+	if (map && !map.faction_organization.Find(TSFSR))
+		msg29 = null
 
 	var/public = "Yes"
 
@@ -985,70 +1020,74 @@ var/redfaction_forceEnabled = FALSE
 
 	if (public == "Yes")
 		if (!shower || (input(shower, "Are you sure you want to show the battle report? Unless the Battle Controller Process died, it will happen automatically!", "Battle Report") in list ("Yes", "No")) == "Yes")
-			world << "<font size=4>Status Report:</font>"
+			to_chat(world, "<font size=4>Status Report:</font>")
 
 			if (msg1)
-				world << "<font size=3>[msg1]</font>"
+				to_chat(world, "<font size=3>[msg1]</font>")
 			if (msg2)
-				world << "<font size=3>[msg2]</font>"
+				to_chat(world, "<font size=3>[msg2]</font>")
 			if (msg3)
-				world << "<font size=3>[msg3]</font>"
+				to_chat(world, "<font size=3>[msg3]</font>")
 			if (msg4)
-				world << "<font size=3>[msg4]</font>"
+				to_chat(world, "<font size=3>[msg4]</font>")
 			if (msg5)
-				world << "<font size=3>[msg5]</font>"
+				to_chat(world, "<font size=3>[msg5]</font>")
 			if (msg6)
-				world << "<font size=3>[msg6]</font>"
+				to_chat(world, "<font size=3>[msg6]</font>")
 			if (msg7)
-				world << "<font size=3>[msg7]</font>"
+				to_chat(world, "<font size=3>[msg7]</font>")
 			if (msg8)
-				world << "<font size=3>[msg8]</font>"
+				to_chat(world, "<font size=3>[msg8]</font>")
 			if (msg9)
-				world << "<font size=3>[msg9]</font>"
+				to_chat(world, "<font size=3>[msg9]</font>")
 			if (msg10)
-				world << "<font size=3>[msg10]</font>"
+				to_chat(world, "<font size=3>[msg10]</font>")
 			if (msg11)
-				world << "<font size=3>[msg11]</font>"
+				to_chat(world, "<font size=3>[msg11]</font>")
 			if (msg12)
-				world << "<font size=3>[msg12]</font>"
+				to_chat(world, "<font size=3>[msg12]</font>")
 			if (msg13)
-				world << "<font size=3>[msg13]</font>"
+				to_chat(world, "<font size=3>[msg13]</font>")
 			if (msg14)
-				world << "<font size=3>[msg14]</font>"
+				to_chat(world, "<font size=3>[msg14]</font>")
 			if (msg15)
-				world << "<font size=3>[msg15]</font>"
+				to_chat(world, "<font size=3>[msg15]</font>")
 			if (msg16)
-				world << "<font size=3>[msg16]</font>"
+				to_chat(world, "<font size=3>[msg16]</font>")
 			if (msg17)
-				world << "<font size=3>[msg17]</font>"
+				to_chat(world, "<font size=3>[msg17]</font>")
 			if (msg18)
-				world << "<font size=3>[msg18]</font>"
+				to_chat(world, "<font size=3>[msg18]</font>")
 			if (msg19)
-				world << "<font size=3>[msg19]</font>"
+				to_chat(world, "<font size=3>[msg19]</font>")
 			if (msg20)
-				world << "<font size=3>[msg20]</font>"
+				to_chat(world, "<font size=3>[msg20]</font>")
 			if (msg21)
-				world << "<font size=3>[msg21]</font>"
+				to_chat(world, "<font size=3>[msg21]</font>")
 			if (msg22)
-				world << "<font size=3>[msg22]</font>"
+				to_chat(world, "<font size=3>[msg22]</font>")
 			if (msg23)
-				world << "<font size=3>[msg23]</font>"
+				to_chat(world, "<font size=3>[msg23]</font>")
 			if (msg24)
-				world << "<font size=3>[msg24]</font>"
+				to_chat(world, "<font size=3>[msg24]</font>")
 			if (msg25)
-				world << "<font size=3>[msg25]</font>"
+				to_chat(world, "<font size=3>[msg25]</font>")
 			if (msg26)
-				world << "<font size=3>[msg26]</font>"
+				to_chat(world, "<font size=3>[msg26]</font>")
 			if (msg27)
-				world << "<font size=3>[msg27]</font>"
+				to_chat(world, "<font size=3>[msg27]</font>")
+			if (msg28)
+				to_chat(world, "<font size=3>[msg28]</font>")
+			if (msg29)
+				to_chat(world, "<font size=3>[msg29]</font>")
 			if (map.civilizations && msg_religions != "")
-				world << "<font size=3>[msg_religions]</font>"
+				to_chat(world, "<font size=3>[msg_religions]</font>")
 			if (map.civilizations && msg_factions != "")
-				world << "<font size=3>[msg_factions]</font>"
+				to_chat(world, "<font size=3>[msg_factions]</font>")
 			if (map.civilizations && msg_companies != "")
-				world << "<font size=3>[msg_companies]</font>"
+				to_chat(world, "<font size=3>[msg_companies]</font>")
 			if (map.ID == MAP_IWO_JIMA)
-				world << "<font size=3>[msg_npcs]</font>"
+				to_chat(world, "<font size=3>[msg_npcs]</font>")
 			if (shower)
 				message_admins("[key_name(shower)] showed everyone the battle report.", key_name(shower))
 			else
@@ -1108,3 +1147,5 @@ var/redfaction_forceEnabled = FALSE
 			shower << msg26
 		if (msg27)
 			shower << msg27
+	if (map)
+		map.show_map_report()

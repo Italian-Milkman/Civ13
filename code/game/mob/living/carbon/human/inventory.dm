@@ -49,6 +49,16 @@ This saves us from having to call add_fingerprint() any time something is put in
 	if (!istype(mob,/mob/living/human))
 		return
 
+	if (ishuman(mob))
+		var/mob/living/human/H = mob
+		//ball possession, pass to nearest
+		if (H.football && H.shoes && istype(H.shoes, /obj/item/clothing/shoes/football)) //if we have the ball, pass it to nearest friendly player
+			H.football_pass()
+			return
+		//no ball, pressure nearest player with ball
+		else if (!H.football && H.shoes && istype(H.shoes, /obj/item/clothing/shoes/football))
+			H.football_pressure(null)
+			return
 	var/obj/item/I = mob.get_active_hand()
 	if (!I)
 		return
@@ -97,8 +107,10 @@ This saves us from having to call add_fingerprint() any time something is put in
 	else
 		H.targeted_organ = "head"
 
-	H.HUDneed["damage zone"].update_icon()
-	H.HUDneed["random damage zone"].update_icon()
+	var/obj/screen/dmg_zone = H.HUDneed["damage zone"]
+	var/obj/screen/ran_dmg_zone = H.HUDneed["random damage zone"]
+	dmg_zone.update_icon()
+	ran_dmg_zone.update_icon()
 //NUMPAD 4
 /client/verb/zone_sel_left_upper()
 	set name = "zone_sel_left_upper"
@@ -119,9 +131,10 @@ This saves us from having to call add_fingerprint() any time something is put in
 		H.targeted_organ = "l_arm"
 	else
 		H.targeted_organ = "l_arm"
-
-	H.HUDneed["damage zone"].update_icon()
-	H.HUDneed["random damage zone"].update_icon()
+	var/obj/screen/dmg_zone = H.HUDneed["damage zone"]
+	var/obj/screen/ran_dmg_zone = H.HUDneed["random damage zone"]
+	dmg_zone.update_icon()
+	ran_dmg_zone.update_icon()
 //NUMPAD 5
 /client/verb/zone_sel_chest()
 	set name = "zone_sel_chest"
@@ -136,8 +149,10 @@ This saves us from having to call add_fingerprint() any time something is put in
 
 	H.targeted_organ = "chest"
 
-	H.HUDneed["damage zone"].update_icon()
-	H.HUDneed["random damage zone"].update_icon()
+	var/obj/screen/dmg_zone = H.HUDneed["damage zone"]
+	var/obj/screen/ran_dmg_zone = H.HUDneed["random damage zone"]
+	dmg_zone.update_icon()
+	ran_dmg_zone.update_icon()
 //NUMPAD 6
 /client/verb/zone_sel_right_upper()
 	set name = "zone_sel_right_upper"
@@ -159,8 +174,10 @@ This saves us from having to call add_fingerprint() any time something is put in
 	else
 		H.targeted_organ = "r_arm"
 
-	H.HUDneed["damage zone"].update_icon()
-	H.HUDneed["random damage zone"].update_icon()
+	var/obj/screen/dmg_zone = H.HUDneed["damage zone"]
+	var/obj/screen/ran_dmg_zone = H.HUDneed["random damage zone"]
+	dmg_zone.update_icon()
+	ran_dmg_zone.update_icon()
 //NUMPAD 1
 /client/verb/zone_sel_left_lower()
 	set name = "zone_sel_left_lower"
@@ -182,8 +199,10 @@ This saves us from having to call add_fingerprint() any time something is put in
 	else
 		H.targeted_organ = "l_leg"
 
-	H.HUDneed["damage zone"].update_icon()
-	H.HUDneed["random damage zone"].update_icon()
+	var/obj/screen/dmg_zone = H.HUDneed["damage zone"]
+	var/obj/screen/ran_dmg_zone = H.HUDneed["random damage zone"]
+	dmg_zone.update_icon()
+	ran_dmg_zone.update_icon()
 //NUMPAD 2
 /client/verb/zone_sel_groin()
 	set name = "zone_sel_groin"
@@ -198,8 +217,10 @@ This saves us from having to call add_fingerprint() any time something is put in
 
 	H.targeted_organ = "groin"
 
-	H.HUDneed["damage zone"].update_icon()
-	H.HUDneed["random damage zone"].update_icon()
+	var/obj/screen/dmg_zone = H.HUDneed["damage zone"]
+	var/obj/screen/ran_dmg_zone = H.HUDneed["random damage zone"]
+	dmg_zone.update_icon()
+	ran_dmg_zone.update_icon()
 //NUMPAD 3
 /client/verb/zone_sel_right_lower()
 	set name = "zone_sel_right_lower"
@@ -221,8 +242,10 @@ This saves us from having to call add_fingerprint() any time something is put in
 	else
 		H.targeted_organ = "r_leg"
 
-	H.HUDneed["damage zone"].update_icon()
-	H.HUDneed["random damage zone"].update_icon()
+	var/obj/screen/dmg_zone = H.HUDneed["damage zone"]
+	var/obj/screen/ran_dmg_zone = H.HUDneed["random damage zone"]
+	dmg_zone.update_icon()
+	ran_dmg_zone.update_icon()
 
 /mob/living/human/proc/equip_in_one_of_slots(obj/item/W, list/slots, del_on_fail = TRUE)
 	for (var/slot in slots)
@@ -500,7 +523,7 @@ This saves us from having to call add_fingerprint() any time something is put in
 			var/obj/item/clothing/under/uniform = w_uniform
 			uniform.attackby(W,src)
 		else
-			src << "<span class='danger'>You are trying to equip this item to an unsupported inventory slot. If possible, please write a ticket with steps to reproduce. Slot was: [slot]</span>"
+			to_chat(src, "<span class='danger'>You are trying to equip this item to an unsupported inventory slot. If possible, please write a ticket with steps to reproduce. Slot was: [slot]</span>")
 			return
 
 	if ((W == l_hand) && (slot != slot_l_hand))
@@ -577,12 +600,12 @@ This saves us from having to call add_fingerprint() any time something is put in
 	if (w_uniform) items += w_uniform
 
 	if (include_carried)
-		if (slot_l_hand)	 items += l_hand
-		if (slot_r_hand)	 items += r_hand
-		if (slot_l_store)	items += l_store
-		if (slot_r_store)	items += r_store
-		if (slot_legcuffed)  items += legcuffed
-		if (slot_handcuffed) items += handcuffed
+		if (l_hand)	 items += l_hand
+		if (r_hand)	 items += r_hand
+		if (l_store)	items += l_store
+		if (r_store)	items += r_store
+		if (legcuffed)  items += legcuffed
+		if (handcuffed) items += handcuffed
 
 	return items
 

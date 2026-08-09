@@ -1,7 +1,8 @@
 /obj/map_metadata/missionary_ridge
 	ID = MAP_MISSIONARY_RIDGE
 	title = "Missionary Ridge"
-	lobby_icon = 'icons/lobby/missionary.png'
+	description = "The Union Army and the Confederate Army are battling for the control of Missionary ridge!"
+	lobby_icon = "icons/lobby/missionary.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/one,/area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 0
 	no_hardcore = TRUE
@@ -22,21 +23,9 @@
 	faction2 = CIVILIAN
 	ordinal_age = 4
 	songs = list(
-		"The Good the Bad the Ugly Theme:1" = 'sound/music/good_bad_ugly.ogg')
+		"The Good the Bad the Ugly Theme:1" = "sound/music/good_bad_ugly.ogg")
 	gamemode = "Siege"
 	grace_wall_timer = 3000
-/obj/map_metadata/missionary_ridge/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (istype(J, /datum/job/american))
-		if (J.is_civil_war)
-			. = TRUE
-		else
-			. = FALSE
-	if (istype(J, /datum/job/civilian))
-		if (J.is_civil_war)
-			. = TRUE
-		else
-			. = FALSE
 
 /obj/map_metadata/missionary_ridge/short_win_time(faction)
 	if (!(alive_n_of_side(faction1)) || !(alive_n_of_side(faction2)))
@@ -96,14 +85,14 @@
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The <b>Confederates Army</b> has sucessfuly defended Missionary Ridge! The Union have halted the attack!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_r == FALSE)
 		ticker.finished = TRUE
 		var/message = "The <b>Union</b> have liberated Missionary Ridge! The battle for Missionary Ridge is over!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_r = TRUE
@@ -147,7 +136,7 @@
 
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The [current_winner] has lost control of the Ridge!</font>"
+			to_chat(world, "<font size = 3>The [current_winner] has lost control of the Ridge!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1

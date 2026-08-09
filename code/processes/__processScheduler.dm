@@ -4,39 +4,39 @@ var/global/processScheduler/processScheduler
 /processScheduler
 	parent_type = /datum
 	// Processes known by the scheduler
-	var/tmp/process/list/processes = list()
+	var/tmp/list/processes = list()
 
 	// Processes known by the scheduler, ordered by priority
-	var/tmp/process/list/priority_ordered_processes = list()
+	var/tmp/list/priority_ordered_processes = list()
 
 	// Processes that are currently running
-	var/tmp/process/list/running = list()
+	var/tmp/list/running = list()
 
 	// Processes that are idle
-	var/tmp/process/list/idle = list()
+	var/tmp/list/idle = list()
 
 	// Processes that are queued to run
-	var/tmp/process/list/queued = list()
+	var/tmp/list/queued = list()
 
 	// Process name -> process object map
-	var/tmp/process/list/nameToProcessMap = list()
+	var/tmp/list/nameToProcessMap = list()
 
-	var/tmp/process/list/priorityToProcessMap = list()
+	var/tmp/list/priorityToProcessMap = list()
 
 	// Process last queued times (world time)
-	var/tmp/process/list/last_queued = list()
+	var/tmp/list/last_queued = list()
 
 	// Process last start times (real time)
-	var/tmp/process/list/last_start = list()
+	var/tmp/list/last_start = list()
 
 	// Process last run durations
-	var/tmp/process/list/last_run_time = list()
+	var/tmp/list/last_run_time = list()
 
 	// Per process list of the last 20 durations
-	var/tmp/process/list/last_twenty_run_times = list()
+	var/tmp/list/last_twenty_run_times = list()
 
 	// Process highest run time
-	var/tmp/process/list/highest_run_time = list()
+	var/tmp/list/highest_run_time = list()
 
 	// How long to sleep between runs (set to tick_lag in New)
 	var/tmp/scheduler_sleep_interval = 0
@@ -69,7 +69,7 @@ var/global/processScheduler/processScheduler
  * this treatment.
  */
 
-/processScheduler/proc/deferSetupfor (var/processPath)
+/processScheduler/proc/deferSetupFor (var/processPath)
 	if (!(processPath in deferredSetupList))
 		deferredSetupList += processPath
 
@@ -79,14 +79,17 @@ var/global/processScheduler/processScheduler
 		del(src)
 		return FALSE
 
-	var/process
+	var/process_path
 	// Add all the processes we can find, except for the ticker
-	for (process in subtypesof(/process))
-		if (!(process in deferredSetupList))
-			addProcess(new process(src))
-
-	for (process in deferredSetupList)
-		addProcess(new process(src))
+	for (process_path in subtypesof(/process))
+		var/process/P = new process_path(src)
+		if (P.is_subsystem_member)
+			// Set up the process so it can register itself to the global processes list
+			P.setup()
+			// We still want it in the nameToProcessMap for manual access
+			nameToProcessMap[P.name] = P
+			continue
+		addProcess(P)
 
 	return TRUE
 
@@ -140,7 +143,8 @@ var/global/processScheduler/processScheduler
 					message_admins("Process '[p.name]' is hung and will be restarted.")
 
 /processScheduler/proc/queueProcesses()
-	for (var/process/p in get_priority_ordered_processes())
+	var/current_time = world.time
+	for (var/process/p in priority_ordered_processes)
 		// Don't double-queue, don't queue running processes
 		if (p.disabled || p.running || p.queued || !p.idle)
 			continue
@@ -149,7 +153,7 @@ var/global/processScheduler/processScheduler
 			continue
 
 		// If the process should be running by now, go ahead and queue it
-		if (world.time >= (last_queued[p] + p.schedule_interval))
+		if (current_time >= (last_queued[p] + p.schedule_interval))
 			setQueuedProcessState(p)
 
 
@@ -388,13 +392,13 @@ var/global/processScheduler/processScheduler
 		var/process/process = nameToProcessMap[processName]
 		process.disable()
 
-/processScheduler/proc/statProcesses()
+/processScheduler/proc/statProcesses(client/C)
 	if (!isRunning)
-		stat("Processes", "Scheduler not running")
+		C.add_stat("Processes", "Scheduler not running")
 		return
-	stat("Processes", "[processes.len] (R [running.len] / Q [queued.len] / I [idle.len])")
+	C.add_stat("Processes", "[processes.len] (R [running.len] / Q [queued.len] / I [idle.len])")
 	for (var/process/p in processes)
-		p.statProcess()
+		p.statProcess(C)
 
 /processScheduler/proc/htmlProcesses()
 	. = "<html><body>"

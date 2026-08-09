@@ -36,32 +36,30 @@
 	if ((season == "WINTER" && map.triggered_blizzard) && !map.blizzard)
 		if (prob(1) || map.triggered_blizzard)
 			if(prob(50) || map.triggered_blizzard)
-				world << "<big>A huge blizzard is approaching!</big>"
+				to_chat(world, "<big>A huge blizzard is approaching!</big>")
 				map.triggered_blizzard = FALSE
 				spawn(600)
 					map.blizzard = TRUE
 					change_weather(WEATHER_EXTREME)
-					//world << "<big>The blizzard is in full force!</big>"
 					spawn(rand(2400,3600))
 						map.blizzard = FALSE
 						change_weather(WEATHER_NONE)
-						//world << "<big>The blizzard has passed.</big>"
 	if (map && (season == "SUMMER" || map.triggered_heatwave) && !map.heat_wave)
 		if (prob(1) || map.triggered_heatwave)
 			if(prob(50)|| map.triggered_heatwave)
-				world << "<big>The weather starts to get hotter than normal...</big>"
+				to_chat(world, "<big>The weather starts to get hotter than normal...</big>")
 				map.triggered_heatwave = FALSE
 				spawn(600)
 					map.heat_wave = TRUE
 					change_weather(WEATHER_NONE)
-					world << "<big>A heat wave has arrived in this area!</big>"
+					to_chat(world, "<big>A heat wave has arrived in this area!</big>")
 					for(var/obj/structure/sink/S)
 						if (istype(S, /obj/structure/sink/well) || istype(S, /obj/structure/sink/puddle))
 							S.dry = TRUE
 							S.update_icon()
 					spawn(rand(3000,3600))
 						map.heat_wave = FALSE
-						world << "<big>The heat wave has subsided.</big>"
+						to_chat(world, "<big>The heat wave has subsided.</big>")
 						for(var/obj/structure/sink/S)
 							if (istype(S, /obj/structure/sink/well) || istype(S, /obj/structure/sink/puddle))
 								S.dry = FALSE
@@ -69,13 +67,11 @@
 	if ((season == "Dry Season" && map.triggered_sandstorm) && !map.sandstorm)
 		if (prob(1) || map.triggered_sandstorm)
 			if(prob(50)|| map.triggered_sandstorm)
-				world << "<big>You start seeing dark clouds in the horizon...</big>"
+				to_chat(world, "<big>You start seeing dark clouds in the horizon...</big>")
 				map.triggered_sandstorm = FALSE
 				spawn(600)
 					map.sandstorm = TRUE
 					change_weather(WEATHER_EXTREME)
-					//world << "<big>A sandstorm has arrived in this area!</big>"
 					spawn(rand(3000,3600))
 						map.sandstorm = FALSE
-						//world << "<big>The sandstorm has subsided.</big>"
 						change_weather(WEATHER_NONE)

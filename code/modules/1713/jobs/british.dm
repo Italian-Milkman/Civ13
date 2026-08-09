@@ -14,6 +14,7 @@
 	en_meaning = "Ship Captain"
 	rank_abbreviation = "Captain"
 	is_navy = TRUE
+	allowed_maps = list(MAP_CURSED_ISLAND, MAP_SKULLISLAND)
 
 	spawn_location = "JoinLateRNCap"
 	is_officer = TRUE
@@ -39,7 +40,7 @@
 
 	H.equip_to_slot_or_del(new /obj/item/weapon/attachment/scope/adjustable/binoculars(H), slot_l_store)
 	H.equip_to_slot_or_del(new /obj/item/weapon/material/sword/spadroon(H), slot_belt)
-	world << "<b><big>[H.real_name] is the Captain of the Royal Navy ship!</big></b>"
+	to_chat(world, "<big><b>[H.real_name] is the Captain of the Royal Navy ship!</b></big>")
 	H.add_note("Role", "You are a <b>[title]</b>, the highest ranking officer present. Your job is to command the ship.")
 	H.setStat("strength", STAT_MEDIUM_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -61,6 +62,7 @@
 	is_commander = TRUE
 	is_officer = TRUE
 	whitelisted = TRUE
+	allowed_maps = list(MAP_CURSED_ISLAND, MAP_SKULLISLAND)
 
 
 
@@ -80,7 +82,7 @@
 	H.equip_to_slot_or_del(new /obj/item/clothing/head/tricorne_british(H), slot_head)
 
 	H.equip_to_slot_or_del(new /obj/item/weapon/material/sword/spadroon(H), slot_belt)
-	world << "<b><big>[H.real_name] is the Quartermaster of the Royal Navy ship!</big></b>"
+	to_chat(world, "<big><b>[H.real_name] is the Quartermaster of the Royal Navy ship!</b></big>")
 	H.add_note("Role", "You are a <b>[title]</b>, an officer in charge of the ship's supply allocation. You are also the second in command, after the <b>Captain</b>.")
 	H.setStat("strength", STAT_MEDIUM_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -98,6 +100,7 @@
 	en_meaning = "Head of Personnel Officer"
 	rank_abbreviation = "Boatswain"
 	is_navy = TRUE
+	allowed_maps = list(MAP_CURSED_ISLAND, MAP_SKULLISLAND)
 
 	spawn_location = "JoinLateRNBoatswain"
 	whitelisted = TRUE
@@ -123,7 +126,7 @@
 
 	H.equip_to_slot_or_del(new /obj/item/weapon/attachment/scope/adjustable/binoculars(H), slot_l_store)
 	H.equip_to_slot_or_del(new /obj/item/weapon/material/sword/spadroon(H), slot_belt)
-	world << "<b><big>[H.real_name] is the Boatswain of the Royal Navy ship!</big></b>"
+	to_chat(world, "<big><b>[H.real_name] is the Boatswain of the Royal Navy ship!</b></big>")
 	H.add_note("Role", "You are a <b>[title]</b>, an officer in charge of the crew and their job allocation. The whole ship relies on you!")
 	H.setStat("strength", STAT_MEDIUM_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -144,6 +147,7 @@
 	is_navy = TRUE
 	spawn_location = "JoinLateRNMidshipman"
 	is_officer = TRUE
+	allowed_maps = list(MAP_CURSED_ISLAND, MAP_SKULLISLAND)
 
 
 
@@ -182,6 +186,7 @@
 	is_navy = TRUE
 	spawn_location = "JoinLateRNSurgeon"
 	is_medic = TRUE
+	allowed_maps = list(MAP_CURSED_ISLAND, MAP_SKULLISLAND)
 
 	min_positions = 1
 	max_positions = 10
@@ -218,6 +223,7 @@
 	rank_abbreviation = "Carpenter"
 	is_navy = TRUE
 	spawn_location = "JoinLateRNCarpenter"
+	allowed_maps = list(MAP_CURSED_ISLAND, MAP_SKULLISLAND)
 
 
 
@@ -266,6 +272,7 @@
 	rank_abbreviation = "Cook"
 	is_navy = TRUE
 	spawn_location = "JoinLateRNCook"
+	allowed_maps = list(MAP_CURSED_ISLAND, MAP_SKULLISLAND)
 
 
 
@@ -315,6 +322,7 @@
 	rank_abbreviation = ""
 	is_navy = TRUE
 	spawn_location = "JoinLateRN"
+	allowed_maps = list(MAP_CURSED_ISLAND, MAP_SKULLISLAND)
 
 
 
@@ -372,7 +380,7 @@
 
 	spawn_location = "JoinLateRNCap"
 	is_officer = TRUE
-
+	allowed_maps = list(MAP_BRIDGE, MAP_FIELDS, MAP_SUPPLY_RAID)
 	is_army = TRUE
 	is_commander = TRUE
 
@@ -420,10 +428,9 @@
 	title = "British Sergeant"
 	en_meaning = "Infantry Squad Leader"
 	rank_abbreviation = "Sgt."
-
+	allowed_maps = list(MAP_BRIDGE, MAP_FIELDS, MAP_SUPPLY_RAID)
 	spawn_location = "JoinLateRNMidshipman"
 	is_officer = TRUE
-
 	is_army = TRUE
 	uses_squads = TRUE
 
@@ -469,12 +476,10 @@
 	title = "British Army Doctor"
 	en_meaning = "Infantry Field Medic"
 	rank_abbreviation = "Doc."
-
+	allowed_maps = list(MAP_BRIDGE, MAP_FIELDS, MAP_SUPPLY_RAID)
 	spawn_location = "JoinLateRNSurgeon"
-
 	is_medic = TRUE
 	is_army = TRUE
-
 
 	min_positions = 1
 	max_positions = 6
@@ -514,9 +519,8 @@
 	title = "British Army Soldier"
 	en_meaning = "Infantry Soldier"
 	rank_abbreviation = ""
-
+	allowed_maps = list(MAP_BRIDGE, MAP_FIELDS, MAP_SUPPLY_RAID)
 	spawn_location = "JoinLateRN"
-
 	is_army = TRUE
 	uses_squads = TRUE
 
@@ -552,19 +556,13 @@
 	H.setStat("pistol", STAT_NORMAL)
 	H.setStat("bows", STAT_NORMAL)
 	H.setStat("medical", STAT_MEDIUM_LOW)
-
-
 	return TRUE
-
-
-	return TRUE
-
 
 /datum/job/british/chasseur
 	title = "British Light Infantry"
 	en_meaning = "Light Infantry"
 	rank_abbreviation = "Cha."
-
+	allowed_maps = list(MAP_BRIDGE, MAP_FIELDS, MAP_SUPPLY_RAID)
 	spawn_location = "JoinLateRN"
 
 	is_army = TRUE
@@ -613,6 +611,7 @@
 /datum/job/british/ww1captain
 	title = "Army Captain"
 	rank_abbreviation = "Cap."
+	allowed_maps = list(MAP_VERDUN, MAP_YPRES)
 
 
 	spawn_location = "JoinLateRNCap"
@@ -644,7 +643,7 @@
 	var/obj/item/clothing/accessory/holster/hip/holsterh = new /obj/item/clothing/accessory/holster/hip(null)
 	uniform.attackby(holsterh, H)
 	give_random_name(H)
-	world << "<b><big>[H.real_name] is the Captain of the British Forces!</big></b>"
+	to_chat(world, "<big><b>[H.real_name] is the Captain of the British Forces!</b></big>")
 	H.add_note("Role", "You are a <b>[title]</b>, the highest ranking officer present. Your job is to command the company.")
 	H.setStat("strength", STAT_MEDIUM_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -661,6 +660,7 @@
 /datum/job/british/ww1lieutenant
 	title = "Army 1st Lieutenant"
 	rank_abbreviation = "1Lt."
+	allowed_maps = list(MAP_VERDUN, MAP_YPRES)
 
 
 	spawn_location = "JoinLateRNCap"
@@ -690,7 +690,7 @@
 	var/obj/item/clothing/accessory/holster/hip/holsterh = new /obj/item/clothing/accessory/holster/hip(null)
 	uniform.attackby(holsterh, H)
 	give_random_name(H)
-	world << "<b><big>[H.real_name] is the 1st Lieutenant of the British Forces!</big></b>"
+	to_chat(world, "<big><b>[H.real_name] is the 1st Lieutenant of the British Forces!</b></big>")
 	H.add_note("Role", "You are a <b>[title]</b>, an officer in charge of the troops and their orders. The whole operation relies on you!")
 	H.setStat("strength", STAT_MEDIUM_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -707,6 +707,7 @@
 /datum/job/british/ww1second_lieutenant
 	title = "Army 2nd Lieutenant"
 	rank_abbreviation = "2Lt."
+	allowed_maps = list(MAP_VERDUN, MAP_YPRES)
 
 
 	spawn_location = "JoinLateRNCap"
@@ -736,7 +737,7 @@
 	var/obj/item/clothing/accessory/holster/hip/holsterh = new /obj/item/clothing/accessory/holster/hip(null)
 	uniform.attackby(holsterh, H)
 	give_random_name(H)
-	world << "<b><big>[H.real_name] is the 2nd Lieutenant of the British Forces!</big></b>"
+	to_chat(world, "<big><b>[H.real_name] is the 2nd Lieutenant of the British Forces!</b></big>")
 	H.add_note("Role", "You are a <b>[title]</b>, an officer in charge of the troops and their orders. The whole operation relies on you!")
 	H.setStat("strength", STAT_MEDIUM_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -753,6 +754,7 @@
 /datum/job/british/ww1sergeant
 	title = "Army Sergeant"
 	rank_abbreviation = "Sgt."
+	allowed_maps = list(MAP_VERDUN, MAP_YPRES)
 
 	spawn_location = "JoinLateRN"
 
@@ -799,6 +801,7 @@
 /datum/job/british/ww1doctor
 	title = "Army Doctor"
 	rank_abbreviation = "Dr."
+	allowed_maps = list(MAP_VERDUN, MAP_YPRES)
 
 	spawn_location = "JoinLateRNSurgeon"
 
@@ -843,6 +846,7 @@
 /datum/job/british/ww1shocktroop
 	title = "Shock Troop"
 	rank_abbreviation = ""
+	allowed_maps = list(MAP_VERDUN, MAP_YPRES)
 
 	spawn_location = "JoinLateRN" //for testing!
 	uses_squads = TRUE
@@ -885,6 +889,7 @@
 /datum/job/british/ww1infantry
 	title = "Army Private"
 	rank_abbreviation = ""
+	allowed_maps = list(MAP_VERDUN, MAP_YPRES)
 
 	spawn_location = "JoinLateRN" //for testing!
 	uses_squads = TRUE
@@ -932,6 +937,7 @@
 /datum/job/british/ww2lieutenant_pow
 	title = "POW Lieutenant"
 	rank_abbreviation = "Lt."
+	allowed_maps = list()
 
 
 	spawn_location = "JoinLateRNCap"
@@ -957,7 +963,7 @@
 	H.equip_to_slot_or_del(new /obj/item/clothing/head/ww2/britishoffcap_tropical(H), slot_head)
 //weapons
 	give_random_name(H)
-	world << "<b><big>[H.real_name] is the Lieutenant of the British POWs!</big></b>"
+	to_chat(world, "<big><b>[H.real_name] is the Lieutenant of the British POWs!</b></big>")
 	H.add_note("Role", "You are a <b>[title]</b>, an officer in charge of the POWs and their behaviour. The organizationa and survival of POWs relies on you!")
 	H.setStat("strength", STAT_MEDIUM_HIGH)
 	H.setStat("crafting", STAT_NORMAL)
@@ -973,6 +979,7 @@
 /datum/job/british/ww2sergeant_pow
 	title = "POW Sergeant"
 	rank_abbreviation = "Sgt."
+	allowed_maps = list()
 
 	spawn_location = "JoinLateRN"
 	is_officer = TRUE
@@ -1011,6 +1018,7 @@
 /datum/job/british/ww2pow
 	title = "British P.O.W."
 	rank_abbreviation = ""
+	allowed_maps = list()
 
 	spawn_location = "JoinLateRN" //for testing!
 
@@ -1055,6 +1063,7 @@
 /datum/job/british/ww2doctor_pow
 	title = "POW Doctor"
 	rank_abbreviation = "Dr."
+	allowed_maps = list()
 
 	spawn_location = "JoinLateRNSurgeon"
 

@@ -1,8 +1,9 @@
 /obj/map_metadata/occupation
 	ID = MAP_OCCUPATION
 	title = "Occupation"
+	description = "After 20 minutes civilians (including UPA) will be able to access the SS base and UPA armoury unlocks."
 	no_winner ="The round is proceeding normally."
-	lobby_icon = 'icons/lobby/ww2.png'
+	lobby_icon = "icons/lobby/ww2.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall, /area/caribbean/no_mans_land/invisible_wall/one, /area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 4000
 	has_hunger = TRUE
@@ -24,7 +25,7 @@
 	faction2 = GERMAN
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET, WEATHER_EXTREME)
 	songs = list(
-		"The Great Escape:1" = 'sound/music/the_great_escape.ogg')
+		"The Great Escape:1" = "sound/music/the_great_escape.ogg")
 	gamemode = "Occupation"
 	var/list/points = list(
 		list("SS",0,0),
@@ -35,23 +36,6 @@
 	)
 	is_RP = TRUE
 	var/gracedown1 = TRUE
-/obj/map_metadata/occupation/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_occupation && istype(J, /datum/job/civilian/occupation) && J.title != "DONT USE")
-		. = TRUE
-	if (J.is_occupation && J.is_upa)
-		. = TRUE
-	if (istype(J, /datum/job/civilian/fantasy))
-		. = FALSE
-	if (J.is_civil_war)
-		. = FALSE
-	if (J.is_abashiri)
-		. = FALSE
-	if (istype(J, /datum/job/german))
-		if (J.is_occupation)
-			. = TRUE
-		else
-			. = FALSE
 /obj/map_metadata/occupation/faction2_can_cross_blocks()
 	return (processes.ticker.playtime_elapsed >= 12000 || admin_ended_all_grace_periods)
 
@@ -156,9 +140,9 @@
 /obj/map_metadata/occupation/proc/check_points_msg()
 	check_points()
 	spawn(1)
-		world << "<font size = 4><span class = 'notice'><b>Current Score:</b></font></span>"
+		to_chat(world, "<font size = 4><span class = 'notice'><b>Current Score:</b></font></span>")
 		for (var/i=1,i<=points.len,i++)
-			world << "<br><font size = 3><span class = 'notice'>[points[i][1]]: <b>[points[i][2]+points[i][3]]</b></span></font>"
+			to_chat(world, "<br><font size = 3><span class = 'notice'>[points[i][1]]: <b>[points[i][2]+points[i][3]]</b></span></font>")
 
 	spawn(2400)
 		check_points_msg()

@@ -43,6 +43,7 @@ print("Updating git...")
 os.chdir("{}civ13-git".format(mdir))
 os.system("git pull")
 os.system("git reset --hard origin/master")
+os.system("git pull")
 
 map = sys.argv[1]
 dmms = []
@@ -50,11 +51,24 @@ mapname = "{}.dmm".format(map.lower())
 maploc = "{}civ13-git/maps/".format(mdir)
 maplist = getListOfFiles(maploc)
 done = 0
+
+# Try exact match first
 for i in maplist:
-	if mapname in i:
+	if os.path.basename(i).lower() == mapname:
 		maploc = i
 		print(maploc)
 		done = 1
+		break
+
+# If no exact match, try partial match
+if done == 0:
+	for i in maplist:
+		if mapname in i.lower():
+			maploc = i
+			print(maploc)
+			done = 1
+			break
+
 if done == 0:
 	print("Invalid argument.")
 	sys.exit()

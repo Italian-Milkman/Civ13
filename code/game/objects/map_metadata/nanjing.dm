@@ -2,7 +2,8 @@
 /obj/map_metadata/nanjing
 	ID = MAP_NANJING
 	title = "Nanjing"
-	lobby_icon = 'icons/lobby/china.png'
+	description = "The Japanese will win if they capture the Chinese command. The Chinese will win if they manage to defend their command for 30 minutes!."
+	lobby_icon = "icons/lobby/china.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/one,/area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 1200
 	no_hardcore = TRUE
@@ -25,18 +26,7 @@
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET)
 	grace_wall_timer = 4800
 	songs = list(
-		"Mugi to Heitai:1" = 'sound/music/mugi_to_heitai.ogg',)
-
-/obj/map_metadata/nanjing/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_prison == TRUE || istype(J, /datum/job/japanese/ija_ww2ATunit) || J.is_pacific == TRUE || J.is_navy == TRUE)
-		. = FALSE
-	else if (J.is_ww2 == TRUE)
-		. = TRUE
-	else if (istype(J, /datum/job/chinese/captain) || istype(J, /datum/job/chinese/lieutenant) || istype(J, /datum/job/chinese/sergeant) || istype(J, /datum/job/chinese/doctor) || istype(J, /datum/job/chinese/infantry) || istype(J, /datum/job/chinese/sniper) || istype(J, /datum/job/japanese/ija_ww2_tanker))
-		. = TRUE
-	else
-		. = FALSE
+		"Mugi to Heitai:1" = "sound/music/mugi_to_heitai.ogg",)
 
 /obj/map_metadata/nanjing/roundend_condition_def2name(define)
 	..()
@@ -86,14 +76,14 @@ var/no_loop_n = FALSE
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The <b>Chinese</b> have sucessfuly defended the city of Nanjing! The Japanese have halted the attack!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_n == TRUE)
 		ticker.finished = TRUE
 		var/message = "The <b>Japanese</b> have captured the city of Nanjing! The battle for Nanjing is over!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_n = TRUE
@@ -136,7 +126,7 @@ var/no_loop_n = FALSE
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The <b>Chinese</b> have recaptured the Nanjing Command!</font>"
+			to_chat(world, "<font size = 3>The <b>Chinese</b> have recaptured the Nanjing Command!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1

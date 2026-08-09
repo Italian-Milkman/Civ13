@@ -140,22 +140,13 @@
 	if (healing_stage >= 30 && (istype(buckled, /obj/structure/bed) || istype(buckled, /obj/structure/optable) || istype(buckled, /obj/structure/medicalbed)))
 		if (istype(buckled, /obj/structure/medicalbed))
 			rejuvenate()
-			src << "You feel much better."
+			to_chat(src, "You feel much better.")
 		healing_stage = 0
 		if (getBruteLoss() >= 15)
 			adjustBruteLoss(-2)
 			if (halloss > 40)
 				adjustHalLoss(-30)
-	if (map && map.ID == MAP_FOOTBALL && (r_hand || l_hand))
-		var/area/A = get_area(loc)
-		if (!istype(A, /area/caribbean/football/red/goalkeeper) && !istype(A, /area/caribbean/football/blue/goalkeeper))
-			if (istype(l_hand, /obj/item/football))
-				drop_from_inventory(l_hand, loc, TRUE)
-				drop_item()
-			if (istype(r_hand, /obj/item/football))
-				drop_from_inventory(r_hand, loc, TRUE)
-				drop_item()
-	if (map && map.ID == MAP_FOOTBALL_CMP && (r_hand || l_hand))
+	if (map && istype(map, /obj/map_metadata/football) && (r_hand || l_hand))
 		var/area/A = get_area(loc)
 		if (!istype(A, /area/caribbean/football/red/goalkeeper) && !istype(A, /area/caribbean/football/blue/goalkeeper))
 			if (istype(l_hand, /obj/item/football))
@@ -247,7 +238,7 @@
 			stats["stamina"][2] = 80
 
 		if (getStat("stamina") == getMaxStat("stamina")-1 && m_intent == "walk")
-			src << "<span class = 'good'>You feel like you can run for a while.</span>"
+			to_chat(src, "<span class = 'good'>You feel like you can run for a while.</span>")
 
 	nutrition = min(nutrition, max_nutrition)
 	nutrition = max(nutrition, -max_nutrition)
@@ -291,7 +282,7 @@
 			disease_progression += 0.5
 			// first 3 minutes
 			if (prob(7))
-				src << "You feel painful lumps on your skin."
+				to_chat(src, "You feel painful lumps on your skin.")
 				adjustToxLoss(rand(8,12))
 			//3 more minutes
 			else if (disease_progression >= 90 && prob(10) && stat != DEAD)
@@ -299,7 +290,7 @@
 			// 3 more minutes
 			else if (disease_progression >= 180 && disease_progression <= 300 && prob(15))
 				adjustBrainLoss(rand(3,5))
-				src << "You feel your body burning up from fever!"
+				to_chat(src, "You feel your body burning up from fever!")
 				Weaken(5)
 				bodytemperature = 313.15
 			// 4 more minutes
@@ -307,7 +298,7 @@
 				disease = 0
 				disease_type = "none"
 				disease_progression = 0
-				src << "You feel much better now! The disease is finally gone!"
+				to_chat(src, "You feel much better now! The disease is finally gone!")
 				disease_immunity += "plague"
 				disease_treatment = 0
 				bodytemperature = 310.055
@@ -319,7 +310,7 @@
 				disease_progression += 2
 			// first 2 minutes
 			if (disease_progression == 25)
-				src << "You feel a little feverish."
+				to_chat(src, "You feel a little feverish.")
 				disease_treatment = 0
 				apply_effect(10, DROWSY, FALSE)
 				bodytemperature = 311.35
@@ -328,14 +319,14 @@
 				emote("sniff")
 				apply_effect(5, DROWSY, FALSE)
 			else if (disease_progression >= 60 && disease_progression < 180 && bodytemperature < 312.15 && prob(10))
-				src << "You feel like your fever is getting worse!"
+				to_chat(src, "You feel like your fever is getting worse!")
 				apply_effect(5, AGONY, FALSE)
 				apply_effect(5, DROWSY, FALSE)
 				emote(pick("cough","sneeze"))
 				bodytemperature = 312.15
 			else if (disease_progression >= 60 && disease_progression < 180 && bodytemperature < 313.15 && prob(1))
 				adjustBrainLoss(rand(7,10))
-				src << "You feel your body burning up from fever!"
+				to_chat(src, "You feel your body burning up from fever!")
 				apply_effect(10, AGONY, FALSE)
 				apply_effect(5, DROWSY, FALSE)
 				emote(pick("cough","sneeze"))
@@ -343,12 +334,12 @@
 				bodytemperature = 313.15
 			// 2 more minutes
 			else if (disease_progression >= 180 && disease_progression < 240 && bodytemperature >= 313.15 && prob(8))
-				src << "You feel your fever going down."
+				to_chat(src, "You feel your fever going down.")
 				apply_effect(5, DROWSY, FALSE)
 				emote(pick("cough","sneeze"))
 				bodytemperature = 312.35
 			else if (disease_progression >= 180 && disease_progression < 240 && bodytemperature >= 312.15 && prob(2))
-				src << "You feel your fever going down."
+				to_chat(src, "You feel your fever going down.")
 				emote(pick("cough","sneeze"))
 				bodytemperature = 310.055
 			else if (disease_progression >= 240 && prob(35))
@@ -356,7 +347,7 @@
 				disease_type = "none"
 				disease_progression = 0
 				bodytemperature = 310.055
-				src << "You feel much better now! The disease is finally gone!"
+				to_chat(src, "You feel much better now! The disease is finally gone!")
 				disease_treatment = 0
 				if (prob(25))
 					disease_immunity += "flu"
@@ -369,7 +360,7 @@
 				disease_progression += 5
 			// first 2 minutes
 			if (disease_progression == 25)
-				src << "You feel a little feverish."
+				to_chat(src, "You feel a little feverish.")
 				disease_treatment = 0
 				apply_effect(10, DROWSY, FALSE)
 				bodytemperature = 311.35
@@ -379,17 +370,17 @@
 					emote("cough")
 					apply_effect(5, DROWSY, FALSE)
 				else
-					src << "Your muscles ache!"
+					to_chat(src, "Your muscles ache!")
 					apply_effect(5, AGONY, FALSE)
 			else if (disease_progression >= 60 && disease_progression < 180 && bodytemperature < 312.15 && prob(4))
-				src << "You feel like your fever is getting worse!"
+				to_chat(src, "You feel like your fever is getting worse!")
 				apply_effect(5, AGONY, FALSE)
 				apply_effect(5, DROWSY, FALSE)
 				emote(pick("cough"))
 				bodytemperature = 312.15
 				adjustBrainLoss(1)
 			else if (disease_progression >= 60 && disease_progression < 180 && bodytemperature < 313.15 && prob(1))
-				src << "You feel very nauseous!"
+				to_chat(src, "You feel very nauseous!")
 				apply_effect(8, AGONY, FALSE)
 				spawn(200)
 					water -= 35
@@ -397,12 +388,12 @@
 			// 2 more minutes
 			else if (disease_progression >= 180 && disease_progression < 240 && bodytemperature >= 313.15 && prob(8))
 				if (prob(50))
-					src << "You feel your fever going down."
+					to_chat(src, "You feel your fever going down.")
 					apply_effect(5, DROWSY, FALSE)
 					emote(pick("cough"))
 					bodytemperature = 312.35
 				else
-					src << "You feel nauseous!"
+					to_chat(src, "You feel nauseous!")
 					apply_effect(5, AGONY, FALSE)
 					spawn(200)
 						water -= 12
@@ -412,7 +403,7 @@
 					var/obj/item/organ/external/E = get_organ("groin")
 					var/datum/wound/W = new /datum/wound/internal_bleeding(35, internal_organs_by_name["liver"])
 					E.wounds += W
-				src << "You feel your fever going down."
+				to_chat(src, "You feel your fever going down.")
 				emote(pick("cough"))
 				bodytemperature = 310.055
 			else if (disease_progression >= 240 && prob(35))
@@ -420,7 +411,7 @@
 				disease_type = "none"
 				disease_progression = 0
 				bodytemperature = 310.055
-				src << "You feel much better now! The disease is finally gone!"
+				to_chat(src, "You feel much better now! The disease is finally gone!")
 				disease_treatment = 0
 				if (prob(25))
 					disease_immunity += "typhus"
@@ -433,7 +424,7 @@
 				disease_progression += 1.5
 			// first 2 minutes
 			if (disease_progression == 25)
-				src << "You feel a little feverish."
+				to_chat(src, "You feel a little feverish.")
 				disease_treatment = 0
 				apply_effect(10, DROWSY, FALSE)
 				bodytemperature = 311.35
@@ -442,7 +433,7 @@
 				emote("shiver")
 				apply_effect(7, DROWSY, FALSE)
 			else if (disease_progression >= 60 && disease_progression < 180 && bodytemperature < 312.15 && prob(10))
-				src << "You feel like your fever is getting worse!"
+				to_chat(src, "You feel like your fever is getting worse!")
 				adjustBrainLoss(rand(2,3))
 				apply_effect(8, AGONY, FALSE)
 				apply_effect(6, DROWSY, FALSE)
@@ -453,7 +444,7 @@
 				bodytemperature = 312.15
 			else if (disease_progression >= 60 && disease_progression < 180 && bodytemperature < 313.15 && prob(1) && !disease_treatment)
 				adjustBrainLoss(rand(7,10))
-				src << "You feel your body burning up from fever!"
+				to_chat(src, "You feel your body burning up from fever!")
 				apply_effect(12, AGONY, FALSE)
 				apply_effect(7, DROWSY, FALSE)
 				spawn(200)
@@ -463,13 +454,13 @@
 				bodytemperature = 313.15
 			// 2 more minutes
 			else if (disease_progression >= 180 && disease_progression < 240 && bodytemperature >= 313.15 && prob(8) && !disease_treatment)
-				src << "You feel your fever going down."
+				to_chat(src, "You feel your fever going down.")
 				adjustBrainLoss(rand(4,6))
 				apply_effect(6, DROWSY, FALSE)
 				emote("shiver")
 				bodytemperature = 312.35
 			else if (disease_progression >= 180 && disease_progression < 240 && bodytemperature >= 312.15 && prob(2))
-				src << "You feel your fever going down."
+				to_chat(src, "You feel your fever going down.")
 				adjustBrainLoss(rand(2,3))
 				emote("shiver")
 				bodytemperature = 310.055
@@ -478,7 +469,7 @@
 				disease_type = "none"
 				disease_progression = 0
 				bodytemperature = 310.055
-				src << "You feel much better now! The disease is finally gone!"
+				to_chat(src, "You feel much better now! The disease is finally gone!")
 				disease_treatment = 0
 
 		else if (disease_type == "cholera")
@@ -489,7 +480,7 @@
 				disease_progression += 1.5
 			// first 3 minutes
 			if (disease_progression == 90)
-				src << "You feel nauseous."
+				to_chat(src, "You feel nauseous.")
 				disease_treatment = 0
 				apply_effect(5, AGONY, FALSE)
 			//5 more minutes
@@ -497,7 +488,7 @@
 				emote("shiver")
 				apply_effect(7, DROWSY, FALSE)
 			else if (disease_progression >= 90 && disease_progression < 240 && prob(10))
-				src << "You feel very nauseous!"
+				to_chat(src, "You feel very nauseous!")
 				apply_effect(8, AGONY, FALSE)
 				spawn(200)
 					water -= 55
@@ -511,7 +502,7 @@
 				disease_type = "none"
 				disease_progression = 0
 				bodytemperature = 310.055
-				src << "You feel much better now! The disease is finally gone!"
+				to_chat(src, "You feel much better now! The disease is finally gone!")
 				disease_treatment = 0
 		else if (disease_type == "zombie")
 			mood -= 0.15
@@ -522,28 +513,28 @@
 				disease_type = "none"
 				disease_progression = 0
 				bodytemperature = 310.055
-				src << "You feel much better now! The disease is finally gone!"
+				to_chat(src, "You feel much better now! The disease is finally gone!")
 				disease_treatment = 0
 
 			if (disease_progression == 25)
-				src << "You feel your temperature rising."
+				to_chat(src, "You feel your temperature rising.")
 				apply_effect(10, DROWSY, FALSE)
 				bodytemperature = 311.35
 			if (prob(1))
 				apply_effect(7, DROWSY, FALSE)
 			else if (disease_progression >= 60 && disease_progression < 140 && prob(10))
-				src << pick("You feel like your fever is getting worse!","Your head hurts so much!")
+				to_chat(src, pick("You feel like your fever is getting worse!","Your head hurts so much!"))
 				adjustBrainLoss(rand(2,3))
 				apply_effect(8, AGONY, FALSE)
 				bodytemperature = 313.15
 			else if (disease_progression >= 140 && disease_progression < 200 && prob(1) && !disease_treatment)
 				adjustBrainLoss(rand(7,10))
-				src << "<big>[pick("You feel your body burning up!","Your head is pounding!")]</big>"
+				to_chat(src, "<big>[pick("You feel your body burning up!","Your head is pounding!")]</big>")
 				apply_effect(12, AGONY, FALSE)
 				bodytemperature = 314.15
 
 			else if (disease_progression >= 200 && disease_progression < 240 && prob(8) && !disease_treatment)
-				src << "You feel your fever going down."
+				to_chat(src, "You feel your fever going down.")
 				adjustBrainLoss(rand(4,6))
 				apply_effect(6, DROWSY, FALSE)
 				bodytemperature = 313.35
@@ -606,6 +597,20 @@
 	// recover stamina
 	stats["stamina"][1] = min(stats["stamina"][1] + round(stats["stamina"][2] * 0.02), stats["stamina"][2])
 
+	// recover juice (mana) - ~0.5 per second at standard 2ds Life() ticks
+	if (juice < max_juice)
+		var/juice_regen = 1
+		// Damp Sheep Wool: +30% juice regen
+		if (l_hand && istype(l_hand, /obj/item/weapon/material/magic/wand/crafted))
+			var/obj/item/weapon/material/magic/wand/crafted/W = l_hand
+			if (W.wool_damp)
+				juice_regen = 1.3
+		else if (r_hand && istype(r_hand, /obj/item/weapon/material/magic/wand/crafted))
+			var/obj/item/weapon/material/magic/wand/crafted/W = r_hand
+			if (W.wool_damp)
+				juice_regen = 1.3
+		juice = min(juice + juice_regen, max_juice)
+
 	voice = GetVoice()
 
 	//No need to update all of these procs if the guy is dead.
@@ -631,10 +636,9 @@
 
 		if (!inducedSSD)
 			handle_excrement()
-			if (map.civilizations || map.ID == MAP_COLONY || map.ID == MAP_JUNGLE_COLONY || map.ID == MAP_GULAG13)
+			if (map.civilizations || map.ID == MAP_COLONY || map.ID == MAP_JUNGLE_COLONY || map.ID == MAP_GULAG13 || map.ID == MAP_BAGNE13)
 				handle_hygiene()
 			handle_mood()
-			handle_ptsd()
 		if (!map.civilizations && map.ID != MAP_COLONY && map.ID != MAP_JUNGLE_COLONY)
 			bowels = 0
 			bladder = 0
@@ -755,11 +759,11 @@
 		heatDamageFromClothingTimer++
 
 		if (heatDamageFromClothingTimer == 5)
-			src << "<span class = 'warning'><big>You are sweating inside your coat. It's way too warm to wear one.</big></span>"
+			to_chat(src, "<span class = 'warning'><big>You are sweating inside your coat. It's way too warm to wear one.</big></span>")
 
 		if (heatDamageFromClothingTimer >= 35)
 			if (prob(50))
-				src << "<span class = 'warning'><big>You are very uncomfortable. Remove the coat.</big></span>"
+				to_chat(src, "<span class = 'warning'><big>You are very uncomfortable. Remove the coat.</big></span>")
 			heatDamageFromClothingTimer = 6
 			adjustBurnLoss(2)
 
@@ -788,39 +792,11 @@
 			temp_adj = -0.1
 		if (loc_temp > bodytemperature)
 			temp_adj = 0.1
-	if (map && map.civilizations)
+	if ((map && map.civilizations) || map.ID == MAP_ANTARCTICA)
 		bodytemperature += temp_adj
 	// +/- 50 degrees from 310.15K is the 'safe' zone, where no damage is dealt.
 
-//this is handled in the get_environment_discomfort.
-/*
-	if (bodytemperature >= species.heat_level_1 && !orc)
-		//Body temperature is too hot.
 
-		if (status_flags & GODMODE)	return TRUE	//godmode
-		var/burn_dam = FALSE
-		switch(bodytemperature)
-			if (species.heat_level_1 to species.heat_level_2)
-				burn_dam = HEAT_DAMAGE_LEVEL_1
-			if (species.heat_level_2 to species.heat_level_3)
-				burn_dam = HEAT_DAMAGE_LEVEL_2
-			if (species.heat_level_3 to INFINITY)
-				burn_dam = HEAT_DAMAGE_LEVEL_3
-		take_overall_damage(burn=burn_dam, used_weapon = "High Body Temperature")
-
-	else if (bodytemperature <= species.cold_level_1 && !wolfman)
-		if (status_flags & GODMODE)	return TRUE	//godmode
-
-		var/burn_dam = FALSE
-		switch(bodytemperature)
-			if (-INFINITY to species.cold_level_3)
-				burn_dam = COLD_DAMAGE_LEVEL_3
-			if (species.cold_level_3 to species.cold_level_2)
-				burn_dam = COLD_DAMAGE_LEVEL_2
-			if (species.cold_level_2 to species.cold_level_1)
-				burn_dam = COLD_DAMAGE_LEVEL_1
-		take_overall_damage(burn=burn_dam, used_weapon = "Low Body Temperature")
-*/
 
 	species.get_environment_discomfort(src)
 
@@ -866,6 +842,8 @@
 /mob/living/human/get_cold_protection(temperature)
 
 	temperature = max(temperature, 2.7) //There is an occasional bug where the temperature is miscalculated in ares with a small amount of gas on them, so this is necessary to ensure that that bug does not affect this calculation. Space's temperature is 2.7K and most suits that are intended to protect against any cold, protect down to 2.0K.
+	if (cold_protection_disabled_timer > 0)
+		return 0
 	var/thermal_protection_flags = get_cold_protection_flags(temperature)
 	return get_thermal_protection(thermal_protection_flags)
 
@@ -1032,6 +1010,16 @@
 		if (gloves && germ_level > gloves.germ_level && prob(10))
 			gloves.germ_level += 1
 
+		if (cold_protection_disabled_timer > 0)
+			cold_protection_disabled_timer = max(0, cold_protection_disabled_timer - 1)
+			if (cold_protection_disabled_timer <= 0)
+				to_chat(src, "<span class='notice'>You feel your body heat starting to stabilize.</span>")
+
+		if (phosphor_dye_timer > 0)
+			phosphor_dye_timer = max(0, phosphor_dye_timer - 1)
+			if (phosphor_dye_timer <= 0)
+				set_light(0)
+				to_chat(src, "<span class='notice'>The glowing phosphor dye has finally faded.</span>")
 	return TRUE
 
 /mob/living/human/handle_regular_hud_updates()
@@ -1073,7 +1061,21 @@
 	if (!..())
 		return
 
-	return TRUE
+	if (buckled && istype(buckled, /obj/structure/bed/chair/drivers))
+		hud_used.add_vehicle_hud(src)
+	else
+		hud_used.remove_vehicle_hud(src)
+
+	if (hud_used)
+		var/holding_wand = (l_hand && istype(l_hand, /obj/item/weapon/material/magic/wand)) || (r_hand && istype(r_hand, /obj/item/weapon/material/magic/wand))
+		if (holding_wand)
+			if (!hud_used.wizard_hud.len)
+				hud_used.add_wizard_hud(src)
+		else
+			if (hud_used.wizard_hud.len)
+				hud_used.remove_wizard_hud(src)
+
+		return TRUE
 
 /mob/living/human/handle_random_events()
 
@@ -1086,7 +1088,7 @@
 	if (isturf(loc) && rand(1,1000) == 1)
 		var/turf/T = loc
 		if (T.get_lumcount() == 0)
-			playsound_local(src,pick(scarySounds),50, TRUE, -1)*/s
+			playsound_local(src,pick(scarySounds),50, TRUE, -1)*/
 
 /mob/living/human/handle_stomach()
 	spawn(0)
@@ -1136,15 +1138,15 @@
 
 	if (nutrition < 220 && nutrition >= 150)
 		if (prob(3))
-			src << "<span class = 'warning'>You're getting a bit hungry.</span>"
+			to_chat(src, "<span class = 'warning'>You're getting a bit hungry.</span>")
 
 	else if (nutrition < 150 && nutrition >= 100)
 		if (prob(4))
-			src << "<span class = 'warning'>You're pretty hungry.</span>"
+			to_chat(src, "<span class = 'warning'>You're pretty hungry.</span>")
 
 	else if (nutrition < 100 && nutrition >= 20)
 		if (prob(5))
-			src << "<span class = 'danger'>You're getting really hungry!</span>"
+			to_chat(src, "<span class = 'danger'>You're getting really hungry!</span>")
 
 	else if (nutrition < 20) //Nutrition is below 20 = starvation
 
@@ -1163,7 +1165,7 @@
 				if (sleeping) return
 
 				if (!informed_starvation[num2text(-STARVATION_NOTICE)])
-					src << "<span class='warning'>[pick("You're very hungry.","You really could use a meal right now.")]</span>"
+					to_chat(src, "<span class='warning'>[pick("You're very hungry.","You really could use a meal right now.")]</span>")
 
 				informed_starvation[num2text(-STARVATION_NOTICE)] = TRUE
 				informed_starvation[num2text(-STARVATION_WEAKNESS)] = FALSE
@@ -1171,13 +1173,13 @@
 				informed_starvation[num2text(-STARVATION_NEGATIVE_INFINITY)] = FALSE
 
 				if (prob(10))
-					src << "<span class='warning'>[pick("You're very hungry.","You really could use a meal right now.")]</span>"
+					to_chat(src, "<span class='warning'>[pick("You're very hungry.","You really could use a meal right now.")]</span>")
 
 			if (STARVATION_WEAKNESS to STARVATION_NOTICE)
 				if (sleeping) return
 
 				if (!informed_starvation[num2text(-STARVATION_WEAKNESS)])
-					src << "<span class='danger'>[pick(hunger_phrases)]</span>"
+					to_chat(src, "<span class='danger'>[pick(hunger_phrases)]</span>")
 
 				informed_starvation[num2text(-STARVATION_NOTICE)] = TRUE
 				informed_starvation[num2text(-STARVATION_WEAKNESS)] = TRUE
@@ -1187,20 +1189,20 @@
 				if (prob(6)) //6% chance of a tiny amount of toxin damage (1-5)
 
 					adjustToxLoss(rand(1,5))
-					src << "<span class='danger'>[pick(hunger_phrases)]</span>"
+					to_chat(src, "<span class='danger'>[pick(hunger_phrases)]</span>")
 
 				else if (prob(5)) //5% chance of being weakened
 
 					eye_blurry += 10
 					Weaken(10)
 					adjustToxLoss(rand(1,15))
-					src << "<span class='danger'>You're starving! The lack of strength makes you black out for a few moments...</span>"
+					to_chat(src, "<span class='danger'>You're starving! The lack of strength makes you black out for a few moments...</span>")
 
 			if (STARVATION_NEARDEATH to STARVATION_WEAKNESS) //5-30, 5% chance of weakening and TRUE-230 oxygen damage. 5% chance of a seizure. 10% chance of dropping item
 				if (sleeping) return
 
 				if (!informed_starvation[num2text(-STARVATION_NEARDEATH)])
-					src << "<span class='danger'>You're starving. You feel your life force slowly leaving your body...</span>"
+					to_chat(src, "<span class='danger'>You're starving. You feel your life force slowly leaving your body...</span>")
 
 				informed_starvation[num2text(-STARVATION_NOTICE)] = TRUE
 				informed_starvation[num2text(-STARVATION_WEAKNESS)] = TRUE
@@ -1210,7 +1212,7 @@
 				if (prob(7))
 
 					adjustToxLoss(rand(1,20))
-					src << "<span class='danger'>You're starving. You feel your life force slowly leaving your body...</span>"
+					to_chat(src, "<span class='danger'>You're starving. You feel your life force slowly leaving your body...</span>")
 					eye_blurry += 20
 					if (weakened < 1) Weaken(20)
 
@@ -1226,7 +1228,7 @@
 			if (-INFINITY to STARVATION_NEARDEATH) //Fuck the whole body up at this point
 
 				if (!informed_starvation[num2text(-STARVATION_NEGATIVE_INFINITY)])
-					src << "<span class='danger'>You are dying from starvation!</span>"
+					to_chat(src, "<span class='danger'>You are dying from starvation!</span>")
 
 				informed_starvation[num2text(-STARVATION_NOTICE)] = TRUE
 				informed_starvation[num2text(-STARVATION_WEAKNESS)] = TRUE
@@ -1234,7 +1236,7 @@
 				informed_starvation[num2text(-STARVATION_NEGATIVE_INFINITY)] = TRUE
 
 				if (prob(10))
-					src << "<span class='danger'>You are dying from starvation!</span>"
+					to_chat(src, "<span class='danger'>You are dying from starvation!</span>")
 
 				adjustToxLoss(STARVATION_TOX_DAMAGE)
 				adjustBrainLoss(STARVATION_BRAIN_DAMAGE)
@@ -1257,15 +1259,15 @@
 
 	if (water < 200 && water >= 150)
 		if (prob(3))
-			src << "<span class = 'warning'>You're getting a bit thirsty.</span>"
+			to_chat(src, "<span class = 'warning'>You're getting a bit thirsty.</span>")
 
 	else if (water < 150 && water >= 100)
 		if (prob(4))
-			src << "<span class = 'warning'>You're pretty thirsty.</span>"
+			to_chat(src, "<span class = 'warning'>You're pretty thirsty.</span>")
 
 	else if (water < 100 && water >= 20)
 		if (prob(5))
-			src << "<span class = 'danger'>You're really thirsty!</span>"
+			to_chat(src, "<span class = 'danger'>You're really thirsty!</span>")
 
 	else if (water < 20) //Nutrition is below 20 = dehydration
 
@@ -1284,7 +1286,7 @@
 				if (sleeping) return
 
 				if (!informed_dehydration[num2text(-DEHYDRATION_NOTICE)])
-					src << "<span class='warning'>[pick("You're very thirsty.","You really could use some water right now.")]</span>"
+					to_chat(src, "<span class='warning'>[pick("You're very thirsty.","You really could use some water right now.")]</span>")
 
 				informed_dehydration[num2text(-DEHYDRATION_NOTICE)] = TRUE
 				informed_dehydration[num2text(-DEHYDRATION_WEAKNESS)] = FALSE
@@ -1292,13 +1294,13 @@
 				informed_dehydration[num2text(-DEHYDRATION_NEGATIVE_INFINITY)] = FALSE
 
 				if (prob(10))
-					src << "<span class='warning'>[pick("You're very thirsty.","You really could use some water right now.")]</span>"
+					to_chat(src, "<span class='warning'>[pick("You're very thirsty.","You really could use some water right now.")]</span>")
 
 			if (DEHYDRATION_WEAKNESS to DEHYDRATION_NOTICE)
 				if (sleeping) return
 
 				if (!informed_dehydration[num2text(-DEHYDRATION_WEAKNESS)])
-					src << "<span class='danger'>[pick(thirst_phrases)]</span>"
+					to_chat(src, "<span class='danger'>[pick(thirst_phrases)]</span>")
 
 				informed_dehydration[num2text(-DEHYDRATION_NOTICE)] = TRUE
 				informed_dehydration[num2text(-DEHYDRATION_WEAKNESS)] = TRUE
@@ -1308,20 +1310,20 @@
 				if (prob(6)) //6% chance of a tiny amount of toxin damage (1-5)
 
 					adjustToxLoss(rand(1,5))
-					src << "<span class='danger'>[pick(thirst_phrases)]</span>"
+					to_chat(src, "<span class='danger'>[pick(thirst_phrases)]</span>")
 
 				else if (prob(5)) //5% chance of being weakened
 
 					eye_blurry += 10
 					Weaken(10)
 					adjustToxLoss(rand(1,15))
-					src << "<span class='danger'>You're dehydrating! The lack of strength makes you black out for a few moments...</span>"
+					to_chat(src, "<span class='danger'>You're dehydrating! The lack of strength makes you black out for a few moments...</span>")
 
 			if (DEHYDRATION_NEARDEATH to DEHYDRATION_WEAKNESS) //5-30, 5% chance of weakening and TRUE-230 oxygen damage. 5% chance of a seizure. 10% chance of dropping item
 				if (sleeping) return
 
 				if (!informed_dehydration[num2text(-DEHYDRATION_NEARDEATH)])
-					src << "<span class='danger'>You're dehydrating. You feel your life force slowly leaving your body...</span>"
+					to_chat(src, "<span class='danger'>You're dehydrating. You feel your life force slowly leaving your body...</span>")
 
 				informed_dehydration[num2text(-DEHYDRATION_NOTICE)] = TRUE
 				informed_dehydration[num2text(-DEHYDRATION_WEAKNESS)] = TRUE
@@ -1331,7 +1333,7 @@
 				if (prob(7))
 
 					adjustToxLoss(rand(1,20))
-					src << "<span class='danger'>You're dehydrating. You feel your life force slowly leaving your body...</span>"
+					to_chat(src, "<span class='danger'>You're dehydrating. You feel your life force slowly leaving your body...</span>")
 					eye_blurry += 20
 					if (weakened < 1) Weaken(20)
 
@@ -1347,7 +1349,7 @@
 			if (-INFINITY to DEHYDRATION_NEARDEATH) //Fuck the whole body up at this point
 
 				if (!informed_dehydration[num2text(-DEHYDRATION_NEGATIVE_INFINITY)])
-					src << "<span class='danger'>You are dying from dehydration!</span>"
+					to_chat(src, "<span class='danger'>You are dying from dehydration!</span>")
 
 				informed_dehydration[num2text(-DEHYDRATION_NOTICE)] = TRUE
 				informed_dehydration[num2text(-DEHYDRATION_WEAKNESS)] = TRUE
@@ -1355,7 +1357,7 @@
 				informed_dehydration[num2text(-DEHYDRATION_NEGATIVE_INFINITY)] = TRUE
 
 				if (prob(10))
-					src << "<span class='danger'>You are dying from dehydration!</span>"
+					to_chat(src, "<span class='danger'>You are dying from dehydration!</span>")
 
 				adjustToxLoss(DEHYDRATION_TOX_DAMAGE)
 				adjustBrainLoss(DEHYDRATION_BRAIN_DAMAGE)
@@ -1369,8 +1371,8 @@
 		shock_stage = 0
 		return
 
-	var/traumatic_shock = get_shock()
-	if(traumatic_shock >= max(30, 0.8*shock_stage))
+	var/traumatic_shock = updateshock()
+	if (traumatic_shock >= 80 && shock_stage < 160)
 		shock_stage += 1
 	else
 		shock_stage = min(shock_stage, 160)
@@ -1431,8 +1433,6 @@
 
 		if (base_faction)
 			var/image/holder = hud_list[FACTION_TO_ENEMIES]
-			holder.icon = null
-			holder.icon_state = null
 			hud_list[FACTION_TO_ENEMIES] = holder
 
 			var/image/holder2 = hud_list[BASE_FACTION]
@@ -1603,6 +1603,18 @@
 						holder2.icon_state = "sov_basic"
 					else if (map.ID == MAP_EFT_FACTORY)
 						holder2.icon_state = "none"
+					else if (map.ID == MAP_WIZARD_BOY)
+						switch(faction)
+							if("Rubywyrm")
+								holder2.icon_state = "civ1"
+							if("Mintysnek")
+								holder2.icon_state = "civ2"
+							if("Slatepie")
+								holder2.icon_state = "civ3"
+							if("Mustardweasel")
+								holder2.icon_state = "civ4"
+						if(nationality == "T") // teacher/professor
+							holder2.icon_state = "wizard_teacher"
 					else if (map.ID == MAP_GULAG13)
 						if(nationality == "Polish")
 							holder2.icon_state = "pol_basic"
@@ -1635,7 +1647,27 @@
 					holder2.icon_state = "blugoslavia"
 				if (REDFACTION)
 					holder2.icon_state = "redmenia"
+				if (CAFR)
+					holder2.icon_state = "civ1"
+				if (TSFSR)
+					holder2.icon_state = "sov_basic"
 			holder2.overlays.Cut()
+			if (map && map.ID == MAP_WIZARD_BOY && faction_text == CIVILIAN)
+				switch(nationality)
+					if("R") // loser
+						holder2.overlays += icon(holder2.icon,"wizard_loser")
+					if("0") // idiot
+						holder2.overlays += icon(holder2.icon,"wizard_idiot")
+					if("1") // unga
+						holder2.overlays += icon(holder2.icon,"wizard_unga")
+					if("2") // coal
+						holder2.overlays += icon(holder2.icon,"wizard_coal")
+					if("3") // slate
+						holder2.overlays += icon(holder2.icon,"wizard_gem")
+					if("4") // based
+						holder2.overlays += icon(holder2.icon,"wizard_based")
+					if("5") // chad
+						holder2.overlays += icon(holder2.icon,"wizard_chad")
 			if (faction_text == CIVILIAN && map.ID == MAP_GULAG13)
 				switch(original_job_title)
 					if ("Janitor")
@@ -1650,11 +1682,20 @@
 						holder2.overlays += icon(holder2.icon,"role_builder")
 					if ("Logger")
 						holder2.overlays += icon(holder2.icon,"role_logger")
+			if (faction_text == CIVILIAN && map.ID == MAP_BAGNE13)
+				switch(original_job_title)
+					
+					if ("Cuistot")
+						holder2.overlays += icon(holder2.icon,"role_kitchen")
+					if ("Infirmier")
+						holder2.overlays += icon(holder2.icon,"role")
+					if ("Bucheron")
+						holder2.overlays += icon(holder2.icon,"role_logger")
 			if (original_job.uses_squads)
 				if (faction_text == CIVILIAN && map.ID == MAP_OCCUPATION)
 					holder2.icon_state = ""
 
-				if(map.ID == MAP_CAMPAIGN || map.ID == MAP_ROTSTADT || map.ID == MAP_BATTLE_SHIPS)
+				if(map.ID == MAP_CAMPAIGN || map.ID == MAP_ROTSTADT || map.ID == MAP_BATTLE_SHIPS || map.ID == CAMPAIGN_MAP_LIST_MAPID_OR)
 					switch (squad)
 						if (4)
 							holder2.overlays += icon(holder2.icon,"squad_recon")
@@ -1707,7 +1748,7 @@
 						holder2.icon_state = ""
 					else
 						holder2.overlays += icon(holder2.icon,"nco")
-			if (map.ID == MAP_CAMPAIGN || map.ID == MAP_OPERATION_FALCON || map.ID == MAP_VADSO_CITY)
+			if (map.ID == MAP_CAMPAIGN || map.ID == MAP_OPERATION_FALCON || map.ID == MAP_VADSO_CITY || map.ID == CAMPAIGN_MAP_LIST_MAPID_OR)
 				if (original_job.is_commander)
 					to_chat(world, "<font color='green' size=4>[ckey] is now the <b>[capitalize(lowertext(faction_text))] Army</b> Commander!</font>")
 			if (original_job.is_medic)
@@ -1742,7 +1783,7 @@
 		return
 
 	if (prob(10))
-		src << pick(SPAN_DANGER("<big>OH MY GOD I AM ON FIRE!!!</big>"), SPAN_DANGER("<big>PUT IT OUT!!!</big>"), SPAN_DANGER("<big>I AM BURNING ALIVE!!!</big>"), SPAN_DANGER("<big>MY SKIN IS PEELING OFF!!!</big>"))
+		to_chat(src, pick(SPAN_DANGER("<big>OH MY GOD I AM ON FIRE!!!</big>"), SPAN_DANGER("<big>PUT IT OUT!!!</big>"), SPAN_DANGER("<big>I AM BURNING ALIVE!!!</big>"), SPAN_DANGER("<big>MY SKIN IS PEELING OFF!!!</big>")))
 		emote("scream")
 
 	var/burn_temperature = fire_burn_temperature()
@@ -1858,7 +1899,7 @@
 		spawn(300)
 			if (buriedalive && stat != DEAD)
 				adjustOxyLoss(5)
-				src << "<span class='danger'>You can't breathe!</span>"
+				to_chat(src, "<span class='danger'>You can't breathe!</span>")
 
 
 /mob/living/human/proc/process_addictions(drug = null, value = 0)
@@ -1918,21 +1959,21 @@
 					if (0 to 13)
 						if (prob(5))
 							emote("shiver")
-							src << "You feel slightly sick."
+							to_chat(src, "You feel slightly sick.")
 						return
 					if (13 to 25)
 						if (prob(10))
 							custom_pain("You feel a slight itch.",0)
 						if (prob(8))
 							emote("shiver")
-							src << "You feel sick."
+							to_chat(src, "You feel sick.")
 						return
 					if (25 to 48)
 						if (prob(10))
 							custom_pain("Your body itches all over.",1)
 						if (prob(11))
 							emote("shiver")
-							src << "You feel sick."
+							to_chat(src, "You feel sick.")
 						if (prob(6))
 							vomit()
 						return
@@ -2035,13 +2076,13 @@
 			if (/*!istype(O,/obj/item/weapon/implant) && */prob(2)) //Moving with things stuck in you could be bad.
 				// All kinds of embedded objects cause bleeding.
 				if (species.flags & NO_PAIN)
-					src << "<span class='warning'>You feel [O] moving inside your [organ.name].</span>"
+					to_chat(src, "<span class='warning'>You feel [O] moving inside your [organ.name].</span>")
 				else
 					var/msg = pick( \
 						"<span class='warning'>A spike of pain jolts your [organ.name] as you bump [O] inside.</span>", \
 						"<span class='warning'>Your movement jostles [O] in your [organ.name] painfully.</span>", \
 						"<span class='warning'>Your movement jostles [O] in your [organ.name] painfully.</span>")
-					src << msg
+					to_chat(src, msg)
 
 				organ.take_damage(rand(1,3), FALSE, FALSE)
 				if (!(species.flags & NO_BLOOD)) //There is no blood in protheses.

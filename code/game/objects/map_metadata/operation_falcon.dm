@@ -2,7 +2,8 @@
 /obj/map_metadata/operation_falcon
 	ID = MAP_OPERATION_FALCON
 	title = "Operation Falcon"
-	lobby_icon = 'icons/lobby/operation_falcon.png'
+	description = "Points are added to each team for each minute they control the different objectives. First team to reach 100 points wins!"
+	lobby_icon = "icons/lobby/operation_falcon.png"
 	no_winner = "The battle for the city is still going on."
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/one,/area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 90 SECONDS
@@ -24,9 +25,9 @@
 	faction2 = RUSSIAN
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET, WEATHER_EXTREME)
 	songs = list(
-		"Doe Maar - The Bomb (De Bom):1" = 'sound/music/de_bom.ogg',)
+		"Doe Maar - The Bomb (De Bom):1" = "sound/music/de_bom.ogg",)
 	gamemode = "Area Control"
-	ambience = list('sound/ambience/battle1.ogg')
+	ambience = list("sound/ambience/battle1.ogg")
 	var/rus_points = 0
 	var/dutch_points = 0
 	var/win_points = 100 // Amount of points needed to win
@@ -56,13 +57,6 @@
 		spawn(rand(500,800))
 			jet_flyby()
 
-/obj/map_metadata/operation_falcon/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_operation_falcon == TRUE)
-		. = TRUE
-	else
-		. = FALSE
-
 /obj/map_metadata/operation_falcon/roundend_condition_def2name(define)
 	..()
 	switch (define)
@@ -90,7 +84,7 @@
 /obj/map_metadata/operation_falcon/cross_message(faction)
 	switch (faction)
 		if (DUTCH)
-			var/warning_sound = sound('sound/effects/siren_once.ogg', repeat = FALSE, wait = TRUE, channel = 780)
+			var/warning_sound = sound("sound/effects/siren_once.ogg", repeat = FALSE, wait = TRUE, channel = 780)
 			for (var/mob/M in player_list)
 				if (M.client)
 					M.client << warning_sound
@@ -128,9 +122,9 @@
 				dutch_points++
 			else
 				cust_color = "white"
-			world << "<big><b>[a1_name]</b>: <font color='[cust_color]'>[a1_control]</font></big>"
+			to_chat(world, "<big><b>[a1_name]</b>: <font color='[cust_color]'>[a1_control]</font></big>")
 		else
-			world << "<big><b>[a1_name]</b>: Nobody</big>"
+			to_chat(world, "<big><b>[a1_name]</b>: Nobody</big>")
 		c1 = 0
 		c2 = 0
 		for (var/mob/living/human/H in player_list)
@@ -158,9 +152,9 @@
 				dutch_points++
 			else
 				cust_color = "white"
-			world << "<big><b>[a2_name]</b>: <font color='[cust_color]'>[a2_control]</font></big>"
+			to_chat(world, "<big><b>[a2_name]</b>: <font color='[cust_color]'>[a2_control]</font></big>")
 		else
-			world << "<big><b>[a2_name]</b>: Nobody</big>"
+			to_chat(world, "<big><b>[a2_name]</b>: Nobody</big>")
 		c1 = 0
 		c2 = 0
 		for (var/mob/living/human/H in player_list)
@@ -188,9 +182,9 @@
 				dutch_points++
 			else
 				cust_color = "white"
-			world << "<big><b>[a3_name]</b>: <font color='[cust_color]'>[a3_control]</font></big>"
+			to_chat(world, "<big><b>[a3_name]</b>: <font color='[cust_color]'>[a3_control]</font></big>")
 		else
-			world << "<big><b>[a3_name]</b>: Nobody</big>"
+			to_chat(world, "<big><b>[a3_name]</b>: Nobody</big>")
 		c1 = 0
 		c2 = 0
 		for (var/mob/living/human/H in player_list)
@@ -218,9 +212,9 @@
 				dutch_points++
 			else
 				cust_color = "white"
-			world << "<big><b>[a4_name]</b>: <font color='[cust_color]'>[a4_control]</font></big>"
+			to_chat(world, "<big><b>[a4_name]</b>: <font color='[cust_color]'>[a4_control]</font></big>")
 		else
-			world << "<big><b>[a4_name]</b>: Nobody</big>"
+			to_chat(world, "<big><b>[a4_name]</b>: Nobody</big>")
 
 	switch (a1_control)
 		if ("Dutch Royal Army")
@@ -274,9 +268,9 @@
 	spawn(600) // 1 minute
 		points_check()
 		spawn(5)
-			world << "<big><b>Current Points:</big></b>"
-			world << "<big>Dutch: [dutch_points]</big>"
-			world << "<big>Russian: [rus_points]</big>"
+			to_chat(world, "<big><b>Current Points:</b></big>")
+			to_chat(world, "<big>Dutch: [dutch_points]</big>")
+			to_chat(world, "<big>Russian: [rus_points]</big>")
 
 /obj/map_metadata/operation_falcon/update_win_condition()
 	if (processes.ticker.playtime_elapsed > 3000)
@@ -287,9 +281,9 @@
 				return FALSE
 			ticker.finished = TRUE
 			var/message = "The <b>Russians</b> have reached [rus_points] points and claimed victory in Operation Falcon!"
-			world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+			to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 
-			var/anthem = sound('sound/music/russian_anthem.ogg', repeat = FALSE, wait = FALSE, volume = 100, channel = 775)
+			var/anthem = sound("sound/music/russian_anthem.ogg", repeat = FALSE, wait = FALSE, volume = 100, channel = 775)
 			for (var/mob/M in player_list)
 				if (M.client)
 					M.client << anthem
@@ -302,9 +296,9 @@
 				return FALSE
 			ticker.finished = TRUE
 			var/message = "The <b>Dutch</b> have reached [dutch_points] points and claimed victory in Operation Falcon!"
-			world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+			to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 			
-			var/anthem = sound('sound/music/dutch_anthem.ogg', repeat = FALSE, wait = FALSE, volume = 100, channel = 775)
+			var/anthem = sound("sound/music/dutch_anthem.ogg", repeat = FALSE, wait = FALSE, volume = 100, channel = 775)
 			for (var/mob/M in player_list)
 				if (M.client)
 					M.client << anthem
@@ -337,15 +331,15 @@
 			var/sound/uploaded_sound
 			switch (direction)
 				if (1)
-					uploaded_sound = sound('sound/effects/aircraft/f16_left-right.ogg', repeat = FALSE, wait = TRUE, channel = 777)
+					uploaded_sound = sound("sound/effects/aircraft/f16_left-right.ogg", repeat = FALSE, wait = TRUE, channel = 777)
 				if (2)
-					uploaded_sound = sound('sound/effects/aircraft/f16_center.ogg', repeat = FALSE, wait = TRUE, channel = 777)
+					uploaded_sound = sound("sound/effects/aircraft/f16_center.ogg", repeat = FALSE, wait = TRUE, channel = 777)
 				if (3)
-					uploaded_sound = sound('sound/effects/aircraft/f16_right-left.ogg', repeat = FALSE, wait = TRUE, channel = 777)
+					uploaded_sound = sound("sound/effects/aircraft/f16_right-left.ogg", repeat = FALSE, wait = TRUE, channel = 777)
 			uploaded_sound.priority = 250
 			for (var/mob/M in player_list)
 				if (!new_player_mob_list.Find(M))
-					M << SPAN_NOTICE("<font size=3>The air rumbles as a F-16 flies overhead.</font>")
+					to_chat(M, SPAN_NOTICE("<font size=3>The air rumbles as a F-16 flies overhead.</font>"))
 					if (M.client)
 						M.client << uploaded_sound
 		if(2)
@@ -353,15 +347,15 @@
 			var/sound/uploaded_sound
 			switch (direction)
 				if (1)
-					uploaded_sound = sound('sound/effects/aircraft/su25_left-right.ogg', repeat = FALSE, wait = TRUE, channel = 777)
+					uploaded_sound = sound("sound/effects/aircraft/su25_left-right.ogg", repeat = FALSE, wait = TRUE, channel = 777)
 				if (2)
-					uploaded_sound = sound('sound/effects/aircraft/su25_center.ogg', repeat = FALSE, wait = TRUE, channel = 777)
+					uploaded_sound = sound("sound/effects/aircraft/su25_center.ogg", repeat = FALSE, wait = TRUE, channel = 777)
 				if (3)
-					uploaded_sound = sound('sound/effects/aircraft/su25_right-left.ogg', repeat = FALSE, wait = TRUE, channel = 777)
+					uploaded_sound = sound("sound/effects/aircraft/su25_right-left.ogg", repeat = FALSE, wait = TRUE, channel = 777)
 			uploaded_sound.priority = 250
 			for (var/mob/M in player_list)
 				if (!new_player_mob_list.Find(M))
-					M << SPAN_NOTICE("<font size=3>The air rumbles as a Su-25 flies overhead.</font>")
+					to_chat(M, SPAN_NOTICE("<font size=3>The air rumbles as a Su-25 flies overhead.</font>"))
 					if (M.client)
 						M.client << uploaded_sound
 		if(3)
@@ -370,22 +364,22 @@
 			var/sound/uploaded_sound2
 			switch (direction)
 				if (1)
-					uploaded_sound1 = sound('sound/effects/aircraft/su25_left-right.ogg', repeat = FALSE, wait = TRUE, channel = 777)
+					uploaded_sound1 = sound("sound/effects/aircraft/su25_left-right.ogg", repeat = FALSE, wait = TRUE, channel = 777)
 					if (prob(80))
-						uploaded_sound2 = sound('sound/effects/aircraft/f16_left-right_firing.ogg', repeat = FALSE, wait = TRUE, channel = 776)
+						uploaded_sound2 = sound("sound/effects/aircraft/f16_left-right_firing.ogg", repeat = FALSE, wait = TRUE, channel = 776)
 					else
-						uploaded_sound2 = sound('sound/effects/aircraft/f16_left-right.ogg', repeat = FALSE, wait = TRUE, channel = 776)
+						uploaded_sound2 = sound("sound/effects/aircraft/f16_left-right.ogg", repeat = FALSE, wait = TRUE, channel = 776)
 				if (2)
-					uploaded_sound1 = sound('sound/effects/aircraft/su25_right-left.ogg', repeat = FALSE, wait = TRUE, channel = 777)
+					uploaded_sound1 = sound("sound/effects/aircraft/su25_right-left.ogg", repeat = FALSE, wait = TRUE, channel = 777)
 					if (prob(80))
-						uploaded_sound2 = sound('sound/effects/aircraft/f16_right-left_firing.ogg', repeat = FALSE, wait = TRUE, channel = 776)
+						uploaded_sound2 = sound("sound/effects/aircraft/f16_right-left_firing.ogg", repeat = FALSE, wait = TRUE, channel = 776)
 					else
-						uploaded_sound2 = sound('sound/effects/aircraft/f16_right-left.ogg', repeat = FALSE, wait = TRUE, channel = 776)
+						uploaded_sound2 = sound("sound/effects/aircraft/f16_right-left.ogg", repeat = FALSE, wait = TRUE, channel = 776)
 			uploaded_sound1.priority = 250
 			uploaded_sound2.priority = 250
 			for (var/mob/M in player_list)
 				if (!new_player_mob_list.Find(M))
-					M << SPAN_DANGER("<font size=4>The air lights up as a Su-25 and a pursuing F-16 fly overhead.</font>")
+					to_chat(M, SPAN_DANGER("<font size=4>The air lights up as a Su-25 and a pursuing F-16 fly overhead.</font>"))
 					if (M.client)
 						M.client << uploaded_sound1
 					spawn(5 SECONDS)

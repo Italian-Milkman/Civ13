@@ -1,7 +1,6 @@
 #define BURNING_RAG_LIFE_TICKS 10000 // pretty much forever
 
 /obj/item/clothing/gloves
-	var/transfer_blood = FALSE
 	var/mob/living/human/bloody_hands_mob
 
 /obj/item/clothing/shoes/
@@ -55,7 +54,7 @@
 				if (on_fire)
 					visible_message("<span class='warning'>\The [user] lights [src] with [W].</span>")
 				else
-					user << "<span class='warning'>You manage to singe [src], but fail to light it. Maybe you should wet it.</span>"
+					to_chat(user, "<span class='warning'>You manage to singe [src], but fail to light it. Maybe you should wet it.</span>")
 	. = ..()
 	update_name()
 
@@ -96,7 +95,7 @@
 
 /obj/item/weapon/reagent_containers/glass/rag/proc/wipe_down(atom/A, mob/user)
 	if (!reagents.total_volume)
-		user << "<span class='warning'>The [initial(name)] is dry!</span>"
+		to_chat(user, "<span class='warning'>The [initial(name)] is dry!</span>")
 	else
 		user.visible_message("\The [user] starts to wipe down [A] with [src]!")
 		reagents.splash(A, TRUE) //get a small amount of liquid on the thing we're wiping.
@@ -137,7 +136,7 @@
 
 	if (istype(A, /obj/structure/reagent_dispensers))
 		if (!reagents.get_free_space())
-			user << "<span class='warning'>\The [src] is already soaked.</span>"
+			to_chat(user, "<span class='warning'>\The [src] is already soaked.</span>")
 			return
 
 		if (A.reagents && A.reagents.trans_to_obj(src, reagents.maximum_volume))

@@ -54,9 +54,13 @@ var/list/radio_prefixes = list(";", ":b", ":l", ":r", ":t", ":f",
 	return verb
 
 /mob/living/say(var/message, var/datum/language/speaking = null, var/verb="says", var/alt_name = "", var/alt_message=null, var/animal = FALSE, var/howl = FALSE, var/original_message = "")
+	if (choked_by)
+		to_chat(src, "<span class='warning'>You cannot speak while being choked!</span>")
+		return
+
 	if (client)
 		if (client.prefs.muted & MUTE_IC)
-			src << "<span class = 'red'>You cannot speak in IC (Muted).</span>"
+			to_chat(src, "<span class = 'red'>You cannot speak in IC (Muted).</span>")
 			return
 
 	if (stat)
@@ -142,8 +146,8 @@ var/list/radio_prefixes = list(";", ":b", ":l", ":r", ":t", ":f",
 		for (var/I in hear)
 			if (ismob(I))
 				var/mob/M = I
-				listening += M
-				hearturfs += M.locs[1]
+				listening |= M
+				hearturfs |= M.locs[1]
 			else if (isobj(I))
 				var/obj/O = I
 				hearturfs += O.locs[1]
@@ -153,7 +157,7 @@ var/list/radio_prefixes = list(";", ":b", ":l", ":r", ":t", ":f",
 			if (M.stat == DEAD && M.is_preference_enabled(/datum/client_preference/ghost_ears))
 				listening |= M
 				continue
-			if (M.loc && M.locs[1] in hearturfs)
+			if (M.loc && (M.locs[1] in hearturfs))
 				listening |= M
 
 	var/speech_bubble_test = say_test(message)
@@ -163,7 +167,7 @@ var/list/radio_prefixes = list(";", ":b", ":l", ":r", ":t", ":f",
 	for (var/mob/M in listening)
 		if (howl)
 			verb = "howls"
-		M << speech_bubble
+		to_chat(M, speech_bubble)
 		M.hear_say(message, verb, speaking, alt_name, italics, src, speech_sound, sound_vol, alt_message, animal, original_message)
 
 	for (var/obj/O in listening_obj)

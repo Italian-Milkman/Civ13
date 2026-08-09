@@ -7,14 +7,6 @@ var/list/exterior_turfs = list(/turf/floor/grass,
 var/list/interior_areas = list(/area/caribbean/houses,
 							)
 
-// atmos stuff
-///turf/var/zone/zone
-/turf/var/open_directions
-
-///turf/var/needs_air_update = FALSE
-///turf/var/datum/gas_mixture/air
-
-
 /turf
 	name = "turf"
 	icon = 'icons/turf/floors.dmi'
@@ -36,7 +28,6 @@ var/list/interior_areas = list(/area/caribbean/houses,
 	var/calcborders = FALSE //if borders were calculated already. To prevent both sides creating borders over each other.
 
 	var/wet = FALSE
-	var/image/wet_overlay = null
 	var/water_level = 0 // For flooding
 	var/is_diggable = FALSE //can be digged with a shovel?
 	var/is_plowed = FALSE // ready to be farmed?
@@ -47,34 +38,20 @@ var/list/interior_areas = list(/area/caribbean/houses,
 //	var/list/resources
 
 	var/to_be_destroyed = FALSE //Used for fire, if a melting temperature was reached, it will be destroyed
-	var/max_fire_temperature_sustained = FALSE //The max temperature of the fire which it was subjected to
 	var/dirt = FALSE
 
 //	var/datum/scheduled_task/flooding_task
 	var/interior = TRUE
 	var/stepsound = null
 	var/floor_type= null
-	var/intact = TRUE
 
 	// for digging out dirt
 	var/available_dirt = 0
 	var/available_sand = 0
 	var/available_snow = 0
 	var/bullethole_count = 0
-	var/overlay_priority = 0
 
 	map_storage_saved_vars = "icon_state;name"
-
-/turf/New()
-	..()
-	for (var/atom/movable/AM as mob|obj in src)
-		spawn( FALSE )
-			Entered(AM)
-			return
-	if (ticker && ticker.current_state == GAME_STATE_PLAYING)
-		new_turfs |= src
-	turfs |= src
-
 
 /turf/CanPass(atom/movable/mover, turf/target, height=1.5,air_group=0)
 	if (!target) return FALSE
@@ -115,12 +92,6 @@ var/list/interior_areas = list(/area/caribbean/houses,
 	..()
 
 /turf/ex_act(severity)
-	return FALSE
-
-/turf/proc/is_space()
-	return FALSE
-
-/turf/proc/is_intact()
 	return FALSE
 
 /mob/var/next_push = -1
@@ -171,7 +142,7 @@ var/list/interior_areas = list(/area/caribbean/houses,
 
 /turf/Enter(atom/movable/mover as mob|obj, atom/forget as mob|obj|turf|area)
 	if (movement_disabled && usr.ckey != movement_disabled_exception)
-		usr << "<span class='warning'>Movement is admin-disabled.</span>" //This is to identify lag problems
+		to_chat(usr, "<span class='warning'>Movement is admin-disabled.</span>") //This is to identify lag problems
 		return
 
 	..()
@@ -217,7 +188,7 @@ var/const/enterloopsanity = 100
 /turf/Entered(atom/atom as mob|obj)
 
 	if (movement_disabled)
-		usr << "<span class='warning'>Movement is admin-disabled.</span>" //This is to identify lag problems
+		to_chat(usr, "<span class='warning'>Movement is admin-disabled.</span>") //This is to identify lag problems
 		return
 	..()
 
@@ -236,14 +207,6 @@ var/const/enterloopsanity = 100
 		for (var/atom/movable/thing in range(1))
 			if (objects > enterloopsanity) break
 			objects++
-			spawn(0)
-				if (A)
-					A.HasProximity(thing, TRUE)
-					if ((thing && A) && (thing.flags & PROXMOVE))
-						thing.HasProximity(A, TRUE)
-	return
-
-/turf/proc/adjacent_fire_act(turf/floor/source, temperature, volume)
 	return
 
 /turf/proc/is_plating()
@@ -253,21 +216,6 @@ var/const/enterloopsanity = 100
 	for (var/obj/O in src)
 		O.hide(O.hides_under_flooring() && !is_plating())
 
-/turf/proc/AdjacentTurfs()
-	var/L[] = new()
-	for (var/turf/t in oview(src,1))
-		if (!t.density)
-			if (!LinkBlocked(src, t) && !TurfBlockedNonWindow(t))
-				L.Add(t)
-	return L
-
-/turf/proc/CardinalTurfs()
-	var/L[] = new()
-	for (var/turf/T in AdjacentTurfs())
-		if (T.x == x || T.y == y)
-			L.Add(T)
-	return L
-
 /turf/proc/Distance(turf/t)
 	if (get_dist(src,t) == TRUE)
 		var/cost = (x - t.x) * (x - t.x) + (y - t.y) * (y - t.y)
@@ -275,14 +223,6 @@ var/const/enterloopsanity = 100
 		return cost
 	else
 		return get_dist(src,t)
-
-/turf/proc/AdjacentTurfsSpace()
-	var/L[] = new()
-	for (var/turf/t in oview(src,1))
-		if (!t.density)
-			if (!LinkBlocked(src, t) && !TurfBlockedNonWindow(t))
-				L.Add(t)
-	return L
 
 /turf/proc/process()
 	return PROCESS_KILL
@@ -306,11 +246,8 @@ var/const/enterloopsanity = 100
 			if (istype(O,/obj/effect/decal/cleanable) || istype(O,/obj/effect/overlay))
 				qdel(O)
 	else
-		user << "<span class='warning'>\The [source] is too dry to wash that.</span>"
+		to_chat(user, "<span class='warning'>\The [source] is too dry to wash that.</span>")
 	source.reagents.trans_to_turf(src, TRUE, 10)	//10 is the multiplier for the reaction effect. probably needed to wet the floor properly.
-
-/turf/proc/update_blood_overlays()
-	return
 
 /turf/clean_blood()
 	for (var/obj/effect/decal/cleanable/blood/B in contents)
@@ -319,8 +256,16 @@ var/const/enterloopsanity = 100
 
 /turf/New()
 	..()
-	levelupdate()
+	for (var/atom/movable/AM as mob|obj in src)
+		spawn( FALSE )
+			Entered(AM)
+			return
+	if (ticker && ticker.current_state == GAME_STATE_PLAYING)
+		new_turfs |= src
+	turfs |= src
 
+	levelupdate()
+	calculate_window_coeff()
 
 /turf/proc/initialize()
 	return
@@ -333,7 +278,7 @@ var/const/enterloopsanity = 100
 
 /turf/Entered(atom/A, atom/OL)
 	if (movement_disabled && usr.ckey != movement_disabled_exception)
-		usr << "<span class='danger'>Movement is admin-disabled.</span>" //This is to identify lag problems
+		to_chat(usr, "<span class='danger'>Movement is admin-disabled.</span>") //This is to identify lag problems
 		return
 
 	if (istype(A,/mob/living))
@@ -473,19 +418,11 @@ var/const/enterloopsanity = 100
 
 	if (istype(M))
 		for (var/obj/effect/decal/cleanable/blood/B in contents)
-	/*		if (!B.blood_DNA)
-				B.blood_DNA = list()
-			if (!B.blood_DNA[M.dna.unique_enzymes])
-				B.blood_DNA[M.dna.unique_enzymes] = M.dna.b_type
-				B.virus2 = virus_copylist(M.virus2)*/
 			return TRUE //we bloodied the floor
 		blood_splatter(src,M.get_blood(M.vessel),1)
 		return TRUE //we bloodied the floor
 	return FALSE
 
-
-/turf/proc/can_build_cable(var/mob/user)
-	return FALSE
 
 /turf/proc/try_airstrike(var/ckey, var/faction_text, var/aircraft_name, var/direction = "NORTH", var/payload = "Rockets", var/payload_class = 1, var/admin = FALSE)
 	var/turf/T = src

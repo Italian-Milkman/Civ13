@@ -19,6 +19,7 @@
 	health = 10
 	maxHealth = 10
 	mob_size = MOB_SMALL
+	flying = TRUE
 	stop_automated_movement_when_pulled = FALSE
 	stop_automated_movement = TRUE
 	wander = TRUE
@@ -28,12 +29,3 @@
 	melee_damage_upper = 5
 	wandersounds = list('sound/animals/bat/bats_1.ogg','sound/animals/bat/bats_2.ogg','sound/animals/bat/bats_3.ogg')
 	hostilesounds = list('sound/animals/bat/bats_1.ogg','sound/animals/bat/bats_2.ogg','sound/animals/bat/bats_3.ogg')
-/mob/living/simple_animal/vampirebatblack/New()
-	..()
-
-/mob/living/simple_animal/vampirebatblack/Life()
-	..()
-	return
-
-/mob/living/simple_animal/vampirebatblack/bullet_act(var/obj/item/projectile/Proj)
-	return

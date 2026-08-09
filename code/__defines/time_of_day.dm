@@ -10,7 +10,8 @@ var/list/time_of_day2luminosity = list(
 	"Afternoon" = BASIC_LIGHT_AMOUNT * 18,
 	"Midday" = MAX_LIGHT_AMOUNT,
 	"Evening" = BASIC_LIGHT_AMOUNT * 7,
-	"Night" = BASIC_LIGHT_AMOUNT * 2,)
+	"Night" = BASIC_LIGHT_AMOUNT * 2,
+	"Dark Night" = 0)
 
 var/list/time_of_day2ticks = list(
 	"Early Morning" = 20*60,
@@ -19,11 +20,6 @@ var/list/time_of_day2ticks = list(
 	"Midday" = 20*60,
 	"Evening" = 20*60,
 	"Night" = 20*60,)
-
-/proc/isDarkOutside()
-	if (list("Evening", "Night").Find(time_of_day))
-		return TRUE
-	return FALSE
 
 /proc/pick_TOD()
 
@@ -49,7 +45,7 @@ var/list/time_of_day2ticks = list(
 			return pick(c_times_of_day)
 	#endif
 
-/proc/progress_time_of_day(var/caller = null, var/force = FALSE)
+/proc/progress_time_of_day(var/caller_ref = null, var/force = FALSE)
 	if(config.daynight_on || force)
 		var/TOD_position_in_list = 1
 		for (var/v in 1 to times_of_day.len)
@@ -62,7 +58,7 @@ var/list/time_of_day2ticks = list(
 
 		for (var/v in 1 to times_of_day.len)
 			if (v == TOD_position_in_list)
-				update_lighting(times_of_day[v], admincaller = caller)
+				update_lighting(times_of_day[v], admincaller = caller_ref)
 
 /proc/TOD_loop()
 	spawn while (1)

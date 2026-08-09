@@ -13,17 +13,14 @@
 	silencer_fire_sound = 'sound/weapons/guns/fire/Glock17-SD.ogg'
 	maxhealth = 45
 	gtype = "pistol"
-	accuracy_increase_mod = 1.50
-	accuracy_decrease_mod = 2.00
 	KD_chance = KD_CHANCE_MEDIUM
 	stat = "pistol"
-	aim_miss_chance_divider = 2.00
 	barrel_x_offset = 17
 	barrel_y_offset = 0
 
 /obj/item/weapon/gun/projectile/pistol/attackby(obj/W as obj, mob/user as mob)
 	if (istype(W, /obj/item/weapon/attachment/bayonet))
-		user << "<span class = 'danger'>That won't fit on there.</span>"
+		to_chat(user, "<span class = 'danger'>That won't fit on there.</span>")
 		return FALSE
 	else
 		return ..()

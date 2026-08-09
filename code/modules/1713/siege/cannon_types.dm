@@ -130,7 +130,7 @@
 	desc = "A barebones cannon made to be carried by vehicles."
 	autoloader = TRUE
 
-/obj/structure/cannon/modern/tank/voyage
+/obj/structure/cannon/modern/voyage
 	spritemod = TRUE
 	w_class = ITEM_SIZE_HUGE
 	maxrange = 35
@@ -147,7 +147,7 @@
 	anchored = TRUE
 	ammotype = /obj/item/cannon_ball
 
-/obj/structure/cannon/modern/tank/voyage/autofire //npc cannon
+/obj/structure/cannon/modern/voyage/autofire //npc cannon
 	var/stopfiring = FALSE
 	attack_hand(mob/user)
 		return
@@ -190,12 +190,12 @@
 			if (!TF)
 				return FALSE
 
-			var/obj/item/projectile/shell/S = new loaded.subtype(loc)
-			S.damage = loaded.damage
-			S.atype = loaded.atype
-			S.caliber = loaded.caliber
-			S.heavy_armor_penetration = loaded.heavy_armor_penetration
-			S.name = loaded.name
+			var/obj/item/projectile/shell/S = new W.subtype(loc)
+			S.damage = W.damage
+			S.atype = W.atype
+			S.caliber = W.caliber
+			S.heavy_armor_penetration = W.heavy_armor_penetration
+			S.name = W.name
 			S.starting = get_turf(src)
 			loaded = null
 			if (S.atype == "grapeshot")
@@ -226,7 +226,7 @@
 			spawn (rand(1,2))
 				var/turf/t1 = get_turf(src)
 				playsound(t1, "artillery_out", 100, TRUE)
-				playsound(t1, "artillery_out_distant", 100, TRUE)
+				playsound(t1, "artillery_out_distance", 100, TRUE)
 
 /obj/structure/cannon/modern/tank/german75
 	name = "7.5cm KwK 40"
@@ -506,7 +506,7 @@
 	set name = "Retrieve"
 	set src in range(1, usr)
 	if (usr.l_hand && usr.r_hand)
-		usr << (SPAN_WARNING("You need to have a hand free to do this."))
+		to_chat(usr, (SPAN_WARNING("You need to have a hand free to do this.")))
 		return
 	usr.face_atom(src)
 	visible_message(SPAN_WARNING("[usr] starts to get \the [src] from the ground."))
@@ -526,7 +526,7 @@
 /obj/structure/cannon/mortar/foldable/attackby(obj/item/I as obj, mob/M as mob)
 	if (istype(I, ammotype))
 		if (loaded.len)
-			M << "<span class = 'warning'>There's already a [loaded[1]] loaded.</span>"
+			to_chat(M, "<span class = 'warning'>There's already a [loaded[1]] loaded.</span>")
 			return
 		// load first and only slot
 		if (do_after(M, 45, src, can_move = TRUE))
@@ -541,8 +541,6 @@
 	layer = MOB_LAYER + 1 //just above mobs
 	density = TRUE
 	icon_state = "m29_davy_crockett_empty"
-	var/icon_state_unloaded = "m29_davy_crockett_empty"
-	var/icon_state_loaded = "m29_davy_crockett_loaded"
 	pixel_x = 0
 	pixel_y = 0
 	bound_height = 32

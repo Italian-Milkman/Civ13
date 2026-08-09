@@ -113,6 +113,31 @@
 	return shock_damage
 
 /mob/living/human/swap_hand()
+	var/obj/item/weapon/material/magic/wand/W = get_active_hand()
+	if (!istype(W))
+		W = get_inactive_hand()
+	if (istype(W) && W.chewing_gum_sticky)
+		if (W.peeling_gum == 2)
+			W.peeling_gum = 0
+		else if (W.peeling_gum == 1)
+			to_chat(src, SPAN_WARNING("You are already peeling \the [W]!"))
+			return
+		else
+			W.peeling_gum = 1
+			to_chat(src, SPAN_WARNING("You start peeling \the [W] off your fingers to swap hands... it's incredibly sticky!"))
+			var/old_loc = loc
+			spawn(0)
+				if (do_after(src, 30, old_loc))
+					if ((get_active_hand() == W || get_inactive_hand() == W) && loc == old_loc)
+						to_chat(src, SPAN_NOTICE("You finally peel \the [W] off and swap hands."))
+						W.peeling_gum = 2
+						swap_hand()
+					else
+						W.peeling_gum = 0
+				else
+					W.peeling_gum = 0
+			return
+
 	hand = !( hand )
 	for (var/obj/screen/inventory/hand/H in HUDinventory)
 		H.update_icon()
@@ -124,18 +149,7 @@
 			unset_using_drone()
 	return
 
-/mob/living/human/proc/activate_hand(var/selhand) //0 or "r" or "right" for right hand; TRUE or "l" or "left" for left hand.
 
-	if (istext(selhand))
-		selhand = lowertext(selhand)
-
-		if (selhand == "right" || selhand == "r")
-			selhand = FALSE
-		if (selhand == "left" || selhand == "l")
-			selhand = TRUE
-
-	if (selhand != hand)
-		swap_hand()
 
 /mob/living/human/proc/help_shake_act(mob/living/human/M)
 	if (health >= config.health_threshold_crit)
@@ -350,7 +364,7 @@
 /mob/living/human/can_use_hands()
 	if (handcuffed)
 		return FALSE
-	if (buckled && !istype(buckled, /obj/structure/bed/chair)) // buckling does not restrict hands
+	if (buckled && !istype(buckled, /obj/structure/bed/chair) && !istype(buckled, /obj/structure/vehicle/magic/mop)) // buckling does not restrict hands
 		return FALSE
 	return TRUE
 
@@ -378,25 +392,11 @@
 
 /mob/living/human/Bump(var/atom/movable/AM, yes)
 	if (istype(AM, /obj/item/football))
-		var/obj/item/football/FB = AM
-		if (!FB.owner && !src.football)
-			FB.owner = src
-			FB.last_owner = src
-			src.football = FB
-			FB.update_movement()
+		football_bump(AM)
 	else if (istype(AM, /mob/living/human))
 		var/mob/living/human/HM = AM
 		if (HM.civilization != src.civilization && (HM.dir == OPPOSITE_DIR(src.dir) || findtext(HM.original_job_title, "goalkeeper") || findtext(src.original_job_title, "goalkeeper")))
-			if (src.football)
-				src.football.last_owner = src
-				src.football.owner = null
-				src.football = null
-				visible_message("[src] bumps into [HM] and loses control of the ball!")
-			else if (HM.football)
-				HM.football.last_owner = HM
-				HM.football.owner = null
-				HM.football = null
-				visible_message("[HM] bumps into [src] and loses control of the ball!")
+			football_bump(AM)
 	if (now_pushing || !yes)
 		return
 	..()
@@ -405,7 +405,7 @@
 	if (buckled)
 		return FALSE
 	stop_pulling()
-	src << "<span class='warning'>You slipped on [slipped_on]!</span>"
+	to_chat(src, "<span class='warning'>You slipped on [slipped_on]!</span>")
 	playsound(loc, 'sound/misc/slip.ogg', 50, TRUE, -3)
 	Stun(stun_duration)
 	Weaken(Floor(stun_duration/2))
@@ -438,10 +438,10 @@
 	<BR><b>Back:</b> <A href='?src=\ref[src];item=back'>[(back ? back : "Nothing")]</A>
 	<BR><A href='?src=\ref[src];item=pockets'>Empty Pockets</A>
 	<BR><A href='?src=\ref[user];refresh=1'>Refresh</A>
-	<BR><A href='?src=\ref[user];mach_close=mob[name]'>Close</A>
+	<BR><A href='?src=\ref[user];mach_close=inventory'>Close</A>
 	<BR>"}
-	user << browse(dat, text("window=mob[];size=325x500", name))
-	onclose(user, "mob[name]")
+	user << browse(dat, "window=inventory;size=325x500")
+	onclose(user, "inventory")
 	return
 
 /mob/living/human/proc/get_fullness()

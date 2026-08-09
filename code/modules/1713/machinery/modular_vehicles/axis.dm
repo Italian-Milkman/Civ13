@@ -222,10 +222,12 @@ var/global/list/tank_names_nato = list("Alpha", "Bravo", "Charlie", "Delta", "Ec
 			for(var/obj/item/ammo_casing/AC in T)
 				if(!AC.BB)
 					qdel(AC) //to prevent the "empty empty empty empty"... spam
-			for(var/obj/item/I in TT && !(I in transporting))
-				qdel(I)
-			for(var/obj/effect/fire/BO in T && !(BO in transporting))
-				qdel(BO)
+			for(var/obj/item/I in TT)
+				if (!(I in transporting))
+					qdel(I)
+			for(var/obj/effect/fire/BO in T)
+				if (!(BO in transporting))
+					qdel(BO)
 			var/canpass = FALSE
 			for(var/obj/covers/CVV in T)
 				if (!CVV.density)
@@ -261,9 +263,6 @@ var/global/list/tank_names_nato = list("Alpha", "Bravo", "Charlie", "Delta", "Ec
 				return TRUE
 			else
 				return FALSE
-		return FALSE
-
-	return TRUE
 
 /obj/structure/vehicleparts/axis/proc/do_move()
 	add_transporting()
@@ -283,7 +282,7 @@ var/global/list/tank_names_nato = list("Alpha", "Bravo", "Charlie", "Delta", "Ec
 				MV.dir = OPPOSITE_DIR(dir)
 			else
 				MV.dir = dir
-			MV.forceMove(get_step(MV.loc, MV.dir))
+			MV.forceMove(get_step(MV.loc, m_dir))
 			MV.update_icon()
 		if (istype(M, /mob/living))
 			var/mob/living/ML = M
@@ -330,7 +329,7 @@ var/global/list/tank_names_nato = list("Alpha", "Bravo", "Charlie", "Delta", "Ec
 /obj/structure/vehicleparts/axis/MouseDrop(var/obj/structure/vehicleparts/frame/VP)
 	if (istype(VP, /obj/structure/vehicleparts/frame) && !VP.axis)
 		playsound(loc, 'sound/effects/lever.ogg',100, TRUE)
-		usr << "You connect \the [src] to \the [VP]."
+		to_chat(usr, "You connect \the [src] to \the [VP].")
 		VP.axis = src
 		VP.anchored = TRUE
 		components += VP
@@ -457,39 +456,38 @@ var/global/list/tank_names_nato = list("Alpha", "Bravo", "Charlie", "Delta", "Ec
 						corners[3] = F
 					if (EAST) // FL
 						corners[2] = F
-	maxdist=1+max(abs(corners[1].x-corners[2].x),abs(corners[1].y-corners[3].y),abs(corners[1].y-corners[2].y),abs(corners[1].x-corners[3].x))
+	if (corners[1] && corners[2] && corners[3])
+		maxdist=1+max(abs(corners[1].x-corners[2].x),abs(corners[1].y-corners[3].y),abs(corners[1].y-corners[2].y),abs(corners[1].x-corners[3].x))
 	for(var/obj/structure/vehicleparts/frame/FM in components)
 		for(var/obj/structure/vehicleparts/movement/MV in wheels)
 			if (!MV.axis && MV.x == FM.x && MV.y == FM.y && MV.z == FM.z)
 				MV.axis = src
 				MV.connected = FM
 				FM.mwheel = MV
+	
 	for(var/obj/structure/vehicleparts/movement/MV in wheels)
 		//Front-Right, Front-Left, Back-Right,Back-Left; FR, FL, BR, BL
 		if (MV.connected == corners[1])
 			MV.reversed = FALSE
 		else if (MV.connected == corners[2])
-			if (MV.ntype == "wheel")
-				MV.reversed = TRUE
-			else
-				MV.reversed = FALSE
+			MV.reversed = FALSE
 		else if (MV.connected == corners[3])
 			if (MV.ntype == "wheel")
-				MV.reversed = TRUE
-			else
 				MV.reversed = FALSE
+			else
+				MV.reversed = TRUE
 		else if (MV.connected == corners[4])
 			if (MV.ntype == "wheel")
-				MV.reversed = TRUE
+				MV.reversed = FALSE
 			else
 				MV.reversed = TRUE
-		else
-			return
-
+		
+		// Immediately sync the direction
 		if (MV.reversed)
 			MV.dir = OPPOSITE_DIR(dir)
 		else
 			MV.dir = dir
+		MV.update_icon()
 	if (corners[1] != null && corners[2] != null && corners[3] != null && corners[4] != null)
 		return TRUE
 	else
@@ -636,7 +634,7 @@ var/global/list/tank_names_nato = list("Alpha", "Bravo", "Charlie", "Delta", "Ec
 					dlocfind = rotation_matrixes4[tdir][loc2textv][1]
 				if (5)
 					dlocfind = rotation_matrixes5[tdir][loc2textv][1]
-//			world.log << "LOG: currloc: [loc2textv] ([matrix_current_locs[loc2textv][1].x],[matrix_current_locs[loc2textv][1].y]), moving to: [rotation_matrixes5[tdir][loc2textv][1]] ([matrix_current_locs[dlocfind][1].x],[matrix_current_locs[dlocfind][1].y])"
+//			world.log << "LOG: currloc: [loc2textv] ([matrix_current_locs[loc2textv][1].x],[matrix_current_locs[loc2textv][1].y]), moving to: [rotation_matrixes5[tdir][loc2textv][1]] ([matrix_current_locs[dlocfind][1].x],[matrix_current_locs[dlocfind][1].y])")
 			if (islist(matrix_current_locs[loc2textv][2]))
 				for (var/obj/effect/pseudovehicle/PV in matrix_current_locs[dlocfind][1])
 					var/turf/toget = matrix_current_locs[dlocfind][1]
@@ -760,6 +758,8 @@ var/global/list/tank_names_nato = list("Alpha", "Bravo", "Charlie", "Delta", "Ec
 				chooseturret += "_turret"
 		dir = 1
 		new/obj/effect/autoassembler(locate(x+2,y-2,z))
+		check_corners()
+		check_matrix()
 		to_chat(H, SPAN_NOTICE("Vehicle assembled."))
 		for (var/obj/O in components)
 			O.update_icon()

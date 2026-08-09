@@ -94,7 +94,7 @@ var/list/global/floor_cache = list()
 	if (istype (C, /obj/item/weapon/barrier) && !istype(C, /obj/item/weapon/barrier/sandbag))
 		var/choice = WWinput(user, "Do you want to start filling up the trench with \the [C]?","Trench","Yes",list("Yes","No"))
 		if (choice == "Yes")
-			user << "You shove some dirt into the trench."
+			to_chat(user, "You shove some dirt into the trench.")
 			if (istype(src, /turf/floor/trench))
 				trench_filling++
 				qdel(C)
@@ -106,7 +106,7 @@ var/list/global/floor_cache = list()
 	if (istype (C, /obj/item/weapon/barrier) && !istype(C, /obj/item/weapon/barrier/sandbag))
 		var/choice = WWinput(user, "Do you want to start filling up the trench with \the [C]?","Trench","Yes",list("Yes","No"))
 		if (choice == "Yes")
-			user << "You shove some dirt into the trench."
+			to_chat(user, "You shove some dirt into the trench.")
 			if (istype(src, /turf/floor/trench))
 				trench_filling++
 				qdel(C)
@@ -325,6 +325,10 @@ var/list/global/floor_cache = list()
 
 /turf/floor/dirt/attackby(obj/item/C as obj, mob/user as mob)
 	if (istype(C, /obj/item/weapon/material/shovel) && user.a_intent == I_HARM)
+		var/mob/living/human/HU = user
+		if (map && !map.is_node_done(istype(HU) ? HU.civilization : null, "gunsmithing"))
+			to_chat(user, SPAN_WARNING("Your people haven't researched Gunsmithing yet."))
+			return
 		var/obj/item/weapon/material/shovel/trench/S = C
 		visible_message("<span class = 'notice'>[user] starts to dig a trench.</span>")
 		if (!do_after(user, (10 - S.dig_speed)*10, src))
@@ -334,7 +338,7 @@ var/list/global/floor_cache = list()
 			if(1)
 				//icon_state = ""
 				visible_message("<span class = 'notice'>[user] digs.</span>")
-				user << ("<span class = 'notice'>You need to dig this tile one more time to make a trench.</span>")
+				to_chat(user, ("<span class = 'notice'>You need to dig this tile one more time to make a trench.</span>"))
 				return
 			if(2)
 				visible_message("<span class = 'notice'>[user] makes a trench.</span>")
@@ -348,6 +352,10 @@ var/list/global/floor_cache = list()
 	var/trench_stage = 0
 /turf/floor/beach/sand/attackby(obj/item/C as obj, mob/user as mob)
 	if (istype(C, /obj/item/weapon/material/shovel) && user.a_intent == I_HARM)
+		var/mob/living/human/HU = user
+		if (map && !map.is_node_done(istype(HU) ? HU.civilization : null, "gunsmithing"))
+			to_chat(user, SPAN_WARNING("Your people haven't researched Gunsmithing yet."))
+			return
 		var/obj/item/weapon/material/shovel/trench/S = C
 		visible_message("<span class = 'notice'>[user] starts to dig a trench.</span>")
 		if (!do_after(user, (10 - S.dig_speed)*10, src))
@@ -358,7 +366,7 @@ var/list/global/floor_cache = list()
 				if(1)
 					//icon_state = ""
 					visible_message("<span class = 'notice'>[user] digs.</span>")
-					user << ("<span class = 'notice'>You need to dig this tile one more time to make a trench.</span>")
+					to_chat(user, ("<span class = 'notice'>You need to dig this tile one more time to make a trench.</span>"))
 					return
 				if(2)
 					visible_message("<span class = 'notice'>[user] makes a trench.</span>")
@@ -370,6 +378,10 @@ var/list/global/floor_cache = list()
 
 /turf/floor/dirt/attackby(obj/item/C as obj, mob/user as mob)
 	if (istype(C, /obj/item/weapon/material/shovel) && user.a_intent == I_HARM)
+		var/mob/living/human/HU = user
+		if (map && !map.is_node_done(istype(HU) ? HU.civilization : null, "gunsmithing"))
+			to_chat(user, SPAN_WARNING("Your people haven't researched Gunsmithing yet."))
+			return
 		var/obj/item/weapon/material/shovel/trench/S = C
 		visible_message("<span class = 'notice'>[user] starts to dig a trench.</span>")
 		if (!do_after(user, (10 - S.dig_speed)*5, src))
@@ -380,7 +392,7 @@ var/list/global/floor_cache = list()
 				if(1)
 					//icon_state = ""
 					visible_message("<span class = 'notice'>[user] digs.</span>")
-					user << ("<span class = 'notice'>You need to dig this tile one more time to make a trench.</span>")
+					to_chat(user, ("<span class = 'notice'>You need to dig this tile one more time to make a trench.</span>"))
 					return
 				if(2)
 					visible_message("<span class = 'notice'>[user] makes a trench.</span>")
@@ -492,7 +504,9 @@ var/list/global/floor_cache = list()
 			var/choice = WWinput(user, "Do you want to fill up the irrigation channel with \the [C]?","Irrigation Channel","Yes",list("Yes","No"))
 			if (choice == "Yes")
 				to_chat(user, SPAN_NOTICE("You shove some dirt into the irrigation channel."))
-				ChangeTurf(get_base_turf_by_area(src))
+				irrigation = 0
+				irrigation_overlay = null
+				update_icon()
 				qdel(C)
 				return
 		else if (istype(C, /obj/item/weapon/reagent_containers/glass) || istype(C, /obj/item/weapon/reagent_containers/food/drinks))
@@ -521,9 +535,9 @@ var/list/global/floor_cache = list()
 			return
 		if (H.a_intent == I_GRAB)
 			if (salty)
-				H << "<span class='warning'>It's probably not a good idea to drink saltwater.</span>"
+				to_chat(H, "<span class='warning'>It's probably not a good idea to drink saltwater.</span>")
 				return
-			H << "You start drinking some water from \the [src]..."
+			to_chat(H, "You start drinking some water from \the [src]...")
 			if (do_after(H,50,src))
 				var/watertype = "water"
 				if (radiation>0)
@@ -545,7 +559,7 @@ var/list/global/floor_cache = list()
 					H.water += rand(40,50)
 				H.water += 75
 				H.bladder += 75
-				H << "You drink some water."
+				to_chat(H, "You drink some water.")
 				playsound(H.loc, "drink", rand(10, 50), TRUE)
 				return
 			else

@@ -40,7 +40,6 @@
 	var/fire_delay = 0.1 	//delay after shooting before the gun can be used again
 	var/fire_sound = 'sound/weapons/guns/fire/rifle.ogg'
 	var/silencer_fire_sound = 'sound/weapons/guns/fire/AKM-SD.ogg'
-	var/fire_sound_text = "gunshot"
 	var/shake_strength = 0		//screen shake
 	var/muzzle_flash = 3
 
@@ -54,13 +53,10 @@
 	var/next_fire_time = 0
 
 	var/sel_mode = 1 //index of the currently selected mode
-	var/list/firemodes = list()
+	var/list/datum/firemode/firemodes = list()
 	var/firemode_type = /datum/firemode //for subtypes that need custom firemode data
 
 	//aiming system stuff
-	var/keep_aim = TRUE 	//1 for keep shooting until aim is lowered
-						//0 for one bullet after tarrget moves and aim is lowered
-	var/multi_aim = FALSE //Used to determine if you can target multiple people.
 	var/tmp/list/mob/living/aim_targets //List of who yer targeting.
 	var/tmp/mob/living/last_moved_mob //Used to fire faster at more than one person.
 	var/tmp/told_cant_shoot = FALSE //So that it doesn't spam them with the fact they cannot hit them.
@@ -174,7 +170,7 @@
 /obj/item/weapon/gun/attack(atom/A, mob/living/user, def_zone)
 	var/mob/living/human/H = user
 	if (istype(H) && (H.faction_text == INDIANS) && (map && (!map.ID == MAP_AFRICAN_WARLORDS || !map.ID == MAP_TADOJSVILLE)))
-		user << SPAN_DANGER("You have no idea how this thing works.")
+		to_chat(user, SPAN_DANGER("You have no idea how this thing works."))
 		return
 	if (A == user)
 		var/tgt = user.targeted_organ
@@ -280,6 +276,10 @@
 
 	if (!user || !target) return
 
+	if (user.choked_by)
+		to_chat(user, SPAN_WARNING("You cannot fire a gun while being choked!"))
+		return
+
 	add_fingerprint(user)
 
 	if (!force)
@@ -288,7 +288,7 @@
 
 		if (world.time < next_fire_time)
 			if (world.time % 3) //to prevent spam
-				user << SPAN_WARNING("[src] is not ready to fire again!")
+				to_chat(user, SPAN_WARNING("[src] is not ready to fire again!"))
 			return
 
 	//unpack firemode data
@@ -297,6 +297,14 @@
 	var/_burst_delay = isnull(firemode.burst_delay)? 2 : firemode.burst_delay
 	var/_fire_delay = isnull(firemode.fire_delay) ? fire_delay : firemode.fire_delay
 	var/_move_delay = firemode.move_delay
+
+	#ifdef OPENDREAM
+	if (full_auto && _burst == 1)
+		// OpenDream clients don't send MouseDown/MouseUp correctly for hold-to-fire.
+		// Translate full-auto into a burst mechanism per-click.
+		// Calculate burst size so it shoots roughly 0.5 seconds worth of bullets.
+		_burst = max(3, round(10 / max(1, _burst_delay*2)))
+	#endif
 
 	if (forceburst != -1)
 		_burst = forceburst
@@ -468,7 +476,7 @@
 	if(dt >= firemodes[sel_mode].burst_delay)
 		shot_recoil /= sqrt(dt) * 2
 		if(dt * 0.5 < abs(shot_recoil) )
-			shot_recoil -= sign(shot_recoil) * dt * 0.5
+			shot_recoil -= ((shot_recoil) ? ((shot_recoil) < 0 ? -1 : 1) : 0) * dt * 0.5
 		else
 			shot_recoil = 0
 
@@ -551,7 +559,7 @@
 			user.death()
 			M.attack_log += "\[[time_stamp()]\] [M]/[M.ckey]</b> shot themselves in the mouth (committed suicide)"
 		else
-			user << "<span class = 'notice'>Ow...</span>"
+			to_chat(user, "<span class = 'notice'>Ow...</span>")
 			user.apply_effect(110,AGONY,0)
 
 		if (istype(src, /obj/item/weapon/gun/projectile))
@@ -610,7 +618,7 @@
 			if (in_chamber.damage_type != HALLOSS)
 				user.apply_damage(in_chamber.damage*damage_multiplier, in_chamber.damage_type, tgt, used_weapon = "Point blank shot in the [user.targeted_organ] with \a [in_chamber]", sharp=1)
 			else
-				user << "<span class = 'notice'>Ow...</span>"
+				to_chat(user, "<span class = 'notice'>Ow...</span>")
 				user.apply_effect(110,AGONY,0)
 
 
@@ -632,15 +640,15 @@
 		var/health_percentage = (health/maxhealth)*100
 		switch (health_percentage)
 			if (-100 to 21)
-				user << "<font color='#7f0000'>Is pratically falling apart!</font>"
+				to_chat(user, "<font color='#7f0000'>Is pratically falling apart!</font>")
 			if (22 to 49)
-				user << "<font color='#a74510'>Seems to be in very bad condition.</font>"
+				to_chat(user, "<font color='#a74510'>Seems to be in very bad condition.</font>")
 			if (50 to 69)
-				user << "<font color='#cccc00'>Seems to be in a rough condition.</font>"
+				to_chat(user, "<font color='#cccc00'>Seems to be in a rough condition.</font>")
 			if (70 to 84)
-				user << "<font color='#4d5319'>Seems to be in a somewhat decent condition.</font>"
+				to_chat(user, "<font color='#4d5319'>Seems to be in a somewhat decent condition.</font>")
 			if (85 to 200)
-				user << "<font color='#326327'>Seems to be in very good condition.</font>"
+				to_chat(user, "<font color='#326327'>Seems to be in very good condition.</font>")
 
 	if (firemodes.len > 1)
 		var/datum/firemode/current_mode = firemodes[sel_mode]
@@ -662,47 +670,8 @@
 /obj/item/weapon/gun/attack_self(mob/user)
 	if (firemodes.len > 1)
 		switch_firemodes(user)
-/*
-/obj/item/weapon/gun/proc/wield(mob/user as mob)
-	if (wielded)
-		return
-
-	wielded = TRUE
-	update_icon()
-
-	var/obj/item/weapon/offhand/O = new(src)
-	if (user.get_inactive_hand() == src)
-		user:swap_hand()
-	user.drop_inactive_hand()
-	user.put_in_inactive_hand(O)
-
-/obj/item/weapon/gun/proc/unwield(mob/user as mob)
-	if (!wielded)
-		return
-
-	wielded = FALSE
-	update_icon()
-
-	var/obj/item/weapon/offhand/O = user.get_inactive_hand()
-	if (istype(O))
-		user.drop_inactive_hand()
-		qdel(O)
-	else
-		O = user.get_active_hand()
-		if (istype(O))
-			user.drop_active_hand()
-			qdel(O)
-
-/obj/item/weapon/gun/dropped(mob/user)
-	..()
-	if (wielded)
-		unwield(user)
-*/
-
 /obj/item/weapon/gun/mob_can_equip(M as mob, slot) //Dirty hack
 	. = ..()
-/*	if (.)
-		unwield(M)*/
 	return
 /*
 /obj/item/weapon/offhand
@@ -728,11 +697,11 @@
 	if (!G || !istype(G))
 		G = get_inactive_hand()
 		if (!G || !istype(G))
-			src << "<span class = 'red'>You can't unload magazine from anything in your hands.</span>"
+			to_chat(src, "<span class = 'red'>You can't unload magazine from anything in your hands.</span>")
 			return
 
 	if (G.load_method == MAGAZINE && G.ammo_magazine == null)
-		src << "<span class = 'red'>The [G.name] is already unloaded.</span>"
+		to_chat(src, "<span class = 'red'>The [G.name] is already unloaded.</span>")
 		return
 	if (G && G.ammo_magazine)
 		G.ammo_magazine.loc = get_turf(loc)

@@ -2,7 +2,7 @@
 /obj/map_metadata/skullisland
 	ID = MAP_SKULLISLAND
 	title = "Skull Island"
-	lobby_icon = 'icons/lobby/imperial.png'
+	lobby_icon = "icons/lobby/imperial.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall/)
 	respawn_delay = 600
 
@@ -28,21 +28,6 @@
 	mission_start_message = "<font size=4>All factions have <b>5 minutes</b> to prepare before the combat starts. Each team must capture the other's command post to win.</font>"
 	var/done = FALSE
 	grace_wall_timer = 3000
-
-/obj/map_metadata/skullisland/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (istype(J, /datum/job/pirates))
-		if (J.is_1713 && !J.is_deathmatch)
-			. = TRUE
-		else
-			. = FALSE
-	else if (istype(J, /datum/job/british))
-		if (J.is_navy)
-			. = TRUE
-		else
-			. = FALSE
-	else
-		. = FALSE
 
 /obj/map_metadata/skullisland/tick()
 	..()

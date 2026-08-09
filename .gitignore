@@ -33,3 +33,12 @@ civ13od.dme
 odcomp.bat
 
 config/host.txt
+odstuff/
+dreamchecker.exe
+civ13.json
+extractor.py
+webclient/node_modules/
+webclient/dist/
+webclient/package-lock.json
+webclient/config.json
+TODO.md

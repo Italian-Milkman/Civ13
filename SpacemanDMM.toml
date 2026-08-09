@@ -1,3 +1,8 @@
 # Keep the keys in this file alphabetical please
-[debugger]
-engine = "auxtools"
+environment = "civ13.dme"
+
+[langserver]
+dreamchecker = true
+
+[dmdoc]
+use_typepath_names = true

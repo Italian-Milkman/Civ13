@@ -1,7 +1,8 @@
 /obj/map_metadata/sammirhayeed
 	ID = MAP_SAMMIRHAYEED
 	title = "Sammir Hayeed"
-	lobby_icon = 'icons/lobby/medieval.png'
+	description = "The Crusaders are besieging the Arab fortress of Sammir Hayeed! The Arabs will win if they manage to hold the fortress for 35 minutes."
+	lobby_icon = "icons/lobby/medieval.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/one,/area/caribbean/no_mans_land/invisible_wall/two)
 	respawn_delay = 300
 	no_hardcore = TRUE
@@ -20,21 +21,11 @@
 	mission_start_message = "<font size=4>The <b>Crusaders</b> are besieging the <b>Arab</b> fortress of Sammir Hayeed! The Arabs will win if they manage to hold the fortress for 35 minutes. <br> The siege will start in <b>6 minutes</b>.</font>"
 	faction1 = ARAB
 	faction2 = FRENCH
-	ambience = list('sound/ambience/desert.ogg')
+	ambience = list("sound/ambience/desert.ogg")
 	songs = list(
-		"Crusaders:1" = 'sound/music/crusaders.ogg')
+		"Crusaders:1" = "sound/music/crusaders.ogg")
 	gamemode = "Siege"
 	grace_wall_timer = 3600
-
-/obj/map_metadata/sammirhayeed/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (J.is_crusader && J.is_medieval)
-		. = TRUE
-	else if (J.is_arabcaliph && J.is_medieval)
-		. = TRUE
-	else
-		. = FALSE
-
 
 /obj/map_metadata/sammirhayeed/roundend_condition_def2name(define)
 	..()
@@ -82,14 +73,14 @@ var/no_loop_kar = FALSE
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The Arabic Caliphate have managed to defend the fortress!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_kar == FALSE)
 		ticker.finished = TRUE
 		var/message = "The Crusaders have captured the fortress! The remaining Arabs have surrendered!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_kar = TRUE
@@ -132,7 +123,7 @@ var/no_loop_kar = FALSE
 				current_loser = "Arabic Caliphate"
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The Arabs have recaptured the fortress!</font>"
+			to_chat(world, "<font size = 3>The Arabs have recaptured the fortress!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1

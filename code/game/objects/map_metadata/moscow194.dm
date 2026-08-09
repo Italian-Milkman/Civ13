@@ -1,7 +1,7 @@
 /obj/map_metadata/siegemoscow
 	ID = MAP_BIGSIEGEMOSCOW
 	title = "Siege of Moscow"
-	lobby_icon = 'icons/lobby/ww2.png'
+	lobby_icon = "icons/lobby/ww2.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall/tundra,/area/caribbean/no_mans_land/invisible_wall/tundra/one,/area/caribbean/no_mans_land/invisible_wall/tundra/two)
 	respawn_delay = 1200
 	no_winner ="The Politburo is under Soviet control."
@@ -22,20 +22,9 @@
 	faction2 = GERMAN
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET)
 	songs = list(
-		"Red Army Choir - Katyusha:1" = 'sound/music/katyusha.ogg',)
+		"Red Army Choir - Katyusha:1" = "sound/music/katyusha.ogg",)
 	gamemode = "Siege"
 	grace_wall_timer = 4800
-
-/obj/map_metadata/siegemoscow/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if ((J.is_ww2 == TRUE && J.is_reichstag == FALSE && J.is_occupation == FALSE) || J.is_smallsiegemoscow == TRUE)
-		. = TRUE
-	else if (J.is_ss_panzer == TRUE)
-		. = TRUE
-	else if (istype(J, /datum/job/german/mediziner) || istype(J, /datum/job/russian/doctor_soviet))
-		. = TRUE
-	else
-		. = FALSE
 
 /obj/map_metadata/siegemoscow/roundend_condition_def2name(define)
 	..()
@@ -84,14 +73,14 @@
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The <b>Soviets</b> have sucessfuly defended Moscow! The Germans stopped the attack!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_r == FALSE) //Needs to be looked into to prevent the bug of Germans "winning" by getting wiped and not respawning after 10 seconds.
 		ticker.finished = TRUE
 		var/message = "The <b>Germans</b> have captured Moscow! The Siege of Moscow is over!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_r = TRUE
@@ -134,7 +123,7 @@
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The <b>Soviets</b> have recaptured the Politburo!</font>"
+			to_chat(world, "<font size = 3>The <b>Soviets</b> have recaptured the Politburo!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1
@@ -153,7 +142,6 @@
 				return TRUE
 		else
 			return !faction1_can_cross_blocks()
-			return !faction2_can_cross_blocks()
 	return FALSE
 
 
@@ -164,7 +152,7 @@
 /obj/map_metadata/smallsiegemoscow
 	ID = MAP_SMALLSIEGEMOSCOW
 	title = "Central Siege of Moscow"
-	lobby_icon = 'icons/lobby/ww2.png'
+	lobby_icon = "icons/lobby/ww2.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall/tundra,/area/caribbean/no_mans_land/invisible_wall/tundra/one,/area/caribbean/no_mans_land/invisible_wall/tundra/two)
 	respawn_delay = 1200
 	no_winner ="The Politburo is under Soviet control."
@@ -185,20 +173,10 @@
 	faction2 = GERMAN
 	valid_weather_types = list(WEATHER_NONE, WEATHER_WET)
 	songs = list(
-		"Red Army Choir - Katyusha:1" = 'sound/music/katyusha.ogg',)
+		"Red Army Choir - Katyusha:1" = "sound/music/katyusha.ogg",)
 	gamemode = "Siege"
 	grace_wall_timer = 4800
 
-/obj/map_metadata/smallsiegemoscow/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if ((J.is_ww2 == TRUE && J.is_reichstag == FALSE && J.is_occupation == FALSE) || J.is_smallsiegemoscow == TRUE)
-		. = TRUE
-	else if (J.is_ss_panzer == TRUE)
-		. = TRUE
-	else if (istype(J, /datum/job/german/mediziner) || istype(J, /datum/job/russian/doctor_soviet))
-		. = TRUE
-	else
-		. = FALSE
 
 /obj/map_metadata/smallsiegemoscow/roundend_condition_def2name(define)
 	..()
@@ -246,14 +224,14 @@
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The <b>Soviets</b> have sucessfuly defended Moscow! The Germans stopped the attack!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_r == FALSE) //Needs to be looked into to prevent the bug of Germans "winning" by getting wiped and not respawning after 10 seconds.
 		ticker.finished = TRUE
 		var/message = "The <b>Germans</b> have captured Moscow! The Siege of Moscow is over!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_r = TRUE
@@ -296,7 +274,7 @@
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The <b>Soviets</b> have recaptured the Politburo!</font>"
+			to_chat(world, "<font size = 3>The <b>Soviets</b> have recaptured the Politburo!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1
@@ -315,5 +293,4 @@
 				return TRUE
 		else
 			return !faction1_can_cross_blocks()
-			return !faction2_can_cross_blocks()
 	return FALSE

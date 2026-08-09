@@ -1,6 +1,4 @@
 /mob/living/simple_animal/hostile/poison
-	var/poison_per_bite = 0
-	var/poison_type = "toxin"
 
 
 /mob/living/simple_animal/hostile/poison/snake
@@ -19,7 +17,7 @@
 	response_help  = "pets"
 	response_disarm = "shoos"
 	response_harm   = "steps on"
-	faction = list("hostile")
+	faction = "hostile"
 	density = FALSE
 	pass_flags = PASSTABLE
 	mob_size = MOB_SMALL
@@ -75,7 +73,7 @@
 	response_help  = "pets"
 	response_disarm = "shoos"
 	response_harm   = "steps on"
-	faction = list("hostile")
+	faction = "hostile"
 	density = FALSE
 	mob_size = MOB_MEDIUM
 	predatory_carnivore = 1
@@ -137,7 +135,7 @@
 		Paralyse(100)
 		L.adjustOxyLoss(25)
 		L.adjustBrainLoss(5)
-		L << "<span class='danger'>You can't breathe!</span>"
+		to_chat(L, "<span class='danger'>You can't breathe!</span>")
 		if (L.stat == DEAD)
 			constricting = FALSE
 			stop_automated_movement = FALSE
@@ -168,7 +166,7 @@
 	constricting = FALSE
 	if (cons_target)
 		cons_target.canmove = TRUE
+		if (cons_target.client)
+			cons_target.client.canmove = TRUE
 		cons_target = null
 	update_icons()
-	if (cons_target && cons_target.client)
-		cons_target.client.canmove = TRUE

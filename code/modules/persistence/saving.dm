@@ -9,6 +9,10 @@
 /map_storage/proc/Save_World()
 	// ***** MAP SECTION *****
 	var/backup_dir = "map_backups/"
+	// Remove the completion marker first: if this save dies partway through, the
+	// marker's absence tells the startup autoload not to trust map_saves/.
+	if (fexists("map_saves/save_complete.txt"))
+		fdel("map_saves/save_complete.txt")
 	var/F0 = file("map_saves/map.txt")
 	if (fexists(F0))
 		fcopy(F0,file("map_backups/map.txt"))
@@ -44,10 +48,14 @@
 				savefile["[turf.x]"] << ref
 				TICK_CHECK
 		log_startup_progress("	Saved z-level [A].")
+	clear_bookkeeping()
+	text2file(time2text(world.realtime,"YYYY-MM-DD-(hh-mm-ss)"),"map_saves/save_complete.txt")
 	log_startup_progress("Finished saving.")
 	return 1
 
-/map_storage/proc/BuildVarDirectory(savefile/savefile, atom/A, var/contents = 0)
+/map_storage/proc/BuildVarDirectory(savefile/savefile, datum/A, var/contents = 0)
+	if(!A || istype(A, /client))
+		return 0
 	if(!A.should_save)
 		return 0
 	var/ind = saving_references.Find(A)

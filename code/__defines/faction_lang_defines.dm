@@ -1,3 +1,9 @@
+// Custom faction symbols: canvas edge length in pixels (see
+// code/game/mob/groups/faction_symbol.dm and faction_creation.dm)
+#define FACTION_SYMBOL_SIZE 32
+// How many undo steps a symbol canvas keeps (each is a full grid snapshot)
+#define FACTION_SYMBOL_UNDO_MAX 20
+
 //factions only
 #define PIRATES "PIRATES"
 #define CIVILIAN "CIVILIAN"
@@ -60,6 +66,9 @@
 #define WELSH "WELSH"
 #define BLUEFACTION "BLUEFACTION"
 #define REDFACTION "REDFACTION"
+#define TSFSR "TSFSR"
+#define CAFR "CAFR"
+
 
 /proc/faction_const2name(constant,age = 0)
 	switch(constant)
@@ -99,7 +108,7 @@
 					return "Ruhr Red Army"
 				if ("MAGISTRAL")
 					return "DRA Army"
-				if ("BANK_ROBBERY" || "DRUG_BUST")
+				if ("BANK_ROBBERY", "DRUG_BUST")
 					return "Police Department"
 				if ("LONG_MARCH")
 					return "Red Army"
@@ -227,7 +236,7 @@
 				switch(map.ID)
 					if ("ARAB_TOWN")
 						return "Hezbollah"
-					if ("KANDAHAR" || "HILL_3234" || "MAGISTRAL")
+					if ("KANDAHAR", "HILL_3234", "MAGISTRAL")
 						return "Mujahideen"
 					if ("SYRIA")
 						return "Syrian Armed Forces"
@@ -311,4 +320,9 @@
 		
 		if (REDFACTION)
 			return "Redmenia"
-
+		
+		if (CAFR)
+			return "Central Asian Federal Republic"
+		
+		if (TSFSR)
+			return "Turkestan SFSR"

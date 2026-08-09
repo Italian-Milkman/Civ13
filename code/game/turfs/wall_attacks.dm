@@ -42,17 +42,10 @@
 
 	if (istype(src, /turf/wall/indestructable))
 		return
-	else return ..()
-
-	// this code is no longer used - you need c4 to get through walls now - Kachnov
-
-	/* not sure what this shitcode is so its disabled - Kachnov
-	if (!user.)
-		user << "<span class='warning'>You don't have the dexterity to do this!</span>"
-		return*/
 
 	//get the user's location
-	if (!istype(user.loc, /turf))	return	//can't do this stuff whilst inside objects and such
+	if (!istype(user.loc, /turf))
+		return	//can't do this stuff whilst inside objects and such
 
 	if (W)
 		if (is_hot(W))
@@ -63,7 +56,7 @@
 		F.try_build(src)
 		return*/
 	if (istype(W, /obj/item/weapon/poster/religious))
-		user << "You start placing the [W] on the [src]..."
+		to_chat(user, "You start placing the [W] on the [src]...")
 		if (do_after(user, 70, src))
 			visible_message("[user] places the [W] on the [src].")
 			var/obj/structure/poster/religious/RP = new/obj/structure/poster/religious(get_turf(src))
@@ -76,7 +69,7 @@
 			qdel(W)
 			return
 	if (istype(W, /obj/item/weapon/poster/faction))
-		user << "You start placing the [W] on the [src]..."
+		to_chat(user, "You start placing the [W] on the [src]...")
 		if (do_after(user, 70, src))
 			visible_message("[user] places the [W] on the [src].")
 			var/obj/structure/poster/faction/RP = new/obj/structure/poster/faction(get_turf(src))

@@ -75,7 +75,6 @@
 	var/list/beakers = list() //All containers inside the gun.
 	var/list/mixing = list() //Containers being used for mixing.
 	var/max_beakers = 1
-	var/dart_reagent_amount = 10
 	var/container_type = /obj/item/weapon/reagent_containers
 	var/list/starting_chems = null
 	move_delay=2
@@ -105,7 +104,6 @@
 	attachment_slots = ATTACH_IRONSIGHTS|ATTACH_SCOPE
 	caliber = "dart"
 	fire_sound = 'sound/weapons/guns/interact/garandload.ogg'
-	fire_sound_text = "a sharp metalic clack"
 	shake_strength = FALSE
 	magazine_type = /obj/item/ammo_magazine/chemdart
 	auto_eject = FALSE
@@ -113,7 +111,6 @@
 	beakers = list() //All containers inside the gun.
 	mixing = list() //Containers being used for mixing.
 	max_beakers = 3
-	dart_reagent_amount = 15
 	container_type = /obj/item/weapon/reagent_containers/glass/beaker
 	muzzle_flash = FALSE
 
@@ -147,13 +144,11 @@
 	throwforce = 20
 	caliber = "dart"
 	fire_sound = 'sound/weapons/guns/fire/Crossbow.ogg'
-	fire_sound_text = "someone blowing through a tube"
 	bulletinsert_sound = 'sound/items/matchstick_hit.ogg'
 	shake_strength = 0
 	auto_eject = FALSE
 	gtype = "none"
 	max_beakers = 1
-	dart_reagent_amount = 10
 	beakers = list() //All containers inside the gun.
 	mixing = list() //Containers being used for mixing.
 	container_type = /obj/item/weapon/reagent_containers/food/drinks/drinkingglass/tribalpot
@@ -171,11 +166,11 @@
 	//	return
 	..()
 	if (beakers.len)
-		user << "<span class = 'notice'>[src] contains:</span>"
+		to_chat(user, "<span class = 'notice'>[src] contains:</span>")
 		for(var/obj/item/weapon/reagent_containers/B in beakers)
 			if(B.reagents && B.reagents.reagent_list.len)
 				for(var/datum/reagent/R in B.reagents.reagent_list)
-					user << "<span class = 'notice'>[R.volume] units of [R.name]</span>"
+					to_chat(user, "<span class = 'notice'>[R.volume] units of [R.name]</span>")
 
 /obj/item/weapon/gun/projectile/dartgun/attackby(obj/item/I as obj, mob/user as mob)
 	if (..()) // handle attachments
@@ -183,16 +178,16 @@
 
 	if(istype(I, /obj/item/weapon/reagent_containers))
 		if(!istype(I, container_type))
-			user << "<span class = 'notice'>[I] doesn't seem to fit into [src].</span>"
+			to_chat(user, "<span class = 'notice'>[I] doesn't seem to fit into [src].</span>")
 			return
 		if(beakers.len >= max_beakers)
-			user << "<span class = 'notice'>[src] already has [max_beakers] beakers in it - another one isn't going to fit!</span>"
+			to_chat(user, "<span class = 'notice'>[src] already has [max_beakers] beakers in it - another one isn't going to fit!</span>")
 			return
 		var/obj/item/weapon/reagent_containers/B = I
 		user.drop_item()
 		B.loc = src
 		beakers += B
-		user << "<span class = 'notice'>You slot [B] into [src].</span>"
+		to_chat(user, "<span class = 'notice'>You slot [B] into [src].</span>")
 		updateUsrDialog()
 		return TRUE
 	..()
@@ -262,7 +257,7 @@
 		if(index <= beakers.len)
 			if(beakers[index])
 				var/obj/item/weapon/reagent_containers/B = beakers[index]
-				usr << "You remove [B] from [src]."
+				to_chat(usr, "You remove [B] from [src].")
 				mixing -= B
 				beakers -= B
 				B.loc = get_turf(src)
@@ -289,12 +284,10 @@
 	attachment_slots = ATTACH_IRONSIGHTS|ATTACH_SCOPE
 	caliber = "dart"
 	fire_sound = 'sound/weapons/guns/interact/garandload.ogg'
-	fire_sound_text = "a sharp metalic clack"
 	shake_strength = 0
 	auto_eject = TRUE
 	gtype = "none"
 	max_beakers = 1
-	dart_reagent_amount = 10
 	beakers = list() //All containers inside the gun.
 	mixing = list() //Containers being used for mixing.
 	container_type = /obj/item/weapon/reagent_containers/glass/bottle
@@ -329,7 +322,6 @@
 	attachment_slots = ATTACH_IRONSIGHTS|ATTACH_SCOPE
 	caliber = "dart"
 	fire_sound = 'sound/weapons/guns/interact/garandload.ogg'
-	fire_sound_text = "a sharp metalic clack"
 	shake_strength = 0
 	magazine_type = /obj/item/ammo_magazine/chemdart/mag
 	auto_eject = TRUE
@@ -337,7 +329,6 @@
 	beakers = list() //All containers inside the gun.
 	mixing = list() //Containers being used for mixing.
 	max_beakers = 1
-	dart_reagent_amount = 10
 	container_type = /obj/item/weapon/reagent_containers/glass/bottle
 	starting_chems = null
 

@@ -1,38 +1,4 @@
 
-/client/proc/callproc()
-	set category = "Debug"
-	set name = "Advanced ProcCall"
-
-	if (!check_rights(R_DEBUG)) return
-	if (config.debugparanoid && !check_rights(R_ADMIN)) return
-
-	var/target = null
-	var/targetselected = FALSE
-
-	switch(alert(src, "Is the proc owned by something?", "Advanced Callproc", null, list("Yes", "No", "Cancel")))
-		if ("Yes")
-			targetselected=1
-			switch(input("Proc owned by...", "Owner", null) as null|anything in list("Obj", "Mob", "Area or Turf", "Client"))
-				if ("Obj")
-					target = input("Select target:", "Target") as null|obj in world
-				if ("Mob")
-					target = input("Select target:", "Target", usr) as null|mob in world
-				if ("Area or Turf")
-					target = input("Select target:", "Target", get_turf(usr)) as null|area|turf in world
-				if ("Client")
-					target = input("Select target:", "Target", usr.client) as null|anything in clients
-				else
-					return
-			if (!target)
-				usr << "Proc call cancelled."
-				return
-		if ("Cancel")
-			return
-		if ("No")
-			; // do nothing
-
-	callproc_targetpicked(targetselected, target)
-
 /client/proc/callproc_target(atom/A in range(7))
 	set category = "Debug"
 	set name = "Advanced ProcCall Target"
@@ -55,10 +21,10 @@
 
 	if (hastarget)
 		if (!target)
-			usr << "Your callproc target no longer exists."
+			to_chat(usr, "Your callproc target no longer exists.")
 			return
 		if (!hascall(target, procname))
-			usr << "\The [target] has no call [procname]()"
+			to_chat(usr, "\The [target] has no call [procname]()")
 			return
 
 	var/list/arguments = list()
@@ -67,7 +33,7 @@
 
 	while (!done)
 		if (hastarget && !target)
-			usr << "Your callproc target no longer exists."
+			to_chat(usr, "Your callproc target no longer exists.")
 			return
 		switch(input("Type of [arguments.len+1]\th variable", "argument [arguments.len+1]") as null|anything in list(
 				"finished", "null", "text", "num", "type", "obj reference", "mob reference",
@@ -137,7 +103,7 @@
 
 	if (hastarget)
 		if (!target)
-			usr << "Your callproc target no longer exists."
+			to_chat(usr, "Your callproc target no longer exists.")
 			return
 		var/M = "[key_name(src)] called [target]'s [procname]() with [arguments.len ? "the arguments [list2params(arguments)]" : "no arguments"]."
 		log_admin(M)
@@ -153,5 +119,5 @@
 		returnval = call(procname)(arglist(arguments))
 
 
-	usr << "<span class='info'>[procname]() returned: [isnull(returnval) ? "null" : returnval]</span>"
+	to_chat(usr, "<span class='info'>[procname]() returned: [isnull(returnval) ? "null" : returnval]</span>")
 

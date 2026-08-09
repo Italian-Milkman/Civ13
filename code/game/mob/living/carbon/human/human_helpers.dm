@@ -20,9 +20,9 @@
 		return TRUE
 	if (feedback)
 		if (status[1] == HUMAN_EATING_NO_MOUTH)
-			src << "Where do you intend to put \the [food]? You don't have a mouth!"
+			to_chat(src, "Where do you intend to put \the [food]? You don't have a mouth!")
 		else if (status[1] == HUMAN_EATING_BLOCKED_MOUTH)
-			src << SPAN_WARNING("\The [status[2]] is in the way!")
+			to_chat(src, SPAN_WARNING("\The [status[2]] is in the way!"))
 	return FALSE
 
 /mob/living/human/can_force_feed(var/feeder, var/food, var/feedback = TRUE)
@@ -31,7 +31,7 @@
 		return TRUE
 	if (feedback)
 		if (status[1] == HUMAN_EATING_NO_MOUTH)
-			feeder << "Where do you intend to put \the [food]? \The [src] doesn't have a mouth!"
+			to_chat(feeder, "Where do you intend to put \the [food]? \The [src] doesn't have a mouth!")
 		else if (status[1] == HUMAN_EATING_BLOCKED_MOUTH)
 			feeder << SPAN_WARNING("\The [status[2]] is in the way!")
 	return FALSE
@@ -53,9 +53,7 @@
 	equipment_tint_total = FALSE
 	equipment_see_invis	= FALSE
 	equipment_vision_flags = FALSE
-	equipment_prescription = FALSE
 	equipment_darkness_modifier = FALSE
-//	equipment_overlays.Cut()
 
 	if (istype(head, /obj/item/clothing/head))
 		add_clothing_protection(head)
@@ -264,7 +262,7 @@
 	if (!client)
 		return
 
-	var/view_dist = client.view + 4
+	var/view_dist = client.view + 5 // + reserve so that when moving the load is not visible [translated]
 
 	var/view_x_offset = 0
 	var/view_y_offset = 0
@@ -286,11 +284,14 @@
 			if(get_dist(tmpimg, view_loc) < view_dist)
 				client.images.Remove(tmpimg)
 
-	for (var/obj/structure/turret/T in view(view_dist, view_loc))
+	for (var/obj/structure/turret/T in range(view_dist, view_loc))
 		client.images += T.turret_image
 		client.images += T.turret_roof_image
 
-	for (var/obj/structure/turret/T in view(1,client))
+	if (buckled && looking)
+		return
+
+	for (var/obj/structure/turret/T in range(1, view_loc))
 
 		var/obj/structure/vehicleparts/frame/turret_vehicle = null
 		var/obj/structure/vehicleparts/frame/client_vehicle = null
@@ -309,7 +310,8 @@
 /mob/living/human/proc/process_vehicle_roofs()
 	if (!client)
 		return
-	var/view_dist = client.view + 4 // + reserve so that when moving the load is not visible [translated]
+
+	var/view_dist = client.view + 5 // + reserve so that when moving the load is not visible [translated]
 
 	var/view_x_offset = 0
 	var/view_y_offset = 0
@@ -334,17 +336,15 @@
 				client.images.Remove(tmpimg)
 	for (var/obj/structure/vehicleparts/frame/FRL in loc)
 		found = FRL
-	for (var/obj/structure/vehicleparts/frame/FR in view(view_dist, view_loc))
+	for (var/obj/structure/vehicleparts/frame/FR in range(view_dist, view_loc))
 		if (found)
-			if (FR.axis != found.axis && FR != found)
+			if ((FR.axis != found.axis && FR != found) || (buckled && looking))
 				client.images += FR.roof
 			else
 				client.images -= FR.roof
 		else
-			if (locate(FR) in view(view_dist, view_loc))
+			if (locate(FR) in range(view_dist, view_loc))
 				client.images += FR.roof
-			else
-				client.images -= FR.roof
 
 /mob/living/human/proc/process_static_roofs()
 	if (!client)
@@ -376,11 +376,17 @@
 			update_fire(1)
 			return
 		else
+			if (istype(T, /turf/floor/sub_deck) && T:water_depth > 0)
+				drowning = FALSE
+				water_overlay = TRUE
+				update_fire(1)
+				return
 			water_overlay = FALSE
 			if (plane == FLOOR_PLANE)
 				plane = GAME_PLANE
 			if (!on_fire)
 				overlays_standing[25] = null
+			update_fire(1)
 			return
 	else
 		var/turf/floor/beach/water/deep/D = T
@@ -399,8 +405,7 @@
 					water_overlay = FALSE
 					return
 			drowning = TRUE
-			src << SPAN_WARNING("<font size='2'>You are drowning!</font>")
+			to_chat(src, SPAN_WARNING("<font size='2'>You are drowning!</font>"))
 			update_fire(1)
 			adjustOxyLoss(10)
 			return
-	return

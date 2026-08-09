@@ -901,7 +901,6 @@
 /obj/item/ammo_magazine/a25mm_ap
 	name = "AP-T ammo belt (25 mm)"
 	icon_state = "maximbelt"
-	worn_state = "maximbelt"
 	mag_type = MAGAZINE
 	caliber = "a25"
 	w_class = ITEM_SIZE_LARGE
@@ -914,7 +913,6 @@
 /obj/item/ammo_magazine/a25mm_he
 	name = "HE-T ammo belt (25 mm)"
 	icon_state = "maximbelt"
-	worn_state = "maximbelt"
 	mag_type = MAGAZINE
 	caliber = "a25"
 	w_class = ITEM_SIZE_LARGE
@@ -932,7 +930,6 @@
 /obj/item/ammo_magazine/a30mm_ap
 	name = "AP-T ammo belt (30mm)"
 	icon_state = "maximbelt"
-	worn_state = "maximbelt"
 	mag_type = MAGAZINE
 	caliber = "a30"
 	w_class = ITEM_SIZE_LARGE
@@ -951,7 +948,6 @@
 /obj/item/ammo_magazine/a30mm_he
 	name = "HE-T ammo belt (30mm)"
 	icon_state = "maximbelt"
-	worn_state = "maximbelt"
 	mag_type = MAGAZINE
 	caliber = "a30"
 	w_class = ITEM_SIZE_LARGE
@@ -971,7 +967,6 @@
 /obj/item/ammo_magazine/a35mm_fap
 	name = "FAP ammo belt (35mm)"
 	icon_state = "maximbelt"
-	worn_state = "maximbelt"
 	mag_type = MAGAZINE
 	caliber = "a35"
 	w_class = ITEM_SIZE_LARGE
@@ -984,7 +979,6 @@
 /obj/item/ammo_magazine/a35mm_hei
 	name = "HEI-T ammo belt (35mm)"
 	icon_state = "maximbelt"
-	worn_state = "maximbelt"
 	mag_type = MAGAZINE
 	caliber = "a35"
 	w_class = ITEM_SIZE_LARGE
@@ -1023,10 +1017,10 @@
 	set name = "Toggle Open"
 	if (opened)
 		opened=FALSE
-		usr << "You close the [src]."
+		to_chat(usr, "You close the [src].")
 	else
 		opened=TRUE
-		usr << "You open the [src]."
+		to_chat(usr, "You open the [src].")
 	update_icon()
 	return
 
@@ -1043,7 +1037,7 @@
 			update_icon()
 			return
 		else
-			user << "<span class='warning'>[src] is empty.</span>"
+			to_chat(user, "<span class='warning'>[src] is empty.</span>")
 			update_icon()
 	else
 		return ..()
@@ -1063,7 +1057,7 @@
 		return
 	if (istype(W, flare_type))
 		if (stored.len >= max)
-			user << "<span class='warning'>[src] is full!</span>"
+			to_chat(user, "<span class='warning'>[src] is full!</span>")
 			return
 		user.remove_from_mob(W)
 		W.loc = src

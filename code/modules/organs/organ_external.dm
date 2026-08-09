@@ -29,9 +29,6 @@
 	var/brute_dam = FALSE //sum of blunt, pierce and cut damage
 	var/burn_dam = FALSE
 	var/blunt_dam = FALSE // not sharp and not edged. More likely to break bones. Won't bleed.
-	var/pierce_dam = FALSE // sharp but not edged. More likely to give internal bleeding or damage wounds. Just a little bleeding.
-	var/cut_dam = FALSE // superficial damage, not a lot of damage but lots of bleeding.
-	var/max_size = FALSE
 	var/last_dam = -1
 	var/icon/mob_icon
 //	var/gendered_icon = FALSE
@@ -50,7 +47,6 @@
 	var/obj/item/organ/external/parent
 	var/list/obj/item/organ/external/children
 	var/list/internal_organs = list() 	// Internal organs of this body part
-	var/damage_msg = "<span class = 'red'>You feel an intense pain</span>"
 	var/broken_description
 	var/open = FALSE
 	var/stage = FALSE
@@ -64,7 +60,6 @@
 
 	// Joint/state stuff.
 	var/can_grasp 						//It would be more appropriate if these two were named "affects_grasp" and "affects_stand" at this point
-	var/can_stand
 	var/pain = FALSE
 	var/fracturetimer = 0
 	var/artery_name = "artery"		 	// Flavour text for carotid artery, aorta, etc.
@@ -76,7 +71,6 @@
 	var/burn_ratio = 0
 	var/brute_ratio = 0
 	var/encased
-	var/cavity_name = ""
 
 /obj/item/organ/external/New()
 	..()
@@ -133,7 +127,7 @@
 		for (var/obj/item/I in contents)
 			if (istype(I, /obj/item/organ))
 				continue
-			usr << "<span class='danger'>There is \a [I] sticking out of it.</span>"
+			to_chat(usr, "<span class='danger'>There is \a [I] sticking out of it.</span>")
 	return
 
 /obj/item/organ/external/attackby(obj/item/weapon/W as obj, mob/user as mob)
@@ -204,7 +198,6 @@
 			for(var/mob/living/human/NB in view(6,src))
 				if (!NB.orc)
 					NB.mood -= 10
-					// NB.ptsd += 1
 	return
 
 
@@ -247,13 +240,11 @@
 	return (vital || brute_dam + burn_dam + additional_damage <= max_damage)
 
 
-/obj/item/organ/external/take_damage(brute, burn, sharp, edge, used_weapon = null)
+/obj/item/organ/external/take_damage(brute, burn, sharp, edge, used_weapon = null, silent = 0)
 	brute = round(brute * species.brute_mod, 0.1)
 	burn = round(burn * species.burn_mod, 0.1)
 	if((brute <= 0) && (burn <= 0))
 		return 0
-
-	var/blunt = brute && !sharp && !edge
 
 	/*
 	if(used_weapon)
@@ -289,7 +280,6 @@
 				for(var/mob/living/human/NB in view(6,src))
 					if (!NB.orc)
 						NB.mood -= 10
-						// NB.ptsd += 1
 				return
 
 	// High brute damage or sharp objects may damage internal organs
@@ -302,7 +292,8 @@
 		if(can_feel_pain() && prob(40))
 			//getting hit on broken hand hurts
 			owner.emote("scream")
-	if(blunt_dam > min_broken_damage && prob(blunt_dam + brute * (1+blunt)) ) //blunt damage is gud at fracturing
+	//if the damage from this event is high enough OR the accumulated blunt damage is high enough
+	if(brute >= min_broken_damage || (brute >= ceil(min_broken_damage * 0.5) && prob(blunt_dam)) ) //blunt damage is gud at fracturing
 		if (istype(used_weapon, /obj/item/projectile))
 			if (prob(35))
 				fracture()
@@ -413,7 +404,7 @@
 	/*if ((brute || burn) && children && children.len && (owner.species.flags & REGENERATES_LIMBS))
 		var/obj/item/organ/external/stump/S = locate() in children
 		if (S)
-			world << "Extra healing to go around ([brute+burn]) and [owner] needs a replacement limb."*/
+			to_chat(world, "Extra healing to go around ([brute+burn]) and [owner] needs a replacement limb."*/
 
 	//Sync the organ's damage with its wounds
 	update_damages()
@@ -629,7 +620,7 @@ Note that amputating the affected organ does in fact remove the infection from t
 	if (germ_level >= INFECTION_LEVEL_THREE && antibiotics < 30)	//overdosing is necessary to stop severe infections
 		if (!(status & ORGAN_DEAD))
 			status |= ORGAN_DEAD
-			owner << "<span class='notice'>You can't feel your [name] anymore...</span>"
+			to_chat(owner, "<span class='notice'>You can't feel your [name] anymore...</span>")
 			owner.update_body(1)
 
 		germ_level+=0.5
@@ -706,13 +697,11 @@ Note that amputating the affected organ does in fact remove the infection from t
 			switch(W.damage_type)
 				if (BURN)
 					burn_dam += W.damage
-				else if (PIERCE)
+				if (PIERCE)
 					brute_dam += W.damage
-					pierce_dam += W.damage
-				else if (CUT)
+				if (CUT)
 					brute_dam += W.damage
-					cut_dam += W.damage
-				else if (BRUISE)
+				if (BRUISE)
 					brute_dam += W.damage
 					blunt_dam += W.damage
 		if (W.bleeding() && (H && !(H.species.flags & NO_BLOOD)))
@@ -726,11 +715,6 @@ Note that amputating the affected organ does in fact remove the infection from t
 	//things tend to bleed if they are CUT OPEN
 	if (open && !clamped && (H && !(H.species.flags & NO_BLOOD)))
 		status |= ORGAN_BLEEDING
-
-	//Bone fractures
-	if (blunt_dam >= min_broken_damage * config.organ_health_multiplier && !H.buckled && !H.resting)
-		if (blunt_dam > fracturetimer+20)
-			fracture()
 
 	if (!(brute_dam+burn_dam) || !number_wounds)
 		disfigured = FALSE
@@ -899,12 +883,12 @@ Note that amputating the affected organ does in fact remove the infection from t
 		holder = owner
 	if (!holder)
 		return
-	if (holder.handcuffed && body_part in list(ARM_LEFT, ARM_RIGHT, HAND_LEFT, HAND_RIGHT))
+	if (holder.handcuffed && (body_part in list(ARM_LEFT, ARM_RIGHT, HAND_LEFT, HAND_RIGHT)))
 		holder.visible_message(\
 			"\The [holder.handcuffed.name] falls off of [holder.name].",\
 			"\The [holder.handcuffed.name] falls off you.")
 		holder.drop_from_inventory(holder.handcuffed)
-	if (holder.legcuffed && body_part in list(FOOT_LEFT, FOOT_RIGHT, LEG_LEFT, LEG_RIGHT))
+	if (holder.legcuffed && (body_part in list(FOOT_LEFT, FOOT_RIGHT, LEG_LEFT, LEG_RIGHT)))
 		holder.visible_message(\
 			"\The [holder.legcuffed.name] falls off of [holder.name].",\
 			"\The [holder.legcuffed.name] falls off you.")
@@ -1149,7 +1133,6 @@ Note that amputating the affected organ does in fact remove the infection from t
 	artery_name = "aorta"
 	arterial_bleed_severity = 2
 	encased = "ribcage"
-	cavity_name = "thoracic"
 
 /obj/item/organ/external/groin
 	name = "lower body"
@@ -1168,7 +1151,6 @@ Note that amputating the affected organ does in fact remove the infection from t
 //	gendered_icon = TRUE
 	artery_name = "iliac artery"
 	arterial_bleed_severity = 2
-	cavity_name = "abdominal"
 
 /obj/item/organ/external/arm
 	limb_name = "l_arm"
@@ -1205,7 +1187,6 @@ Note that amputating the affected organ does in fact remove the infection from t
 	parent_organ = "groin"
 	joint = "left knee"
 	amputation_point = "left hip"
-	can_stand = TRUE
 	artery_name = "femoral artery"
 	arterial_bleed_severity = 1
 
@@ -1230,7 +1211,6 @@ Note that amputating the affected organ does in fact remove the infection from t
 	parent_organ = "l_leg"
 	joint = "left ankle"
 	amputation_point = "left ankle"
-	can_stand = TRUE
 	artery_name = "dorsal artery"
 	arterial_bleed_severity = 1
 
@@ -1293,9 +1273,6 @@ Note that amputating the affected organ does in fact remove the infection from t
 
 	var/list/teeth_list = list()
 	var/max_teeth = 32
-	var/eye_icon = "eyes_s"
-	var/eye_icon_location = 'icons/mob/human_face.dmi'
-
 /obj/item/organ/external/head/removed()
 	if (owner)
 		name = "[owner.real_name]'s head"
@@ -1303,12 +1280,14 @@ Note that amputating the affected organ does in fact remove the infection from t
 		owner.drop_from_inventory(owner.l_ear)
 		owner.drop_from_inventory(owner.r_ear)
 		owner.drop_from_inventory(owner.wear_mask)
+		var/mob/living/human/prev_owner = owner
 		spawn(1)
-			owner.update_hair()
+			if (prev_owner)
+				prev_owner.update_hair()
 	..()
 
-/obj/item/organ/external/head/take_damage(brute, burn, sharp, edge, used_weapon = null, list/forbidden_limbs = list())
-	..(brute, burn, sharp, edge, used_weapon, forbidden_limbs)
+/obj/item/organ/external/head/take_damage(brute, burn, sharp, edge, used_weapon = null, list/forbidden_limbs = list(), silent = 0)
+	..(brute, burn, sharp, edge, used_weapon, silent = silent)
 	if (!disfigured)
 		if (brute_dam > 40)
 			if (prob(50))

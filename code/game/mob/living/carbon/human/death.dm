@@ -22,7 +22,6 @@
 	for(var/mob/living/human/NB in view(6,src))
 		if (!NB.orc)
 			NB.mood -= 15
-			//NB.ptsd += 3
 
 /mob/living/human/crush()
 
@@ -38,7 +37,6 @@
 	for(var/mob/living/human/NB in view(6,src))
 		if (!NB.orc)
 			NB.mood -= 15
-			//NB.ptsd += 3
 
 /mob/living/human/maim()
 	next_emote["vocal"] = world.time + 50
@@ -51,6 +49,20 @@
 	water_overlay = FALSE
 	update_fire(1)
 	if (stat == DEAD) return
+
+	if (map && istype(map, /obj/map_metadata/wizard_boy))
+		var/obj/map_metadata/wizard_boy/WB = map
+		var/mob/living/human/killer = last_harmed
+		if (!killer && lastattacker && ishuman(lastattacker))
+			killer = lastattacker
+		if (killer && ishuman(killer) && killer != src)
+			if (killer.client && client)
+				WB.record_pvp_win(killer.client.ckey, client.ckey)
+			if (istype(get_area(src), /area/caribbean/houses/nml_one))
+				if (killer.client && WB.check_level(killer.client.ckey) == "4")
+					WB.change_level(killer.client.ckey, "5")
+					to_chat(world, "<font size=3 class='wizard'><b>[killer.real_name]</b> ([killer.key]) has progressed to qualification level 5 (<b>C.H.A.D.</b>) by defeating <b>[real_name]</b> ([key]) in the Arena!</font>")
+
 	if (map && client)
 		if (map.battleroyale && alive_n_of_side(PIRATES) > 1)
 			var/obj/map_metadata/battleroyale/BR = map
@@ -65,7 +77,7 @@
 					if (GD.gladiator_stats[i][1] == client.ckey && GD.gladiator_stats[i][2] == name)
 						GD.gladiator_stats[i][4] = 1
 						GD.save_gladiators()
-				src << "<big><b>[name]'s life fades away into history...</b></big>"
+				to_chat(src, "<big><b>[name]'s life fades away into history...</b></big>")
 
 			if (MAP_GULAG13)
 				var/obj/map_metadata/gulag13/GD = map
@@ -84,7 +96,7 @@
 							i[3]-=50
 		
 			if (MAP_ALLEYWAY)
-				if (civilization && civilization in map.scores)
+				if (civilization && (civilization in map.scores))
 					switch (civilization)
 						if ("Yamaguchi-Gumi")
 							if (original_job)
@@ -104,7 +116,7 @@
 										map.scores["Yamaguchi-Gumi"] += 1
 
 			if (MAP_YELTSIN)
-				if (civilization && civilization in map.scores)
+				if ((civilization && civilization) in map.scores)
 					switch (civilization)
 						if ("Russian Army")
 							if (original_job)
@@ -130,7 +142,7 @@
 							to_chat(world, "<font color='red' size=4>The <b>Dutch Army</b> Commander has been killed!</font>")
 			
 			if (MAP_CAPITOL_HILL)
-				if (civilization && civilization in map.scores)
+				if ((civilization && civilization) in map.scores)
 					switch (civilization)
 						if ("National Guard")
 							map.scores["Militia"] += 1
@@ -218,7 +230,7 @@
 								to_chat(world, "<font color='red' size=2>A <b>Mujahideen Group Leader</b> has been killed!</font>")
 
 			if (MAP_SEKIGAHARA)
-				if (civilization && civilization in map.scores)
+				if ((civilization && civilization) in map.scores)
 					switch (civilization)
 						if ("Eastern Army")
 							switch (original_job.title)
@@ -239,33 +251,9 @@
 								else
 									map.scores["Eastern Army"] += 1
 
-		/*
-			if (MAP_AFRICAN_WARLORDS)
-				if (faction_text == CIVILIAN && original_job_title == "United Nations Doctor")
-					var/mob/living/human/killer = last_harmed
-					if (ishuman(killer))
-						map.scores[killer.nationality] -= 12
-						to_chat(world, "<b><big>A United Nations Doctor has been killed! The elders are furious and have put a bounty on [killer.real_name], a [killer.original_job_title]! Bring his head to your altar for a generous reward!</big></b>")
-						killer.nationality = "Exiled"
-				if (faction_text == CIVILIAN && original_job_title == "United Nations Engineer")
-					var/mob/living/human/killer = last_harmed
-					if (ishuman(killer))
-						map.scores[killer.nationality] -= 10
-						killer.nationality = "Exiled"
-						to_chat(world, "<b><big>A United Nations Engineer has been killed! The elders are furious and have put a bounty on [killer.real_name], a [killer.original_job_title]! Bring his head to your altar for a generous reward!</big></b>")
-				if (faction_text == CIVILIAN && original_job_title == "United Nations Soldier")
-					map.scores["Blugisi"] -= 4
-					map.scores["Yellowagwana"] -= 4
-					map.scores["Redkantu"] -= 4
-					to_chat(world, "<b><big>A United Nations Soldier has been killed. The United Nations have lowered their financial support in the region. The local population is paying the consequences!</b></big>")
-				if (faction_text == CIVILIAN && original_job_title == "Local Policeman")
-					map.scores["Blugisi"] -= 4
-					map.scores["Yellowagwana"] -= 4
-					map.scores["Redkantu"] -= 4
-					to_chat(world, "<b><big>A Local Policeman has been killed! The local population is in shock and lowered their support for the warbands!</b></big>")
-		*/
+
 			if (MAP_THE_ART_OF_THE_DEAL)
-				if (civilization && civilization in map.scores)
+				if ((civilization && civilization) in map.scores)
 					if (civilization == "Paramedics")
 						map.scores[last_harmed.civilization] -= 500
 					else if (civilization == "Government")
@@ -426,26 +414,26 @@
 				map.faction1_squad_leaders[squad] = null
 				for(var/mob/living/human/HSM in map.faction1_squads[squad])
 					if (HSM != src)
-						HSM << "<big><b><font color='red'>Your squad leader has been killed!</font></b></big>"
+						to_chat(HSM, "<big><b><font color='red'>Your squad leader has been killed!</font></b></big>")
 						if (HSM.original_job.is_squad_leader && (!map.faction1_squad_leaders[squad] || map.faction1_squad_leaders[squad] == src))
-							HSM << "<big><b><font color='green'>You are the new squad leader!</font></b></big>"
+							to_chat(HSM, "<big><b><font color='green'>You are the new squad leader!</font></b></big>")
 							map.faction1_squad_leaders[squad] = HSM
 							for(var/mob/living/human/HSM2 in map.faction2_squads[squad])
 								if (HSM2 != HSM)
-									HSM2 << "<big><b>[HSM] is your new squad leader.</b></big>"
+									to_chat(HSM2, "<big><b>[HSM] is your new squad leader.</b></big>")
 		else if (faction_text == map.faction2)
 			map.faction2_squads[squad] -= src
 			if (map.faction2_squad_leaders[squad] == src)
 				map.faction2_squad_leaders[squad] = null
 				for(var/mob/living/human/HSM in map.faction2_squads[squad])
 					if (HSM != src)
-						HSM << "<big><b><font color='red'>Your squad leader has been killed!</font></b></big>"
+						to_chat(HSM, "<big><b><font color='red'>Your squad leader has been killed!</font></b></big>")
 						if (HSM.original_job.is_squad_leader && (!map.faction2_squad_leaders[squad] || map.faction2_squad_leaders[squad] == src))
-							HSM << "<big><b><font color='green'>You are the new squad leader!</font></b></big>"
+							to_chat(HSM, "<big><b><font color='green'>You are the new squad leader!</font></b></big>")
 							map.faction2_squad_leaders[squad] = HSM
 							for(var/mob/living/human/HSM2 in map.faction2_squads[squad])
 								if (HSM2 != HSM)
-									HSM2 << "<big><b>[HSM] is your new squad leader.</b></big>"
+									to_chat(HSM2, "<big><b>[HSM] is your new squad leader.</b></big>")
 	handle_hud_list()
 	var/list/poss_list = list()
 	if (map)
@@ -460,9 +448,9 @@
 				for(var/l=1, l <= map.custom_company[stocky].len, l++)
 					if (map.custom_company[stocky][l][1] == src)
 						map.custom_company[stocky][l][1] = null
-	src << browse(null, "window=memory")
 
 	if (client)
+		src << browse(null, "window=memory")
 		client.movement_busy = FALSE
 
 	//Handle species-specific deaths.
@@ -478,29 +466,33 @@
 		ticker.mode.check_win()*/
 
 	if (client)
-		switch (map.ID)
-			if (MAP_CAMPAIGN) // If it's campaign make respawn times based off of how many times you've respawned
-				client.next_normal_respawn = world.realtime + 1800 + (client.respawn_count * 600)
-				client.respawn_count++
-				to_chat(client, RESPAWN_MESSAGE)
-			if (MAP_BATTLE_SHIPS) // If it's battle ships make respawn times based off of if your factions engines have been destroyed
-				var/obj/map_metadata/battle_ships/BS = map
-				if (faction_text == map.faction1)
-					client.next_normal_respawn = world.realtime + (BS.faction1_engines_killed ? map.respawn_delay : (map.respawn_delay + (map.respawn_delay * 3)))
-				else if (faction_text == map.faction2)
-					client.next_normal_respawn = world.realtime + (BS.faction2_engines_killed ? map.respawn_delay : (map.respawn_delay + (map.respawn_delay * 3)))
-				else
-					client.next_normal_respawn = world.realtime
-				to_chat(client, RESPAWN_MESSAGE)
-			else // If it's not a special map do the normal respawn times
-				if (map.gamemode == "Hardcore")
-					client.next_normal_respawn = world.realtime + 999999
-				else if (map.gamemode == "Competitive")
-					client.next_normal_respawn = world.realtime + (map ? map.respawn_delay : 3000)
+		if(map.is_campaign_map == TRUE)
+			client.next_normal_respawn = world.realtime + map.respawn_delay
+			to_chat(client, RESPAWN_MESSAGE)
+		else
+			switch (map.ID)
+				if (MAP_CAMPAIGN) // If it's campaign make respawn times based off of how many times you've respawned
+					client.next_normal_respawn = world.realtime + 1800 + (client.respawn_count * 600)
+					client.respawn_count++
 					to_chat(client, RESPAWN_MESSAGE)
-				else
-					client.next_normal_respawn = world.realtime
+				if (MAP_BATTLE_SHIPS) // If it's battle ships make respawn times based off of if your factions engines have been destroyed
+					var/obj/map_metadata/battle_ships/BS = map
+					if (faction_text == map.faction1)
+						client.next_normal_respawn = world.realtime + (BS.faction1_engines_killed ? map.respawn_delay : (map.respawn_delay + (map.respawn_delay * 3)))
+					else if (faction_text == map.faction2)
+						client.next_normal_respawn = world.realtime + (BS.faction2_engines_killed ? map.respawn_delay : (map.respawn_delay + (map.respawn_delay * 3)))
+					else
+						client.next_normal_respawn = world.realtime
 					to_chat(client, RESPAWN_MESSAGE)
+				else // If it's not a special map do the normal respawn times
+					if (map.gamemode == "Hardcore")
+						client.next_normal_respawn = world.realtime + 999999
+					else if (map.gamemode == "Competitive")
+						client.next_normal_respawn = world.realtime + (map ? map.respawn_delay : 3000)
+						to_chat(client, RESPAWN_MESSAGE)
+					else
+						client.next_normal_respawn = world.realtime
+						to_chat(client, RESPAWN_MESSAGE)
 
 
 	. = ..(gibbed)//,species.death_message)

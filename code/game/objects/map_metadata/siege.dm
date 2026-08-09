@@ -2,7 +2,8 @@
 /obj/map_metadata/siege
 	ID = MAP_SIEGE
 	title = "Siege"
-	lobby_icon = 'icons/lobby/ancient.png'
+	description = "The Roman troops are sieging a Greek fortress near Syracuse! The Greeks will win if they manage to hold the fortress for 35 minutes."
+	lobby_icon = "icons/lobby/ancient.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall/)
 	respawn_delay = 300
 	no_hardcore = TRUE
@@ -21,9 +22,9 @@
 	mission_start_message = "<font size=4>The <b>Roman</b> troops are sieging a <b>Greek</b> fortress near Syracuse! The Greeks will win if they manage to hold the fortress for 35 minutes. <br> The siege will start in <b>6 minutes</b>.</font>"
 	faction1 = GREEK
 	faction2 = ROMAN
-	ambience = list('sound/ambience/jungle1.ogg')
+	ambience = list("sound/ambience/jungle1.ogg")
 	songs = list(
-		"Divinitus:1" = 'sound/music/divinitus.ogg',)
+		"Divinitus:1" = "sound/music/divinitus.ogg",)
 	gamemode = "Siege"
 /obj/map_metadata/siege/faction1_can_cross_blocks()
 	return (processes.ticker.playtime_elapsed >= 36000 || admin_ended_all_grace_periods)
@@ -31,20 +32,7 @@
 /obj/map_metadata/siege/faction2_can_cross_blocks()
 	return (processes.ticker.playtime_elapsed >= 3600 || admin_ended_all_grace_periods)
 
-obj/map_metadata/siege/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (istype(J, /datum/job/roman))
-		if (J.is_gladiator == TRUE || J.is_skyrim == TRUE)
-			. = FALSE
-		else
-			. = TRUE
-	if (istype(J, /datum/job/greek))
-		if (J.is_ancient == TRUE)
-			. = TRUE
-		else
-			. = FALSE
-	else
-		. = FALSE
+
 
 var/no_loop_rom = FALSE
 
@@ -55,14 +43,14 @@ var/no_loop_rom = FALSE
 			return FALSE
 		ticker.finished = TRUE
 		var/message = "The Greek troops have managed to defend the fortress!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		return FALSE
 	if ((current_winner && current_loser && world.time > next_win) && no_loop_rom == FALSE)
 		ticker.finished = TRUE
 		var/message = "The Roman Legion has captured the fortress! The remaining Greek troops have surrendered!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		show_global_battle_report(null)
 		win_condition_spam_check = TRUE
 		no_loop_rom = TRUE
@@ -105,7 +93,7 @@ var/no_loop_rom = FALSE
 				current_loser = roundend_condition_def2army(roundend_condition_sides[1][1])
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The Greek troops have recaptured the fortress!</font>"
+			to_chat(world, "<font size = 3>The Greek troops have recaptured the fortress!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1

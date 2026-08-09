@@ -9,9 +9,11 @@
 	var/ready = FALSE
 	var/spawning = FALSE //Referenced when you want to delete the new_player later on in the code.
 	var/totalPlayers = 0		 //Player counts for the Lobby tab
-	var/totalPlayersReady = 0
 	var/desired_job = null // job title. This is for join queues.
 	var/datum/job/delayed_spawning_as_job = null // job title. Self explanatory.
+
+	var/pregameBrowserLoaded = FALSE
+	
 	universal_speak = TRUE
 
 	invisibility = 101
@@ -22,7 +24,6 @@
 
 	anchored = TRUE	//  don't get pushed around
 
-	var/on_welcome_popup = FALSE
 
 var/global/redirect_all_players = null
 /mob/new_player/New()
@@ -40,18 +41,13 @@ var/global/redirect_all_players = null
 				C << link(redirect_all_players)
 	spawn(20)
 		if (map && map.ID == MAP_THE_ART_OF_THE_DEAL)
-			var/htmlfile = "<!DOCTYPE html><HTML><HEAD><TITLE>Wiki Guide</TITLE><META http-equiv=\"X-UA-Compatible\" content=\"IE=edge\"></HEAD> \
-			<BODY><iframe src=\"https://civ13.github.io/civ13-wiki/The_Art_of_the_Deal\"  style=\"position: absolute; height: 97%; width: 97%; border: none\"></iframe></BODY></HTML>"
-			src << browse(htmlfile,"window=wiki;size=820x650")
+			src << browse("<script>window.location.href='https://civ13.github.io/civ13-wiki/gamemodes/The_Art_of_the_Deal';</script>","window=wiki;size=820x650")
 		if (map && map.ID == MAP_GULAG13)
-			var/htmlfile = "<!DOCTYPE html><HTML><HEAD><TITLE>Wiki Guide</TITLE><META http-equiv=\"X-UA-Compatible\" content=\"IE=edge\"></HEAD> \
-			<BODY><iframe src=\"https://civ13.github.io/civ13-wiki/Gulag_13\"  style=\"position: absolute; height: 97%; width: 97%; border: none\"></iframe></BODY></HTML>"
-			src << browse(htmlfile,"window=wiki;size=820x650")
+			src << browse("<script>window.location.href='https://civ13.github.io/civ13-wiki/maps/Gulag_13';</script>","window=wiki;size=820x650")
 		if (map && map.ID == MAP_PEPELSIBIRSK)
-			var/htmlfile = "<!DOCTYPE html><HTML><HEAD><TITLE>Wiki Guide</TITLE><META http-equiv=\"X-UA-Compatible\" content=\"IE=edge\"></HEAD> \
-			<BODY><iframe src=\"https://civ13.github.io/civ13-wiki/Pepelsibirsk\"  style=\"position: absolute; height: 97%; width: 97%; border: none\"></iframe></BODY></HTML>"
-			src << browse(htmlfile,"window=wiki;size=820x650")
-
+			src << browse("<script>window.location.href='https://civ13.github.io/civ13-wiki/maps/Pepelsibirsk';</script>","window=wiki;size=820x650")
+		if (map && map.ID == MAP_WIZARD_BOY)
+			src << browse("<script>window.location.href='https://civ13.github.io/civ13-wiki/gamemodes/wizard_boy_quickstart';</script>","window=wiki;size=820x650")
 /mob/new_player/Destroy()
 	new_player_mob_list -= src
 	..()
@@ -66,31 +62,31 @@ var/global/redirect_all_players = null
 
 	if (client)
 		if (client.prefs.muted & MUTE_DEADCHAT)
-			src << "<span class = 'red'>You cannot talk in lobbychat (muted).</span>"
+			to_chat(src, "<span class = 'red'>You cannot talk in lobbychat (muted).</span>")
 			return
 
 		if (client.handle_spam_prevention(message,MUTE_DEADCHAT))
 			return
 		if (!client.holder)
 			if (!config.ooc_allowed)
-				src << "<span class='danger'>OOC is globally muted.</span>"
+				to_chat(src, "<span class='danger'>OOC is globally muted.</span>")
 				return
 			if (!config.dooc_allowed && (stat == DEAD))
-				usr << "<span class='danger'>OOC for dead mobs has been turned off.</span>"
+				to_chat(usr, "<span class='danger'>OOC for dead mobs has been turned off.</span>")
 				return
 			if (client.prefs.muted & MUTE_OOC)
-				src << "<span class='danger'>You cannot use OOC (muted).</span>"
+				to_chat(src, "<span class='danger'>You cannot use OOC (muted).</span>")
 				return
 			if (client.handle_spam_prevention(message,MUTE_OOC))
 				return
 			if (findtext(message, "byond://"))
-				src << "<b>Advertising other servers is not allowed.</b>"
+				to_chat(src, "<b>Advertising other servers is not allowed.</b>")
 				log_admin("[key_name(client)] has attempted to advertise in OOC: [message]")
 				message_admins("[key_name_admin(client)] has attempted to advertise in OOC: [message]", key_name_admin(client))
 				return
 	for (var/new_player in new_player_mob_list)
 		if (new_player:client) // sanity check
-			new_player << "<span class = 'ping'><small>["\["]LOBBY["\]"]</small></span> <span class='deadsay'><b>[capitalize(key)]</b>:</span> [capitalize(message)]"
+			to_chat(new_player, create_text_tag("lobby", "LOBBY:", new_player:client) + "<span class='deadsay'><b>[capitalize(key)]</b>:</span> [capitalize(message)]")
 
 	return TRUE
 
@@ -103,7 +99,6 @@ var/global/redirect_all_players = null
 	// don't know if the above actually works
 
 	var/output_stylized = {"
-	<br>
 	<html>
 	<head>
 	[common_browser_style]
@@ -129,17 +124,17 @@ var/global/redirect_all_players = null
 	else
 		if (map.ID == MAP_TRIBES || map.ID == MAP_THREE_TRIBES || map.ID == MAP_FOUR_KINGDOMS)
 			output += "<p><a href='byond://?src=\ref[src];tribes=1'>Join a Tribe!</a></p>"
-		else if (map.ID == MAP_CAMPAIGN)
+		else if (map.ID ==  MAP_CAMPAIGN || map.ID == CAMPAIGN_MAP_LIST_MAPID_OR)
 			output += "<p><a href='byond://?src=\ref[src];join_campaign=1'>Join Game!</a></p>"
 		else if (map.civilizations && !map.nomads)
 			output += "<p><a href='byond://?src=\ref[src];civilizations=1'>Join a Civilization!</a></p>"
-		else if (map.nomads)
+		else if (map.nomads || map.ID == MAP_ANTARCTICA || map.ID == MAP_LIGHTS_OUT || map.ID == MAP_WIZARD_BOY)
 			output += "<p><a href='byond://?src=\ref[src];nomads=1'>Join!</a></p>"
 		else
 			output += "<p><a href='byond://?src=\ref[src];late_join=1'>["Join Game!"]</a></p>"
 
-	var/height = 250
-	if (client.holder)
+	var/height = 280
+	if (client && client.holder)
 		output += "<p><a href='byond://?src=\ref[src];observe=1'>Observe</A></p>"
 	else if (map && map.ID != MAP_CAMPAIGN && map.ID != MAP_NATIONSRP_COLDWAR_CMP )
 		output += "<p><a href='byond://?src=\ref[src];observe=1'>Observe</A></p>"
@@ -147,7 +142,7 @@ var/global/redirect_all_players = null
 	output += "</div>"
 
 	client << browse(null, "window=playersetup;")
-	client << browse(replacetext(output_stylized, "PLACEHOLDER", output), "window=playersetup;size=275x[height];can_close=0;can_resize=0")
+	client << browse(replacetext(output_stylized, "PLACEHOLDER", output), "window=playersetup;size=280x[height];can_close=0;can_resize=0")
 	return
 
 /mob/new_player/Stat()
@@ -171,26 +166,23 @@ var/global/redirect_all_players = null
 				client << output(list2params(list()), "playerlist.browser:renderPlayerList")
 				player.updateTimeToStart()*/
 
-	if (client.status_tabs && statpanel("Status") && ticker)
-		stat("")
-		stat(stat_header("Lobby"))
-		stat("")
+	if (client.status_tabs && (client.add_stat_tab("Status") || client.statpanel_tab == "Status") && ticker)
+		client.add_stat("<h3>Lobby</h3>")
 
 		// by counting observers, our playercount now looks more impressive - Kachnov
 		if (ticker.current_state == GAME_STATE_PREGAME)
-			stat("Time Until Joining Allowed:", "[ticker.pregame_timeleft][round_progressing ? "" : " (DELAYED)"]")
+			client.add_stat("<b>Time Until Joining Allowed:</b>", "[ticker.pregame_timeleft][round_progressing ? "" : " (DELAYED)"]")
 
-		stat("Players in lobby:", totalPlayers)
-		stat("")
-		stat("")
+		client.add_stat("<b>Players in lobby:</b>", totalPlayers)
 
 		totalPlayers = 0
-
-		for (var/player in new_player_mob_list)
-			stat(player:key)
-			++totalPlayers
-
-		stat("")
+		var/list/player_keys = list()
+		for (var/mob/new_player/player in new_player_mob_list)
+			if (player.client)
+				player_keys += player.client.key
+				++totalPlayers
+		client.add_stat("<b>Player List:</b>", jointext(player_keys, ", "))
+		client.add_stat("")
 
 	..()
 
@@ -209,11 +201,11 @@ var/global/redirect_all_players = null
 			ready = FALSE
 
 	if (href_list["refresh"])
-		src << browse(null, "window=playersetup") //closes the player setup window
+		src << browse(null, "window=playersetup") //closes the player setup window)
 		new_player_panel_proc()
 
 	if (href_list["observe"])
-		if ((map.ID == MAP_CAMPAIGN || map.ID == MAP_NATIONSRP_COLDWAR_CMP) && !client.holder)
+		if ((map.ID == MAP_CAMPAIGN || map.ID == MAP_NATIONSRP_COLDWAR_CMP || map.ID == CAMPAIGN_MAP_LIST_MAPID_OR) && !client.holder)
 			WWalert(src,"You cannot observe during this round.","Error")
 			return TRUE
 
@@ -229,12 +221,15 @@ var/global/redirect_all_players = null
 			src << sound(null, repeat = FALSE, wait = FALSE, volume = 85, channel = TRUE) // MAD JAMS cant last forever yo
 
 			observer.started_as_observer = TRUE
+			#ifdef OPENDREAM
+			client?.unload_pregame()
+			#endif
 			close_spawn_windows()
 			var/turf/T = get_turf(locate(1,1,world.maxz))
 			if (T)
 				observer.loc = T
 			else
-				src << "<span class='danger'>Could not locate an observer spawn point. Use the Teleport verb to jump to another map point.</span>"
+				to_chat(src, "<span class='danger'>Could not locate an observer spawn point. Use the Teleport verb to jump to another map point.</span>")
 			observer.timeofdeath = world.time // Set the time of death so that the respawn timer works correctly.
 
 			announce_ghost_joinleave(src)
@@ -414,11 +409,41 @@ var/global/redirect_all_players = null
 			close_spawn_windows()
 			AttemptLateSpawn("Nomad")
 			return TRUE
+		else if (map && map.ID == MAP_ANTARCTICA)
+			close_spawn_windows()
+			AttemptLateSpawn("Antarctic Survivor")
+		else if (map && map.ID == MAP_LIGHTS_OUT)
+			close_spawn_windows()
+			AttemptLateSpawn("Survivor")
+		else if (map && map.ID == MAP_WIZARD_BOY)
+			if (istype(map, /obj/map_metadata/wizard_boy))
+				var/obj/map_metadata/wizard_boy/WB = map
+				var/house_result = WB.check_house(client.ckey)
+				if (house_result != "Unknown")
+					var/_color = "#FFFFFF"
+					switch(house_result)
+						if("Rubywyrm")
+							_color = "#CF0000"
+						if("Mintysnek")
+							_color = "#00CF00"
+						if("Slatepie")
+							_color = "#0000CF"
+						if("Mustardweasel")
+							_color = "#FFD700"
+					to_chat(src, "<font size=6 class='wizard'>You are a member of <span style='color:[_color]'>[house_result]</span>.</font>")
+					var/skill_result = WB.check_level(client.ckey)
+					var/skill_string = WB.level_to_formatted_text(skill_result)
+					to_chat(src, "<font size=6 class='wizard'>You are a [skill_string].</font>")
+					close_spawn_windows()
+					if (AttemptLateSpawn("Wizard Boy"))
+						return TRUE
+				else
+					if (WB.house_test(client))
+						close_spawn_windows()
+						if (AttemptLateSpawn("Wizard Boy"))
+							return TRUE
 		else
 			return
-		close_spawn_windows()
-		AttemptLateSpawn("Nomad")
-		return TRUE
 
 	if (href_list["join_campaign"])
 
@@ -465,10 +490,22 @@ var/global/redirect_all_players = null
 				temp_ckey = replacetext(temp_ckey,"_", "")
 				if (temp_ckey == client.ckey)
 					factjob = "organizer"
-
 		if (factjob)
 			if (map.ID == MAP_CAMPAIGN)
 				LateChoicesCampaign(factjob)
+			if (map.ID == CAMPAIGN_MAP_LIST_MAPID_OR)
+				LateChoicesCampaignNew(factjob)
+		else if (disable_campaign_whitelist != FALSE)
+			factjob = global.player_faction_list[client.ckey]
+			if (!factjob)
+				factjob = WWinput(src, "This round is part of a campaign, but the whitelist has been disabled. Which faction do you want to join?", "Faction Choice", "blue", list("blue", "red"))
+				if (factjob)
+					global.player_faction_list[client.ckey] = factjob
+			if (factjob)
+				if (map.ID == MAP_CAMPAIGN)
+					LateChoicesCampaign(factjob)
+				if (map.ID == CAMPAIGN_MAP_LIST_MAPID_OR)
+					LateChoicesCampaignNew(factjob)
 		else
 			if (config.discordurl)
 				WWalert(src, "This round is part of an event. You need to be part of one of the two factions to participate. Visit the discord for more information: [config.discordurl]")
@@ -694,6 +731,102 @@ var/global/redirect_all_players = null
 				AttemptLateSpawn(href_list["SelectedJob"])
 				return
 
+			if (map.ID == CAMPAIGN_MAP_LIST_MAPID_OR)
+				if (!findtext(href_list["SelectedJob"], "Private") && !findtext(href_list["SelectedJob"], "Machinegunner") && !findtext(href_list["SelectedJob"], "Des. Marksman"))
+					if ((input(src, "This is a specialist role. You should have decided with your faction on which roles you should pick. If you haven't done so, its probably better if you join as a Private instead. Are you sure you want to join in as a [href_list["SelectedJob"]]?") in list("Yes", "No")) == "No")
+						return
+				if(findtext(href_list["SelectedJob"],"CAFR"))
+					var/obj/map_metadata/campaign_new/MC = map
+					if(findtext(href_list["SelectedJob"],"Squad 1"))
+						if (findtext(href_list["SelectedJob"],"Sniper"))
+							MC.squad_jobs_blue["Squad 1"]["Sniper"]--
+						if (findtext(href_list["SelectedJob"],"Machinegunner"))
+							MC.squad_jobs_blue["Squad 1"]["Machinegunner"]--
+						if (findtext(href_list["SelectedJob"],"Des. Marksman"))
+							MC.squad_jobs_blue["Squad 1"]["Des. Marksman"]--
+
+					else if(findtext(href_list["SelectedJob"],"Squad 2"))
+						if (findtext(href_list["SelectedJob"],"Sniper"))
+							MC.squad_jobs_blue["Squad 2"]["Sniper"]--
+						if (findtext(href_list["SelectedJob"],"Machinegunner"))
+							MC.squad_jobs_blue["Squad 2"]["Machinegunner"]--
+						if (findtext(href_list["SelectedJob"],"Des. Marksman"))
+							MC.squad_jobs_blue["Squad 2"]["Des. Marksman"]--
+
+					else if(findtext(href_list["SelectedJob"],"Squad 3"))
+						if (findtext(href_list["SelectedJob"],"Sniper"))
+							MC.squad_jobs_blue["Squad 3"]["Sniper"]--
+						if (findtext(href_list["SelectedJob"],"Machinegunner"))
+							MC.squad_jobs_blue["Squad 3"]["Machinegunner"]--
+						if (findtext(href_list["SelectedJob"],"Des. Marksman"))
+							MC.squad_jobs_blue["Squad 3"]["Des. Marksman"]--
+
+					else if(findtext(href_list["SelectedJob"],"CAFR Doctor"))
+						MC.squad_jobs_blue["none"]["Doctor"]--
+
+					else if(findtext(href_list["SelectedJob"],"CAFR Officer"))
+						MC.squad_jobs_blue["none"]["Officer"]--
+					else if(findtext(href_list["SelectedJob"],"CAFR Commander"))
+						MC.squad_jobs_blue["none"]["Commander"]--
+						
+					else if(findtext(href_list["SelectedJob"],"CAFR Recon"))
+						MC.squad_jobs_blue["Recon"]["Sniper"]--
+					else if(findtext(href_list["SelectedJob"],"CAFR Anti-Tank"))
+						MC.squad_jobs_blue["AT"]["Anti-Tank"]--
+					else if(findtext(href_list["SelectedJob"],"CAFR Armored Crew"))
+						MC.squad_jobs_blue["Armored"]["Crew"]--
+					else if(findtext(href_list["SelectedJob"],"CAFR Engineer"))
+						MC.squad_jobs_blue["Engineer"]["Engineer"]--
+					AttemptLateSpawn(href_list["SelectedJob"])
+					return
+
+				else if (findtext(href_list["SelectedJob"],"TSFSR"))
+					var/obj/map_metadata/campaign_new/MC = map
+					if(findtext(href_list["SelectedJob"],"Squad 1"))
+						if (findtext(href_list["SelectedJob"],"Sniper"))
+							MC.squad_jobs_red["Squad 1"]["Sniper"]--
+						if (findtext(href_list["SelectedJob"],"Machinegunner"))
+							MC.squad_jobs_red["Squad 1"]["Machinegunner"]--
+						if (findtext(href_list["SelectedJob"],"Des. Marksman"))
+							MC.squad_jobs_red["Squad 1"]["Des. Marksman"]--
+
+					else if(findtext(href_list["SelectedJob"],"Squad 2"))
+						if (findtext(href_list["SelectedJob"],"Sniper"))
+							MC.squad_jobs_red["Squad 2"]["Sniper"]--
+						if (findtext(href_list["SelectedJob"],"Machinegunner"))
+							MC.squad_jobs_red["Squad 2"]["Machinegunner"]--
+						if (findtext(href_list["SelectedJob"],"Des. Marksman"))
+							MC.squad_jobs_red["Squad 2"]["Des. Marksman"]--
+
+					else if(findtext(href_list["SelectedJob"],"Squad 3"))
+						if (findtext(href_list["SelectedJob"],"Sniper"))
+							MC.squad_jobs_red["Squad 3"]["Sniper"]--
+						if (findtext(href_list["SelectedJob"],"Machinegunner"))
+							MC.squad_jobs_red["Squad 3"]["Machinegunner"]--
+						if (findtext(href_list["SelectedJob"],"Des. Marksman"))
+							MC.squad_jobs_red["Squad 3"]["Des. Marksman"]--
+
+					else if(findtext(href_list["SelectedJob"],"TSFSR Doctor"))
+						MC.squad_jobs_red["none"]["Doctor"]--
+
+					else if(findtext(href_list["SelectedJob"],"TSFSR Officer"))
+						MC.squad_jobs_red["none"]["Officer"]--
+					else if(findtext(href_list["SelectedJob"],"TSFSR Commander"))
+						MC.squad_jobs_red["none"]["Commander"]--
+
+					else if(findtext(href_list["SelectedJob"],"TSFSR Recon"))
+						MC.squad_jobs_red["Recon"]["Sniper"]--
+					else if(findtext(href_list["SelectedJob"],"TSFSR Anti-Tank"))
+						MC.squad_jobs_red["AT"]["Anti-Tank"]--
+					else if(findtext(href_list["SelectedJob"],"TSFSR Armored Crew"))
+						MC.squad_jobs_red["Armored"]["Crew"]--
+					else if(findtext(href_list["SelectedJob"],"TSFSR Engineer"))
+						MC.squad_jobs_red["Engineer"]["Engineer"]--
+					AttemptLateSpawn(href_list["SelectedJob"])
+					return
+			else if (findtext(href_list["SelectedJob"],"TSFSR"))
+				AttemptLateSpawn(href_list["SelectedJob"])
+				return
 //Kandahar DRA spawnpoints
 		if (map && map.ID == MAP_KANDAHAR)
 			var/obj/map_metadata/kandahar/MP = map
@@ -1042,7 +1175,7 @@ var/global/redirect_all_players = null
 	character = job_master.EquipRank(character, rank, TRUE)					//equips the human
 
 	//squads
-	if (ishuman(character) && map.ID != MAP_CAMPAIGN && map.ID != MAP_ROTSTADT)
+	if (ishuman(character) && map.ID != MAP_CAMPAIGN && map.ID != CAMPAIGN_MAP_LIST_AND_NOT_MAPID && map.ID != MAP_ROTSTADT)
 		var/mob/living/human/H = character
 		if (H.original_job_title == "FBI officer" || H.original_job_title == "KGB officer")
 			H.verbs += /mob/living/human/proc/find_hvt
@@ -1074,15 +1207,15 @@ var/global/redirect_all_players = null
 				else
 					H.squad = rand(1,map.squads)
 				map.faction1_squads[H.squad] += list(H)
-				H << "<big><b>You have been assigned to Squad [H.squad]!</b></big>"
+				to_chat(H, "<big><b>You have been assigned to Squad [H.squad]!</b></big>")
 				if (H.original_job.is_squad_leader)
 					if (!map.faction1_squad_leaders[H.squad] || map.faction1_squad_leaders[H.squad] == H)
-						H << "<big><b>You are the new squad leader!</b></big>"
+						to_chat(H, "<big><b>You are the new squad leader!</b></big>")
 						map.faction1_squad_leaders[H.squad] = H
 					else if (map.faction1_squad_leaders[H.squad] && map.faction1_squad_leaders[H.squad] != H)
-						H << "<big><b>Your squad leader is [map.faction1_squad_leaders[H.squad]].</b></big>"
+						to_chat(H, "<big><b>Your squad leader is [map.faction1_squad_leaders[H.squad]].</b></big>")
 				else if (map.faction1_squad_leaders[H.squad])
-					H << "<big><b>Your squad leader is [map.faction1_squad_leaders[H.squad]].</b></big>"
+					to_chat(H, "<big><b>Your squad leader is [map.faction1_squad_leaders[H.squad]].</b></big>")
 			else if (H.faction_text == map.faction2)
 				if (H.original_job.is_officer || H.original_job.is_squad_leader || H.original_job.is_commander)
 					if (map.ordinal_age >= 6 && map.ordinal_age < 8)
@@ -1101,17 +1234,21 @@ var/global/redirect_all_players = null
 				else
 					H.squad = rand(1,map.squads)
 				map.faction2_squads[H.squad] += list(H)
-				H << "<big><b>You have been assigned to Squad [H.squad]!</b></big>"
+				to_chat(H, "<big><b>You have been assigned to Squad [H.squad]!</b></big>")
 				if (H.original_job.is_squad_leader)
 					if (!map.faction2_squad_leaders[H.squad] || map.faction2_squad_leaders[H.squad] == H)
-						H << "<big><b>You are the new squad leader!</b></big>"
+						to_chat(H, "<big><b>You are the new squad leader!</b></big>")
 						map.faction2_squad_leaders[H.squad] = H
 					else if (map.faction2_squad_leaders[H.squad] && map.faction2_squad_leaders[H.squad] != H)
-						H << "<big><b>Your squad leader is [map.faction2_squad_leaders[H.squad]].</b></big>"
+						to_chat(H, "<big><b>Your squad leader is [map.faction2_squad_leaders[H.squad]].</b></big>")
 				else if (map.faction2_squad_leaders[H.squad])
-					H << "<big><b>Your squad leader is [map.faction2_squad_leaders[H.squad]].</b></big>"
+					to_chat(H, "<big><b>Your squad leader is [map.faction2_squad_leaders[H.squad]].</b></big>")
 	if(!map.fob_spawns)
 		job_master.relocate(character)
+	if (map.ID == MAP_WIZARD_BOY && ishuman(character))
+		var/obj/map_metadata/wizard_boy/WB = map
+		WB.give_sticker_pack(character)
+		WB.load_wand(character)
 	if (character.buckled && istype(character.buckled, /obj/structure/bed/chair/wheelchair))
 		character.buckled.loc = character.loc
 		character.buckled.set_dir(character.dir)
@@ -1127,183 +1264,17 @@ var/global/redirect_all_players = null
 
 	src << browse(null, "window=latechoices")
 
-	//<body style='background-color:#1D2951; color:#ffffff'>
 	var/list/dat = list("<center>")
-	dat += "<b><big>Welcome, [key].</big></b>"
+	dat += "<font size=5><b>Welcome, [key].</b></font>"
 	dat += "<br>"
-	dat += "Round Duration: [roundduration2text_days()]"
+	dat += "<font size=4>Round Duration: [roundduration2text_days()]</font>"
 	dat += "<br>"
-	dat += "<b>Current Autobalance Status</b>: "
-	if (BRITISH in map.faction_organization)
-		if (map && istype(map, /obj/map_metadata/twotribes))
-			dat += "[alive_french.len] Red Tribesmen "
-		else
-			dat += "[alive_british.len] British "
-	if (PORTUGUESE in map.faction_organization)
-		dat += "[alive_portuguese.len] Portuguese "
-	if (FRENCH in map.faction_organization)
-		if (map && istype(map, /obj/map_metadata/twotribes))
-			dat += "[alive_french.len] Blue Tribesmen "
-		else
-			dat += "[alive_french.len] French "
-	if (SPANISH in map.faction_organization)
-		dat += "[alive_spanish.len] Spanish "
-	if (DUTCH in map.faction_organization)
-		dat += "[alive_dutch.len] Dutch "
-	if (ITALIAN in map.faction_organization)
-		dat += "[alive_dutch.len] Italian "
-	if (PIRATES in map.faction_organization)
-		dat += "[alive_pirates.len] Pirates "
-	if (INDIANS in map.faction_organization)
-		if (map && istype(map, /obj/map_metadata/african_warlords))
-			dat += "[alive_indians.len] Blugisi "
-		else if (map && istype(map, /obj/map_metadata/tadojsville))
-			dat += "[alive_indians.len] Wartribe Mercenary "
-		else if (map && istype(map, /obj/map_metadata/east_los_santos))
-			dat += "[alive_indians.len] Ballas "
-		else
-			dat += "[alive_indians.len] Natives "
-	if (CIVILIAN in map.faction_organization)
-		if (map && istype(map, /obj/map_metadata/tsaritsyn))
-			dat += "[alive_civilians.len] Soviets "
-		else if (map && istype(map, /obj/map_metadata/african_warlords))
-			dat += "[alive_civilians.len] Yellowagwana "
-		else if (map && istype(map, /obj/map_metadata/tadojsville))
-			dat += "[alive_civilians.len] UN Peacekeepers "
-		else if (map && istype(map, /obj/map_metadata/capitol_hill))
-			dat += "[alive_civilians.len] Rioters "
-		else if (map && istype(map, /obj/map_metadata/yeltsin))
-			dat += "[alive_civilians.len] Soviet Remnants "
-		else if (map && istype(map, /obj/map_metadata/missionary_ridge))
-			dat += "[alive_civilians.len] Confederates "
-		else if (map && istype(map, /obj/map_metadata/tantiveiv))
-			dat += "[alive_civilians.len] Rebels "
-		else if (map && istype(map, /obj/map_metadata/ruhr_uprising))
-			dat += "[alive_civilians.len] Revolutionaries "
-		else if (map && istype(map, /obj/map_metadata/bank_robbery))
-			dat += "[alive_civilians.len] Policemen "
-		else if (map && istype(map, /obj/map_metadata/drug_bust))
-			dat += "[alive_civilians.len] Policemen and Federal Agents "
-		else if (map && istype(map, /obj/map_metadata/long_march))
-			dat += "[alive_civilians.len] Chinese Red Army "
-		else if (map && istype(map, /obj/map_metadata/holdmadrid))
-			dat += "[alive_civilians.len] Republican "
-		else
-			dat += "[alive_civilians.len] Civilians "
-	if (GREEK in map.faction_organization)
-		dat += "[alive_greek.len] Greeks "
-	if (ROMAN in map.faction_organization)
-		dat += "[alive_roman.len] Romans "
-	if (ARAB in map.faction_organization)
-		if (map && (istype(map, /obj/map_metadata/kandahar) || istype(map, /obj/map_metadata/hill_3234) || istype(map, /obj/map_metadata/magistral)))
-			dat += "[alive_arab.len] Mujahideen "
-		else if (map && istype(map, /obj/map_metadata/syria))
-			dat += "[alive_arab.len] Syrian Government Soldiers "
-		else
-			dat += "[alive_arab.len] Arabs "
-	if (JAPANESE in map.faction_organization)
-		dat += "[alive_japanese.len] Japanese "
-	if (RUSSIAN in map.faction_organization)
-		if (map && istype(map, /obj/map_metadata/yeltsin))
-			dat += "[alive_russian.len] Russian Army "
-		else if (map && istype(map, /obj/map_metadata/bank_robbery))
-			dat +="[alive_russian.len] Robbers "
-		else if (map && istype(map, /obj/map_metadata/drug_bust))
-			dat +="[alive_russian.len] Rednikov Mobsters "
-		else if (map && istype(map, /obj/map_metadata/eft_factory))
-			dat +="[alive_russian.len] BEAR PMCs "
-		else
-			if (map && (map.ordinal_age == 6 || map.ordinal_age == 7))
-				dat += "[alive_russian.len] Soviets "
-			else
-				dat += "[alive_russian.len] Russians "
-	if (CHECHEN in map.faction_organization)
-		dat += "[alive_chechen.len] Chechens "
-	if (FINNISH in map.faction_organization)
-		dat += "[alive_finnish.len] Finnish "
-	if (NORWEGIAN in map.faction_organization)
-		if (map && istype(map, /obj/map_metadata/clash))
-			dat += "[alive_norwegian.len] Bear Clan Vikings "
-		else
-			dat += "[alive_norwegian.len] Norwegians "
-	if (SWEDISH in map.faction_organization)
-		dat += "[alive_swedish.len] Swedes "
-	if (DANISH in map.faction_organization)
-		if (map && istype(map, /obj/map_metadata/clash))
-			dat += "[alive_danish.len] Raven Clan Vikings "
-		else
-			dat += "[alive_danish.len] Danes "
-	if (GERMAN in map.faction_organization)
-		if (map && istype(map, /obj/map_metadata/ruhr_uprising))
-			dat += "[alive_german.len] Reactionaries "
-		else
-			dat += "[alive_german.len] German "
-	if (AMERICAN in map.faction_organization)
-		if (map && istype(map, /obj/map_metadata/arab_town))
-			dat += "[alive_american.len] Israeli "
-		else if (map && istype(map, /obj/map_metadata/capitol_hill))
-			dat += "[alive_american.len] American Government "
-		else if (map && istype(map, /obj/map_metadata/missionary_ridge))
-			dat += "[alive_american.len] Union Soldiers "
-		else if (map && istype(map, /obj/map_metadata/tantiveiv))
-			dat += "[alive_american.len] Imperials "
-		else if (map && istype(map, /obj/map_metadata/east_los_santos))
-			dat += "[alive_american.len] Grove Street "
-		else if (map && istype(map, /obj/map_metadata/eft_factory))
-			dat += "[alive_american.len] USEC PMCs "
-		else if (map && istype(map, /obj/map_metadata/syria))
-			dat += "[alive_american.len] Syrian Rebels "
-		else
-			dat += "[alive_american.len] American "
-	if (VIETNAMESE in map.faction_organization)
-		dat += "[alive_vietnamese.len] Vietnamese "
-	if (CHINESE in map.faction_organization)
-		if (map && istype(map, /obj/map_metadata/long_march))
-			dat += "[alive_chinese.len] Chinese National Army "
-		else
-			dat += "[alive_chinese.len] Chinese "
-	if (FILIPINO in map.faction_organization)
-		dat += "[alive_filipino.len] Filipino "
-	if (POLISH in map.faction_organization)
-		dat += "[alive_polish.len] Poles "
-	if (BLUEFACTION in map.faction_organization)
-		dat += "[alive_bluefaction.len] Blugoslavians "
-	if (REDFACTION in map.faction_organization)
-		dat += "[alive_redfaction.len] Redmenians "
+	dat += "<font size=4><b>Current Autobalance Status</b>: [get_autobalance_status_html()]</font>"
 	dat += "<br>"
-//	dat += "<i>Jobs available for slave-banned players are marked with an *</i>"
-//	dat += "<br>"
 
-//	var/list/restricted_choices = list()
-
-	var/list/available_jobs_per_side = list(
-		CIVILIAN = FALSE,
-		PIRATES = FALSE,
-		SPANISH = FALSE,
-		FRENCH = FALSE,
-		INDIANS = FALSE,
-		PORTUGUESE = FALSE,
-		DUTCH = FALSE,
-		ITALIAN = FALSE,
-		BRITISH = FALSE,
-		ROMAN = FALSE,
-		GREEK = FALSE,
-		ARAB = FALSE,
-		RUSSIAN = FALSE,
-		CHECHEN = FALSE,
-		FINNISH = FALSE,
-		NORWEGIAN = FALSE,
-		SWEDISH = FALSE,
-		DANISH = FALSE,
-		JAPANESE = FALSE,
-		GERMAN = FALSE,
-		AMERICAN = FALSE,
-		VIETNAMESE = FALSE,
-		CHINESE = FALSE,
-		POLISH = FALSE,
-		BLUEFACTION = FALSE,
-		REDFACTION = FALSE,
-		)
+	var/list/available_jobs_per_side = list()
+	for (var/faction in map.faction_organization)
+		available_jobs_per_side[faction] = 0
 
 	var/prev_side = FALSE
 	for (var/datum/job/job in job_master.faction_organized_occupations)
@@ -1322,244 +1293,50 @@ var/global/redirect_all_players = null
 
 		var/job_is_available = job && IsJobAvailable(job.title)
 
-		//	unavailable_message = " <span class = 'color: rgb(255,215,0);'>{WHITELISTED}</span> "
-
 		if (job_master.side_is_hardlocked(job.base_type_flag()))
 			job_is_available = FALSE
 
 		if (map && !map.job_enabled_specialcheck(job))
 			job_is_available = FALSE
 
-		if (istype(job, /datum/job/british) && !british_toggled)
+		if (is_faction_toggled_off(job.base_type_flag()))
 			job_is_available = FALSE
-
-		if (istype(job, /datum/job/pirates) && !pirates_toggled)
-			job_is_available = FALSE
-
-		if (istype(job, /datum/job/indians) && !indians_toggled)
-			job_is_available = FALSE
-
-		if (istype(job, /datum/job/civilian) && !civilians_toggled)
-			job_is_available = FALSE
-
-		if (istype(job, /datum/job/portuguese) && !portuguese_toggled)
-			job_is_available = FALSE
-
-		if (istype(job, /datum/job/french) && !french_toggled)
-			job_is_available = FALSE
-
-		if (istype(job, /datum/job/spanish) && !spanish_toggled)
-			job_is_available = FALSE
-
-		if (istype(job, /datum/job/dutch) && !dutch_toggled)
-			job_is_available = FALSE
-
-		if (istype(job, /datum/job/italian) && !italian_toggled)
-			job_is_available = FALSE
-
-		if (istype(job, /datum/job/roman) && !roman_toggled)
-			job_is_available = FALSE
-
-		if (istype(job, /datum/job/greek) && !greek_toggled)
-			job_is_available = FALSE
-
-		if (istype(job, /datum/job/arab) && !arab_toggled)
-			job_is_available = FALSE
-
-		if (istype(job, /datum/job/russian) && !russian_toggled)
-			job_is_available = FALSE
-
-		if (istype(job, /datum/job/arab/civilian/chechen) && !chechen_toggled)
-			job_is_available = FALSE
-
-		if (istype(job, /datum/job/finnish) && !finnish_toggled)
-			job_is_available = FALSE
-
-		if (istype(job, /datum/job/norwegian) && !norwegian_toggled)
-			job_is_available = FALSE
-
-		if (istype(job, /datum/job/swedish) && !swedish_toggled)
-			job_is_available = FALSE
-
-		if (istype(job, /datum/job/danish) && !danish_toggled)
-			job_is_available = FALSE
-
-		if (istype(job, /datum/job/german) && !german_toggled)
-			job_is_available = FALSE
-
-		if (istype(job, /datum/job/american) && !american_toggled)
-			job_is_available = FALSE
-
-		if (istype(job, /datum/job/vietnamese) && !vietnamese_toggled)
-			job_is_available = FALSE
-
-		if (istype(job, /datum/job/chinese) && !chinese_toggled)
-			job_is_available = FALSE
-
-		if (istype(job, /datum/job/polish) && !polish_toggled)
-			job_is_available = FALSE
-		
-		if (istype(job, /datum/job/bluefaction) && !bluefaction_toggled)
-			job_is_available = FALSE
-		
-		if (istype(job, /datum/job/redfaction) && !redfaction_toggled)
-			job_is_available = FALSE
-
-		// check if the job is admin-locked or disabled codewise
 
 		if (!job.enabled)
 			job_is_available = FALSE
-
-		// check if the job is autobalance-locked
 
 		if (job)
 			var/active = processes.job_data.get_active_positions(job)
 			if (job.base_type_flag() != prev_side)
 				prev_side = job.base_type_flag()
-				var/temp_name = job.get_side_name()
-				if (map)
-					switch (map.ID)
-						if (MAP_ARAB_TOWN)
-							if (temp_name == "American")
-								temp_name = "Israeli"
-						if (MAP_AFRICAN_WARLORDS)
-							if (temp_name == "Indians")
-								temp_name = "Blugisi"
-							else if (temp_name == "Civilian")
-								temp_name = "Yellowagwana"
-						if (MAP_TADOJSVILLE)
-							if (temp_name == "Indians")
-								temp_name = "Mercenary Warband"
-							else if (temp_name == "Civilian")
-								temp_name = "United Nations Peacekeepers"
-						if (MAP_MISSIONARY_RIDGE)
-							if (temp_name == "American")
-								temp_name = "Union"
-							else if (temp_name == "Civilian")
-								temp_name = "Confederate"
-						if (MAP_WHITERUN)
-							if (temp_name == "Roman")
-								temp_name = "Imperials"
-							else if (temp_name == "Civilian")
-								temp_name = "Stormcloaks"
-						if (MAP_SYRIA)
-							if (temp_name == "American")
-								temp_name = "Free Syrian Army"
-							else if (temp_name == "Arab")
-								temp_name = "Syrian Arab Republic"
-						if (MAP_CAPITOL_HILL)
-							if (temp_name == "American")
-								temp_name = "American Government"
-							else if (temp_name == "Civilian")
-								temp_name = "Rioters"
-						if (MAP_YELTSIN)
-							if (temp_name == "Russian")
-								temp_name = "Russian Army"
-							else if (temp_name == "Civilian")
-								temp_name = "Soviet Militia"
-
-						if (MAP_KANDAHAR)
-							if (temp_name == "Russian")
-								temp_name = "Soviet Army"
-							else if (temp_name == "Arab")
-								temp_name = "Mujahideen"
-							else if (temp_name == "Civilian")
-								temp_name = "DRA and Civilians"
-						if (MAP_HILL_3234)
-							if (temp_name == "Russian")
-								temp_name = "Soviet Army"
-							else if (temp_name == "Arab")
-								temp_name = "Mujahideen"
-							else if (temp_name == "Civilian")
-								temp_name = "DRA and Civilians"
-						if (MAP_MAGISTRAL)
-							if (temp_name == "Russian")
-								temp_name = "Soviet Army"
-							else if (temp_name == "Arab")
-								temp_name = "Mujahideen"
-							else if (temp_name == "Civilian")
-								temp_name = "DRA and Civilians"
-
-						if (MAP_RED_MENACE)
-							if (temp_name == "Russian")
-								temp_name = "Soviets"
-						if (MAP_TANTIVEIV)
-							if (temp_name == "Civilian")
-								temp_name = "Rebels"
-							else if (temp_name == "American")
-								temp_name = "Imperials"
-						if (MAP_RUHR_UPRISING)
-							if (temp_name == "German")
-								temp_name = "Reactionaries"
-							if (temp_name == "Civilian")
-								temp_name = "Revolutionaries"
-						if (MAP_BANK_ROBBERY)
-							if (temp_name == "Civilian")
-								temp_name = "Police Department"
-							if (temp_name == "Russian")
-								temp_name = "Robbers"
-						if (MAP_DRUG_BUST)
-							if (temp_name == "Civilian")
-								temp_name = "Police and Federal Agents"
-							if (temp_name == "Russian")
-								temp_name = "Rednikov Mobsters"
-						if (MAP_CLASH)
-							if (temp_name == "Norwegian")
-								temp_name = "Bear Clan"
-							if (temp_name == "Danish")
-								temp_name = "Raven Clan"
-						if (MAP_EAST_LOS_SANTOS)
-							if (temp_name == "Indians")
-								temp_name = "Ballas"
-							if (temp_name == "American")
-								temp_name = "Grove Street Families"
-						if (MAP_LONG_MARCH)
-							if (temp_name == "Civilian")
-								temp_name = "Chinese Red Army"
-							if (temp_name == "Chinese")
-								temp_name = "Chinese National Army"
-						
-						if (MAP_ROTSTADT)
-							if (temp_name == "Redmenia")
-								temp_name = "Rotstadt People's Republic"
-							if (temp_name == "Blugoslavia")
-								temp_name = "Blugoslavian Armed Forces"
-							
-						if (MAP_HOLDMADRID)
-							if (temp_name == "Civilian")
-								temp_name = "Republican"
-							if (temp_name == "Spanish")
-								temp_name = "Spanish"
-
-				var/side_name = "<b><h1><big>[temp_name]</big></h1></b>&&[job.base_type_flag()]&&"
+				var/temp_name = get_faction_custom_name(job.base_type_flag())
+				var/side_name = "<b><big>[temp_name]</big></b>&&[job.base_type_flag()]&&"
 				if (side_name)
-					dat += "<br>[side_name]"
+					dat += "<br>[side_name]<br><hr>"
 
-			var/extra_span = "<b>"
-			var/end_extra_span = "</b>"
-			if (job.is_officer && !job.is_commander)
-				extra_span = "<b><font size=2>"
-				end_extra_span = "</font></b><br>"
-			else if (job.is_commander)
-				extra_span = "<b><font size=3>"
-				end_extra_span = "</font></b><br>"
+			var/job_class = "job-normal"
+			if (job.is_commander)
+				job_class = "job-commander"
+			else if (job.is_officer)
+				job_class = "job-officer"
 			else if (job.is_squad_leader)
-				extra_span = "<br><b><font size=2>"
-				end_extra_span = "</font></b><br>"
+				job_class = "job-squad-leader"
 
 			if (!job.en_meaning)
 				if (job_is_available)
-					dat += "&[job.base_type_flag()]&[extra_span]<a style=\"background-color:[job.selection_color];\" href='byond://?src=\ref[src];SelectedJob=[job.title]'>[job.title] ([job.current_positions]/[job.total_positions]) (Active: [active])</a>[end_extra_span]"
+					dat += "&[job.base_type_flag()]&<a class=\"[job_class]\" style=\"background-color:[job.selection_color];\" href='byond://?src=\ref[src];SelectedJob=[job.title]'>[job.title] ([job.current_positions]/[job.total_positions]) (Active: [active])</a>"
 					++available_jobs_per_side[job.base_type_flag()]
 			else
 				if (job_is_available)
-					dat += "&[job.base_type_flag()]&[extra_span]<a style=\"background-color:[job.selection_color];\" href='byond://?src=\ref[src];SelectedJob=[job.title]'>[job.title] ([job.en_meaning]) ([job.current_positions]/[job.total_positions]) (Active: [active])</a>[end_extra_span]"
+					dat += "&[job.base_type_flag()]&<a class=\"[job_class]\" style=\"background-color:[job.selection_color];\" href='byond://?src=\ref[src];SelectedJob=[job.title]'>[job.title] ([job.en_meaning]) ([job.current_positions]/[job.total_positions]) (Active: [active])</a>"
 					++available_jobs_per_side[job.base_type_flag()]
+
 	if (map && map.ID == MAP_THE_ART_OF_THE_DEAL)
 		dat += "&[CIVILIAN]&<b><a style=\"background-color:#010203;\" href='byond://?src=\ref[src];SelectedJob=Company Member'>Company Member (Random) </b><br>"
+		if (CIVILIAN in available_jobs_per_side)
+			++available_jobs_per_side[CIVILIAN]
 	dat += "</center>"
 
-	// shitcode to hide jobs that aren't available
 	var/any_available_jobs = FALSE
 	for (var/key in available_jobs_per_side)
 		var/val = available_jobs_per_side[key]
@@ -1574,7 +1351,7 @@ var/global/redirect_all_players = null
 		else
 			any_available_jobs = TRUE
 			var/replaced_faction_title = FALSE
-			for (var/v in TRUE to dat.len)
+			for (var/v in 1 to dat.len)
 				if (findtext(dat[v], "&[key]&") && !findtext(dat[v], "&&[key]&&"))
 					dat[v] = replacetext(dat[v], "&[key]&", "")
 				else if (!replaced_faction_title && findtext(dat[v], "&&[key]&&"))
@@ -1589,29 +1366,7 @@ var/global/redirect_all_players = null
 		WWalert(usr,"All roles are disabled by autobalance!","Error")
 		return
 
-	var/data = ""
-	for (var/line in dat)
-		if (line != null)
-			if (line != "<br>")
-				data += "<span style = 'font-size:2.0rem;'>[line]</span>"
-			data += "<br>"
-
-	//<link rel='stylesheet' type='text/css' href='html/browser/common.css'>
-	data = {"
-		<br>
-		<html>
-		<head>
-		[common_browser_style]
-		</head>
-		<body>
-		[data]
-		</body>
-		</html>
-		<br>
-	"}
-
-	spawn (1)
-		src << browse(data, "window=latechoices;size=600x640;can_close=1")
+	show_latechoices_window(dat)
 
 /mob/new_player/proc/create_character(mobtype)
 
@@ -1631,15 +1386,18 @@ var/global/redirect_all_players = null
 		chosen_species = all_species[client.prefs.species]
 		use_species_name = chosen_species.get_station_variant() //Only used by pariahs atm.
 
-	if (chosen_species && use_species_name)
-		// Have to recheck admin due to no usr at roundstart. Latejoins are fine though.
-		if (is_species_whitelisted(chosen_species) || has_admin_rights())
-			new_character = new mobtype(loc, use_species_name)
+	new_character = null
+
+	if (chosen_species && use_species_name && (is_species_whitelisted(chosen_species) || has_admin_rights()))
+		new_character = new mobtype(loc, use_species_name)
 
 	if (!new_character)
 		new_character = new mobtype(loc)
 
-	new_character.stopDumbDamage = TRUE
+	// Safety check - prevent the runtime
+	if (!new_character)
+		return
+
 	new_character.lastarea = get_area(loc)
 
 	if (client)
@@ -1685,9 +1443,11 @@ var/global/redirect_all_players = null
 	return FALSE
 
 /mob/new_player/proc/close_spawn_windows()
-	src << browse(null, "window=latechoices") //closes late choices window
-	src << browse(null, "window=playersetup") //closes the player setup window
-
+	src << browse(null, "window=latechoices") //closes late choices window)
+	src << browse(null, "window=playersetup") //closes the player setup window)
+	#ifdef OPENDREAM
+	client?.unload_pregame()
+	#endif
 /mob/new_player/proc/has_admin_rights()
 	return check_rights(R_ADMIN, FALSE, src)
 

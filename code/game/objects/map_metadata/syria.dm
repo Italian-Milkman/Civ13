@@ -1,7 +1,8 @@
 /obj/map_metadata/syria
 	ID = MAP_SYRIA
 	title = "Syrian Civil War"
-	lobby_icon = 'icons/lobby/syria.png'
+	description = "The Free Syrian Army and the Syrian Goverment forces are battling against each other for the control of the Tadmur town!Both sides have to capture and hold the Goverme..."
+	lobby_icon = "icons/lobby/syria.png"
 	caribbean_blocking_area_types = list(/area/caribbean/no_mans_land/invisible_wall,/area/caribbean/no_mans_land/invisible_wall/one,/area/caribbean/no_mans_land/invisible_wall/two, /area/caribbean/no_mans_land/invisible_wall/three)
 	respawn_delay = 1200
 	no_winner = "The operation is still underway."
@@ -23,7 +24,7 @@
 	faction1 = ARAB
 	faction2 = AMERICAN
 	songs = list(
-		"God, Syria and Bashar!:1" = 'sound/music/godsyriabashar.ogg')
+		"God, Syria and Bashar!:1" = "sound/music/godsyriabashar.ogg")
 	gamemode = "King of the Hill"
 
 /obj/map_metadata/syria/faction2_can_cross_blocks()
@@ -31,21 +32,6 @@
 
 /obj/map_metadata/syria/faction1_can_cross_blocks()
 	return (processes.ticker.playtime_elapsed >= 3600 || admin_ended_all_grace_periods)
-
-/obj/map_metadata/syria/job_enabled_specialcheck(var/datum/job/J)
-	..()
-	if (istype(J, /datum/job/arab))
-		if (J.is_syria)
-			. = TRUE
-		else
-			. = FALSE
-	else if (istype(J, /datum/job/american))
-		if (J.is_syria)
-			. = TRUE
-		else
-			. = FALSE
-	else
-		. = FALSE
 
 /obj/map_metadata/syria/short_win_time(faction)
 	if (!(alive_n_of_side(faction1)) || !(alive_n_of_side(faction2)))
@@ -113,7 +99,7 @@
 		var/message = "The [battle_name ? battle_name : "battle"] has ended in a stalemate!"
 		if (current_winner && current_loser)
 			message = "The battle is over! The [current_winner] was victorious over the [current_loser][battle_name ? " in the [battle_name]" : ""]!"
-		world << "<font size = 4><span class = 'notice'>[message]</span></font>"
+		to_chat(world, "<font size = 4><span class = 'notice'>[message]</span></font>")
 		win_condition_spam_check = TRUE
 		return FALSE
 	// German major
@@ -155,7 +141,7 @@
 
 	else
 		if (current_win_condition != no_winner && current_winner && current_loser)
-			world << "<font size = 3>The [current_winner] has lost control of the Government Building!</font>"
+			to_chat(world, "<font size = 3>The [current_winner] has lost control of the Government Building!</font>")
 			current_winner = null
 			current_loser = null
 		next_win = -1
@@ -180,5 +166,4 @@
 				return TRUE
 		else
 			return !faction1_can_cross_blocks()
-			return !faction2_can_cross_blocks()
 	return FALSE

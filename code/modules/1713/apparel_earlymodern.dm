@@ -3,7 +3,6 @@
 	desc = "A pair of simple, thin leather boots. Covers up to the lower leg."
 	icon_state = "japboots"
 	item_state = "japboots"
-	worn_state = "japboots"
 	force = WEAPON_FORCE_WEAK
 	armor = list(melee = 15, arrow = 10, gun = FALSE, energy = 8, bomb = 15, bio = 10, rad = 25)
 	item_flags = NOSLIP
@@ -17,7 +16,6 @@
 	desc = "A standard uniform for the guards of Abashiri Prison."
 	icon_state = "abashiri_guard"
 	item_state = "abashiri_guard"
-	worn_state = "abashiri_guard"
 	var/rolled = FALSE
 
 /obj/item/clothing/under/abashiri/verb/roll_sleeves()
@@ -28,17 +26,15 @@
 	else
 		if (rolled)
 			item_state = "abashiri_guard"
-			worn_state = "abashiri_guard"
 			item_state_slots["w_uniform"] = "abashiri_guard"
-			usr << "<span class = 'danger'>You roll down your uniform's sleeves.</span>"
+			to_chat(usr, "<span class = 'danger'>You roll down your uniform's sleeves.</span>")
 			rolled = FALSE
 			cold_protection = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 			update_clothing_icon()
 		else if (!rolled)
 			item_state = "abashiri_guard_rolled"
-			worn_state = "abashiri_guard_rolled"
 			item_state_slots["w_uniform"] = "abashiri_guard_rolled"
-			usr << "<span class = 'danger'>You roll up your uniform's sleeves.</span>"
+			to_chat(usr, "<span class = 'danger'>You roll up your uniform's sleeves.</span>")
 			rolled = TRUE
 			heat_protection = ARMS
 			cold_protection = UPPER_TORSO|LOWER_TORSO|LEGS
@@ -49,7 +45,6 @@
 	desc = "A standard yukata for the guards of Abashiri Prison."
 	icon_state = "abashiri_prisoner"
 	item_state = "abashiri_prisoner"
-	worn_state = "abashiri_prisoner"
 	var/rolled = FALSE
 
 /obj/item/clothing/under/abashiri_prisoner/verb/roll_suit()
@@ -60,17 +55,15 @@
 	else
 		if (rolled)
 			item_state = "abashiri_prisoner"
-			worn_state = "abashiri_prisoner"
 			item_state_slots["w_uniform"] = "abashiri_prisoner"
-			usr << "<span class = 'danger'>You roll down your suit.</span>"
+			to_chat(usr, "<span class = 'danger'>You roll down your suit.</span>")
 			rolled = FALSE
 			cold_protection = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 			update_clothing_icon()
 		else if (!rolled)
 			item_state = "abashiri_prisoner_down"
-			worn_state = "abashiri_prisoner_down"
 			item_state_slots["w_uniform"] = "abashiri_prisoner_down"
-			usr << "<span class = 'danger'>You roll up your suit.</span>"
+			to_chat(usr, "<span class = 'danger'>You roll up your suit.</span>")
 			rolled = TRUE
 			heat_protection = ARMS
 			cold_protection = UPPER_TORSO|LOWER_TORSO|LEGS
@@ -85,6 +78,13 @@
 	desc = "A cap worn by the Abashiri Head Guard."
 	icon_state = "abashiri_guard_head"
 	item_state = "abashiri_guard_head"
+
+/obj/item/clothing/head/abashiri_guard/french
+	name = "Governeur Cap"
+	desc = "A cap worn by the prison governeur."
+	icon_state = "abashiri_guard_head"
+	item_state = "abashiri_guard_head"
+
 /obj/item/clothing/head/abashiri_guard/head_guard/warden
 	name = "Abashiri Warden Cap"
 	desc = "A cap worn by the Abashiri Warden."
@@ -100,7 +100,6 @@
 	desc = "A simple haori jacket usually worn over a haori outfit."
 	icon_state = "haori_jacket"
 	item_state = "haori_jacket"
-	worn_state = "haori_jacket"
 	body_parts_covered = UPPER_TORSO|ARMS
 	cold_protection = UPPER_TORSO|LOWER_TORSO|ARM_LEFT|ARM_RIGHT
 	armor = list(melee = 12, arrow = 5, gun = FALSE, energy = 15, bomb = 5, bio = 30, rad = 30)
@@ -110,19 +109,16 @@
 	desc = "A simple haori jacket usually worn over a haori outfit. This one is designated with Wing1 on its back."
 	icon_state = "haori_jacket1"
 	item_state = "haori_jacket1"
-	worn_state = "haori_jacket1"
 /obj/item/clothing/suit/storage/jacket/haori_jacket/abashiri/wing2
 	name = "Abashiri Haori"
 	desc = "A simple haori jacket usually worn over a haori outfit. This one is designated with Wing 2 on its back."
 	icon_state = "haori_jacket2"
 	item_state = "haori_jacket2"
-	worn_state = "haori_jacket2"
 /obj/item/clothing/suit/storage/jacket/haori_jacket/abashiri/wing3
 	name = "Abashiri Haori"
 	desc = "A simple haori jacket usually worn over a haori outfit. This one is designated with Wing 3 on its back."
 	icon_state = "haori_jacket3"
 	item_state = "haori_jacket3"
-	worn_state = "haori_jacket3"
 
 ////////////////////////////////////////////RUSSO-JAP///////////////////////////////////////////////
 /obj/item/clothing/under/japuni
@@ -130,7 +126,6 @@
 	desc = "A standard imperial japanese army uniform."
 	icon_state = "japuni"
 	item_state = "japuni"
-	worn_state = "japuni"
 	var/rolled = FALSE
 
 /obj/item/clothing/under/japuni/verb/roll_sleeves()
@@ -141,17 +136,15 @@
 	else
 		if (rolled)
 			item_state = "japuni"
-			worn_state = "japuni"
 			item_state_slots["w_uniform"] = "japuni"
-			usr << "<span class = 'danger'>You roll down your uniform's sleeves.</span>"
+			to_chat(usr, "<span class = 'danger'>You roll down your uniform's sleeves.</span>")
 			rolled = FALSE
 			cold_protection = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 			update_clothing_icon()
 		else if (!rolled)
 			item_state = "japunirolled"
-			worn_state = "japunirolled"
 			item_state_slots["w_uniform"] = "japunirolled"
-			usr << "<span class = 'danger'>You roll up your uniform's sleeves.</span>"
+			to_chat(usr, "<span class = 'danger'>You roll up your uniform's sleeves.</span>")
 			rolled = TRUE
 			heat_protection = ARMS
 			cold_protection = UPPER_TORSO|LOWER_TORSO|LEGS
@@ -162,7 +155,6 @@
 	desc = "An Imperial Japanese Army officer uniform."
 	icon_state = "japoffuni"
 	item_state = "japoffuni"
-	worn_state = "japoffuni"
 	var/rolled = FALSE
 
 /obj/item/clothing/under/japoffuni/verb/roll_sleeves()
@@ -173,16 +165,14 @@
 	else
 		if (rolled)
 			item_state = "japoffuni"
-			worn_state = "japoffuni"
 			item_state_slots["w_uniform"] = "japoffuni"
-			usr << "<span class = 'danger'>You roll down your uniform's sleeves.</span>"
+			to_chat(usr, "<span class = 'danger'>You roll down your uniform's sleeves.</span>")
 			rolled = FALSE
 			cold_protection = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 		else if (!rolled)
 			item_state = "japoffunirolled"
-			worn_state = "japoffunirolled"
 			item_state_slots["w_uniform"] = "japoffunirolled"
-			usr << "<span class = 'danger'>You roll up your uniform's sleeves.</span>"
+			to_chat(usr, "<span class = 'danger'>You roll up your uniform's sleeves.</span>")
 			rolled = TRUE
 			heat_protection = ARMS
 			cold_protection = UPPER_TORSO|LOWER_TORSO|LEGS
@@ -200,7 +190,6 @@
 	desc = "A standard Imperial Russian Army uniform."
 	icon_state = "rusuni"
 	item_state = "rusuni"
-	worn_state = "rusuni"
 	var/rolled = FALSE
 
 /obj/item/clothing/under/rusuni_ww1
@@ -208,14 +197,12 @@
 	desc = "A standard Imperial Russian Army uniform."
 	icon_state = "ww1_russian2"
 	item_state = "ww1_russian2"
-	worn_state = "ww1_russian2"
 
 /obj/item/clothing/under/rusuni_ww1_officer
 	name = "Russian Army officer uniform"
 	desc = "A standard Imperial Russian Army uniform, with officer epaulettes."
 	icon_state = "ww1_russian_o"
 	item_state = "ww1_russian_o"
-	worn_state = "ww1_russian_o"
 
 
 /obj/item/clothing/under/rusuni_rcw
@@ -223,7 +210,6 @@
 	desc = "A standard early 20th century Russian uniform, with no epaulettes or insignias."
 	icon_state = "ww1_russian"
 	item_state = "ww1_russian"
-	worn_state = "ww1_russian"
 
 /obj/item/clothing/under/rusuni/verb/roll_sleeves()
 	set category = null
@@ -233,17 +219,15 @@
 	else
 		if (rolled)
 			item_state = "rusuni"
-			worn_state = "rusuni"
 			item_state_slots["w_uniform"] = "rusuni"
-			usr << "<span class = 'danger'>You roll down your uniform's sleeves.</span>"
+			to_chat(usr, "<span class = 'danger'>You roll down your uniform's sleeves.</span>")
 			rolled = FALSE
 			cold_protection = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 			update_clothing_icon()
 		else if (!rolled)
 			item_state = "rusunirolled"
-			worn_state = "rusunirolled"
 			item_state_slots["w_uniform"] = "rusunirolled"
-			usr << "<span class = 'danger'>You roll up your uniform's sleeves.</span>"
+			to_chat(usr, "<span class = 'danger'>You roll up your uniform's sleeves.</span>")
 			rolled = TRUE
 			heat_protection = ARMS
 			cold_protection = UPPER_TORSO|LOWER_TORSO|LEGS
@@ -254,7 +238,6 @@
 	desc = "A shiny black leather coat used by Cheka agents."
 	icon_state = "leathercoat_c"
 	item_state = "leathercoat_c"
-	worn_state = "leathercoat_c"
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 	cold_protection = UPPER_TORSO|LOWER_TORSO|LEG_LEFT|LEG_RIGHT|ARM_LEFT|ARM_RIGHT
 	armor = list(melee = 10, arrow = 0, gun = FALSE, energy = 15, bomb = 5, bio = 30, rad = 30)
@@ -265,14 +248,12 @@
 	desc = "A red beshmet with grey trousers, traditional of the Kuban Cossaks."
 	icon_state = "kuban_cossak"
 	item_state = "kuban_cossak"
-	worn_state = "kuban_cossak"
 
 /obj/item/clothing/suit/storage/coat/kuban_cossak
 	name = "Black cherkesska coat"
 	desc = "A traditional Kuban Cossak coat."
 	icon_state = "kuban_cossak"
 	item_state = "kuban_cossak"
-	worn_state = "kuban_cossak"
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 	cold_protection = UPPER_TORSO|LOWER_TORSO|LEG_LEFT|LEG_RIGHT|ARM_LEFT|ARM_RIGHT
 	armor = list(melee = 10, arrow = 0, gun = FALSE, energy = 15, bomb = 5, bio = 30, rad = 30)
@@ -284,7 +265,6 @@
 	desc = "An early Red Army coat."
 	icon_state = "japcoat2"
 	item_state = "japcoat2"
-	worn_state = "japcoat2"
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 	cold_protection = UPPER_TORSO|LOWER_TORSO|LEG_LEFT|LEG_RIGHT|ARM_LEFT|ARM_RIGHT
 	armor = list(melee = 10, arrow = 0, gun = FALSE, energy = 15, bomb = 5, bio = 30, rad = 30)
@@ -295,7 +275,6 @@
 	desc = "A Japanese army coat."
 	icon_state = "japcoat"
 	item_state = "japcoat"
-	worn_state = "japcoat"
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 	cold_protection = UPPER_TORSO|LOWER_TORSO|LEG_LEFT|LEG_RIGHT|ARM_LEFT|ARM_RIGHT
 	armor = list(melee = 10, arrow = 0, gun = FALSE, energy = 15, bomb = 5, bio = 30, rad = 30)
@@ -311,7 +290,6 @@
 	desc = "A holy coat worn by a priest."
 	icon_state = "priestwhite"
 	item_state = "priestwhite"
-	worn_state = "priestwhite"
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 	cold_protection = UPPER_TORSO|LOWER_TORSO|LEG_LEFT|LEG_RIGHT|ARM_LEFT|ARM_RIGHT
 	armor = list(melee = 10, arrow = 0, gun = FALSE, energy = 15, bomb = 5, bio = 30, rad = 30)
@@ -323,7 +301,6 @@
 	desc = "A japanese army coat."
 	icon_state = "japcoat2"
 	item_state = "japcoat2"
-	worn_state = "japcoat2"
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 	cold_protection = UPPER_TORSO|LOWER_TORSO|LEG_LEFT|LEG_RIGHT|ARM_LEFT|ARM_RIGHT
 	armor = list(melee = 10, arrow = 0, gun = FALSE, energy = 15, bomb = 5, bio = 30, rad = 30)
@@ -335,7 +312,6 @@
 	desc = "A russian army coat."
 	icon_state = "ruscoat"
 	item_state = "ruscoat"
-	worn_state = "ruscoat"
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 	cold_protection = UPPER_TORSO|LOWER_TORSO|LEG_LEFT|LEG_RIGHT|ARM_LEFT|ARM_RIGHT
 	armor = list(melee = 10, arrow = 0, gun = FALSE, energy = 15, bomb = 5, bio = 30, rad = 30)
@@ -359,7 +335,6 @@
 	desc = "A Russian Army officer coat. Worn by officers, acknowledge their rank."
 	icon_state = "rusoffcoat"
 	item_state = "rusoffcoat"
-	worn_state = "rusoffcoat"
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 	cold_protection = UPPER_TORSO|LOWER_TORSO|LEG_LEFT|LEG_RIGHT|ARM_LEFT|ARM_RIGHT
 	armor = list(melee = 10, arrow = 0, gun = FALSE, energy = 15, bomb = 5, bio = 30, rad = 30)
@@ -374,7 +349,6 @@
 	desc = "A warm fur lined vest made out of leather."
 	icon_state = "japvest"
 	item_state = "japvest"
-	worn_state = "japvest"
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO
 	cold_protection = UPPER_TORSO|LOWER_TORSO
 	armor = list(melee = 10, arrow = 10, gun = FALSE, energy = 10, bomb = 10, bio = 10, rad = 15)
@@ -396,15 +370,13 @@
 	else
 		if (adjusted)
 			item_state = "japcap"
-			worn_state = "japcap"
 			item_state_slots["slot_head"] = "japcap"
-			usr << "<span class = 'danger'>You adjust your cap's band.</span>"
+			to_chat(usr, "<span class = 'danger'>You adjust your cap's band.</span>")
 			adjusted = FALSE
 		else if (!adjusted)
 			item_state = "japcapad"
-			worn_state = "japcapad"
 			item_state_slots["slot_head"] = "japcapad"
-			usr << "<span class = 'danger'>You adjust your cap's band.</span>"
+			to_chat(usr, "<span class = 'danger'>You adjust your cap's band.</span>")
 			adjusted = TRUE
 	update_clothing_icon()
 
@@ -423,15 +395,13 @@
 	else
 		if (adjusted)
 			item_state = "japcap2"
-			worn_state = "japcap2"
 			item_state_slots["slot_head"] = "japcap2"
-			usr << "<span class = 'danger'>You adjust your cap's band.</span>"
+			to_chat(usr, "<span class = 'danger'>You adjust your cap's band.</span>")
 			adjusted = FALSE
 		else if (!adjusted)
 			item_state = "japcap2ad"
-			worn_state = "japcap2ad"
 			item_state_slots["slot_head"] = "japcap2ad"
-			usr << "<span class = 'danger'>You adjust your cap's band.</span>"
+			to_chat(usr, "<span class = 'danger'>You adjust your cap's band.</span>")
 			adjusted = TRUE
 	update_clothing_icon()
 
@@ -450,15 +420,13 @@
 	else
 		if (adjusted)
 			item_state = "japoffcap"
-			worn_state = "japoffcap"
 			item_state_slots["slot_head"] = "japoffcap"
-			usr << "<span class = 'danger'>You adjust your cap's band.</span>"
+			to_chat(usr, "<span class = 'danger'>You adjust your cap's band.</span>")
 			adjusted = FALSE
 		else if (!adjusted)
 			item_state = "japoffcapad"
-			worn_state = "japoffcapad"
 			item_state_slots["slot_head"] = "japoffcapad"
-			usr << "<span class = 'danger'>You adjust your cap's band.</span>"
+			to_chat(usr, "<span class = 'danger'>You adjust your cap's band.</span>")
 			adjusted = TRUE
 	update_clothing_icon()
 
@@ -676,7 +644,6 @@
 	desc = "A typical plastic helmet worn by constable's of law enforcement. Protects the head from petty battery and assault."
 	icon_state = "constable"
 	item_state = "constable"
-	worn_state = "constable"
 	body_parts_covered = HEAD
 	flags_inv = BLOCKHEADHAIR
 	armor = list(melee = 50, arrow = 60, gun = 5, energy = 15, bomb = 45, bio = 20, rad = FALSE)
@@ -686,77 +653,66 @@
 	desc = "An outfit composed of a white shirt and light brown trousers."
 	icon_state = "modern1"
 	item_state = "modern1"
-	worn_state = "modern1"
 
 /obj/item/clothing/under/modern2
 	name = "black outfit"
 	desc = "An outfit composed of a white shirt and black trousers."
 	icon_state = "modern2"
 	item_state = "modern2"
-	worn_state = "modern2"
 
 /obj/item/clothing/under/expensive
 	name = "shirt outfit"
 	desc = "An outfit composed of a expensive white shirt and black trousers."
 	icon_state = "bman"
 	item_state = "bman"
-	worn_state = "bman"
 
 /obj/item/clothing/under/expensive/green
 	name = "green tie shirt outfit"
 	desc = "An outfit composed of a expensive white shirt and black trousers, with a green tie."
 	icon_state = "bman_green"
 	item_state = "bman_green"
-	worn_state = "bman_green"
 
 /obj/item/clothing/under/expensive/blue
 	name = "blue tie shirt outfit"
 	desc = "An outfit composed of a expensive white shirt and black trousers, with a blue tie."
 	icon_state = "bman_blue"
 	item_state = "bman_blue"
-	worn_state = "bman_blue"
 
 /obj/item/clothing/under/expensive/red
 	name = "red tie shirt outfit"
 	desc = "An outfit composed of a expensive white shirt and black trousers, with a red tie."
 	icon_state = "bman_red"
 	item_state = "bman_red"
-	worn_state = "bman_red"
 
 /obj/item/clothing/under/expensive/yellow
 	name = "yellow tie shirt outfit"
 	desc = "An outfit composed of a expensive white shirt and black trousers, with a yellow tie."
 	icon_state = "bman_yellow"
 	item_state = "bman_yellow"
-	worn_state = "bman_yellow"
 
 /obj/item/clothing/under/modern3
 	name = "grey outfit"
 	desc = "An outfit composed of a white shirt and grey trousers."
 	icon_state = "modern3"
 	item_state = "modern3"
-	worn_state = "modern3"
 
 /obj/item/clothing/under/modern4
 	name = "brown outfit"
 	desc = "An outfit composed of a white shirt and brown trousers."
 	icon_state = "modern4"
 	item_state = "modern4"
-	worn_state = "modern4"
 
 /obj/item/clothing/under/modern7
 	name = "modern outfit"
 	desc = "An outfit composed of a white shirt and black cargo pants."
 	icon_state = "modern7"
 	item_state = "modern7"
-	worn_state = "modern7"
 
 /obj/item/clothing/under/swat
 	name = "swat outfit"
 	desc = "A uniform used by police special forces."
 	icon_state = "swat"
 	item_state = "swat"
-	worn_state = "swat"
 
 /obj/item/clothing/under/cleansuit
 	name = "cleansuit"
@@ -765,84 +721,72 @@
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEG_LEFT|LEG_RIGHT|ARM_LEFT|ARM_RIGHT
 	icon_state = "cleansuit"
 	item_state = "cleansuit"
-	worn_state = "cleansuit"
 
 /obj/item/clothing/under/swat_new
 	name = "swat outfit"
 	desc = "A uniform used by police special forces."
 	icon_state = "swat_new"
 	item_state = "swat_new"
-	worn_state = "swat_new"
 
 /obj/item/clothing/under/combat
 	name = "combat outfit"
 	desc = "A combat uniform plated with kevlar."
 	icon_state = "combat"
 	item_state = "combat"
-	worn_state = "combat"
 
 /obj/item/clothing/under/police
 	name = "police outfit"
 	desc = "A uniform used by police forces."
 	icon_state = "police"
 	item_state = "police"
-	worn_state = "police"
 
 /obj/item/clothing/under/prisoner
 	name = "prison outfit"
 	desc = "Normally worn by criminals and scum."
 	icon_state = "prisoner"
 	item_state = "prisoner"
-	worn_state = "prisoner"
 
 /obj/item/clothing/under/milrus2
 	name = "russian military outfit"
 	desc = "An outfit composed of camo pants and shirt."
 	icon_state = "milrus2"
 	item_state = "milrus2"
-	worn_state = "milrus2"
 
 /obj/item/clothing/under/baily
 	name = "security outfit"
 	desc = "An outfit composed of a green jacket and black pants."
 	icon_state = "baily"
 	item_state = "baily"
-	worn_state = "baily"
 
 /obj/item/clothing/under/tactical1
 	name = "tactical outfit"
 	desc = "An outfit composed of a camo cargo pants and tan ubac."
 	icon_state = "tactical1"
 	item_state = "tactical1"
-	worn_state = "tactical1"
 
 /obj/item/clothing/under/pmc
 	name = "pmc outfit"
 	desc = "A outfit used by PMC units."
 	icon_state = "pmc"
 	item_state = "pmc"
-	worn_state = "pmc"
 
 /obj/item/clothing/under/mafia
 	name = "fancy outfit"
 	desc = "A outfit that is expensive and has style."
 	icon_state = "mafia"
 	item_state = "mafia"
-	worn_state = "mafia"
 
 /obj/item/clothing/under/engi
 	name = "worker outfit"
 	desc = "A outfit used by construction workers."
 	icon_state = "engi"
 	item_state = "engi"
-	worn_state = "engi"
 
 /obj/item/clothing/under/gorka
 	name = "gorka outfit"
 	desc = "A gorka outfit used by Spetsnaz."
 	icon_state = "gorka"
 	item_state = "gorka"
-	worn_state = "gorka"
 
 /obj/item/clothing/under/gorka/frag //provides actual armor
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
@@ -854,77 +798,66 @@
 	desc = "An outfit composed of a black skirt and white shirt."
 	icon_state = "modern8"
 	item_state = "modern8"
-	worn_state = "modern8"
 
 /obj/item/clothing/under/oldmansuit
 	name = "old man suit"
 	desc = "An outfit worn by fancy men in the 1800s."
 	icon_state = "oldmansuit"
 	item_state = "oldmansuit"
-	worn_state = "oldmansuit"
 
 /obj/item/clothing/under/cozyoldy
 	name = "fancy outfit"
 	desc = "An outfit worn by fancy men in the 1800s."
 	icon_state = "cozyoldy"
 	item_state = "cozyoldy"
-	worn_state = "cozyoldy"
 
 /obj/item/clothing/under/peakyblinder
 	name = "fancy suit"
 	desc = "An outfit used by scum."
 	icon_state = "peakyblinder"
 	item_state = "peakyblinder"
-	worn_state = "peakyblinder"
 
 /obj/item/clothing/under/constable
 	name = "constable outfit"
 	desc = "An black outfit used by enforcers of the law."
 	icon_state = "constable"
 	item_state = "constable"
-	worn_state = "constable"
 
 /obj/item/clothing/under/oldfirefighter
 	name = "fire fighter uniform"
 	desc = "An outfit used by fire fighters. Damn hot."
 	icon_state = "oldfirefighter"
 	item_state = "oldfirefighter"
-	worn_state = "oldfirefighter"
 
 /obj/item/clothing/under/blacktango
 	name = "black dress"
 	desc = "An dress used by fancy woman."
 	icon_state = "black_tango_alt_s"
 	item_state = "black_tango_alt_s"
-	worn_state = "black_tango_alt_s"
 
 /obj/item/clothing/under/clown
 	name = "clown outfit"
 	desc = "An outfit used by clowns."
 	icon_state = "clown"
 	item_state = "clown"
-	worn_state = "clown"
 
 /obj/item/clothing/under/jester
 	name = "jester outfit"
 	desc = "A jester outfit. WHERE IS ME FUN HAHA."
 	icon_state = "jester"
 	item_state = "jester"
-	worn_state = "jester"
 
 /obj/item/clothing/under/farmer_outfit
 	name = "farmer outfit"
 	desc = "An outfit composed of a checkered shirt and a denim bib."
 	icon_state = "farmer_outfit"
 	item_state = "farmer_outfit"
-	worn_state = "farmer_outfit"
 
 /obj/item/clothing/under/mechanic_outfit
 	name = "mechanic outfit"
 	desc = "An outfit composed of a white shirt and a leather bib."
 	icon_state = "mechanic_outfit"
 	item_state = "mechanic_outfit"
-	worn_state = "mechanic_outfit"
 
 /*Feminine Clothing*/
 
@@ -933,77 +866,74 @@
 	desc = "A early 20th century style dress made to be well fitting, often worn by housewives"
 	icon_state = "tradwife_blue"
 	item_state = "tradwife_blue"
-	worn_state = "tradwife_blue"
 
 /obj/item/clothing/under/tradwife/yellow
 	name = "yellow traditional dress"
 	desc = "A early 20th century style dress made to be well fitting, often worn by housewives"
 	icon_state = "tradwife_yellow"
 	item_state = "tradwife_yellow"
-	worn_state = "tradwife_yellow"
 
 /obj/item/clothing/under/tradwife/orange
 	name = "orange traditional dress"
 	desc = "A early 20th century style dress made to be well fitting, often worn by housewives"
 	icon_state = "tradwife_orange"
 	item_state = "tradwife_orange"
-	worn_state = "tradwife_orange"
 
 /obj/item/clothing/under/tradwife/purple
 	name = "purple traditional dress"
 	desc = "A early 20th century style dress made to be well fitting, often worn by housewives"
 	icon_state = "tradwife_purple"
 	item_state = "tradwife_purple"
-	worn_state = "tradwife_purple"
 
 /obj/item/clothing/under/tradwife/red
 	name = "red traditional dress"
 	desc = "A early 20th century style dress made to be well fitting, often worn by housewives"
 	icon_state = "tradwife_red"
 	item_state = "tradwife_red"
-	worn_state = "tradwife_red"
 
 /obj/item/clothing/suit/storage/jacket/black_suit
 	name = "black suit"
 	desc = "A formal black suit."
 	icon_state = "black_suit"
 	item_state = "black_suit"
-	worn_state = "black_suit"
 
 /obj/item/clothing/suit/storage/jacket/really_black_suit
 	name = "dark black suit"
 	desc = "A very black formal suit."
 	icon_state = "really_black_suit"
 	item_state = "really_black_suit"
-	worn_state = "really_black_suit"
 
 /obj/item/clothing/suit/storage/jacket/charcoal_suit
 	name = "charcoal suit"
 	desc = "A formal charcoal grey suit."
 	icon_state = "charcoal_suit"
 	item_state = "charcoal_suit"
-	worn_state = "charcoal_suit"
 
 /obj/item/clothing/suit/storage/jacket/navy_suit
 	name = "navy suit"
 	desc = "A formal navy blue suit."
 	icon_state = "navy_suit"
 	item_state = "navy_suit"
-	worn_state = "navy_suit"
 
 /obj/item/clothing/suit/storage/jacket/checkered_suit
 	name = "checkered suit"
 	desc = "A formal grey checkered suit."
 	icon_state = "checkered_suit"
 	item_state = "checkered_suit"
-	worn_state = "checkered_suit"
 
 /obj/item/clothing/suit/storage/jacket/burgundy_suit
 	name = "burgundy suit"
 	desc = "A formal burgundy colored suit."
 	icon_state = "burgundy_suit"
 	item_state = "burgundy_suit"
-	worn_state = "burgundy_suit"
+
+
+/obj/item/clothing/suit/storage/jacket/white_suit
+	name = "white suit"
+	desc = "A formal white colored suit."
+	icon_state = "white_suit"
+	item_state = "white_suit"
+
 
 /obj/item/clothing/accessory/tie
 	name = "black tie"
@@ -1073,7 +1003,6 @@
 	desc = "A typical pointed helmet."
 	icon_state = "pickelhaube"
 	item_state = "pickelhaube"
-	worn_state = "pickelhaube"
 	body_parts_covered = HEAD
 	flags_inv = BLOCKHEADHAIR
 	armor = list(melee = 50, arrow = 40, gun = 10, energy = 15, bomb = 50, bio = 20, rad = FALSE)
@@ -1089,7 +1018,6 @@
 	desc = "A typical german helmet."
 	icon_state = "stahlhelm"
 	item_state = "stahlhelm"
-	worn_state = "stahlhelm"
 	body_parts_covered = HEAD
 	flags_inv = BLOCKHEADHAIR
 	armor = list(melee = 55, arrow = 45, gun = 15, energy = 15, bomb = 55, bio = 20, rad = FALSE)
@@ -1099,7 +1027,6 @@
 	desc = "A typical rounded helmet."
 	icon_state = "brodie"
 	item_state = "brodie"
-	worn_state = "brodie"
 	body_parts_covered = HEAD
 	flags_inv = BLOCKHEADHAIR
 	armor = list(melee = 45, arrow = 35, gun = 10, energy = 15, bomb = 45, bio = 20, rad = FALSE)
@@ -1109,7 +1036,6 @@
 	desc = "A typical tropical helmet."
 	icon_state = "pith"
 	item_state = "pith"
-	worn_state = "pith"
 	body_parts_covered = HEAD
 	flags_inv = BLOCKHEADHAIR
 	armor = list(melee = 50, arrow = 40, gun = 10, energy = 15, bomb = 50, bio = 20, rad = FALSE)
@@ -1119,7 +1045,6 @@
 	desc = "A white labcoat."
 	icon_state = "labcoat"
 	item_state = "labcoat"
-	worn_state = "labcoat"
 	var/closed = TRUE
 
 /obj/item/clothing/suit/storage/jacket/doctor/verb/toggle()
@@ -1130,19 +1055,17 @@
 		return
 	else
 		if(closed)
-			worn_state = "labcoat_open"
 			item_state = "labcoat_open"
 			icon_state = "labcoat_open"
 			item_state_slots["w_uniform"] = "labcoat_open"
-			usr << "You <b>open up</b> your jacket."
+			to_chat(usr, "You <b>open up</b> your jacket.")
 			closed = FALSE
 			update_clothing_icon()
 		else if (!closed)
-			worn_state = "labcoat"
 			item_state = "labcoat"
 			icon_state = "labcoat"
 			item_state_slots["w_uniform"] = "labcoat"
-			usr << "You <b>close up</b> your jacket."
+			to_chat(usr, "You <b>close up</b> your jacket.")
 			closed = TRUE
 			update_clothing_icon()
 
@@ -1151,14 +1074,12 @@
 	desc = "A blue plastic surgery apron."
 	icon_state = "surgical"
 	item_state = "surgical"
-	worn_state = "surgical"
 
 /obj/item/clothing/suit/storage/jacket/coveralls
 	name = "coveralls"
 	desc = "A blue pair of coveralls, protects against heat."
 	icon_state = "coveralls"
 	item_state = "coveralls"
-	worn_state = "coveralls"
 	var/rolled = FALSE
 
 /obj/item/clothing/suit/storage/jacket/coveralls/verb/roll_down_suit()
@@ -1169,18 +1090,16 @@
 	else
 		if (rolled)
 			item_state = "coveralls"
-			worn_state = "coveralls"
 			item_state_slots["w_suit"] = "coveralls"
-			usr << "<span class = 'danger'>You roll down your coveralls.</span>"
+			to_chat(usr, "<span class = 'danger'>You roll down your coveralls.</span>")
 			rolled = FALSE
 			cold_protection = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 			heat_protection = ARMS|UPPER_TORSO|LOWER_TORSO|LEGS
 			update_clothing_icon()
 		else if (!rolled)
 			item_state = "coveralls_down"
-			worn_state = "coveralls_down"
 			item_state_slots["w_suit"] = "coveralls_down"
-			usr << "<span class = 'danger'>You roll up your coveralls.</span>"
+			to_chat(usr, "<span class = 'danger'>You roll up your coveralls.</span>")
 			rolled = TRUE
 			heat_protection = UPPER_TORSO|ARMS
 			cold_protection = LOWER_TORSO|LEGS
@@ -1511,21 +1430,18 @@
 	desc = "Basic blue shorts."
 	icon_state = "shorts_blue"
 	item_state = "shorts_blue"
-	worn_state = "shorts_blue"
 
 /obj/item/clothing/under/red_shorts
 	name = "red shorts"
 	desc = "Basic red shorts"
 	icon_state = "shorts_red"
 	item_state = "shorts_red"
-	worn_state = "shorts_red"
 
 /obj/item/clothing/under/yellow_shorts
 	name = "yellow shorts"
 	desc = "Basic yellow shorts"
 	icon_state = "shorts_yellow"
 	item_state = "shorts_yellow"
-	worn_state = "shorts_yellow"
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////PHILIPPINE-AMERICAN WAR///////////////////////////////////////////////////////////////////////
 /obj/item/clothing/head/ph_us_war/filipino
@@ -1549,15 +1465,13 @@
 	else
 		if (adjusted)
 			item_state = "baliwag"
-			worn_state = "baliwag"
 			item_state_slots["slot_head"] = "baliwag"
-			usr << "<span class = 'danger'>You pull your hat down.</span>"
+			to_chat(usr, "<span class = 'danger'>You pull your hat down.</span>")
 			adjusted = FALSE
 		else if (!adjusted)
 			item_state = "baliwag_down"
-			worn_state = "baliwag_down"
 			item_state_slots["slot_head"] = "baliwag_down"
-			usr << "<span class = 'danger'>You push up your hat.</span>"
+			to_chat(usr, "<span class = 'danger'>You push up your hat.</span>")
 			adjusted = TRUE
 	update_clothing_icon()
 /obj/item/clothing/under/ph_us_war/filipino
@@ -1566,7 +1480,6 @@
 	desc = "A standard philippine republic army uniform."
 	icon_state = "filuni"
 	item_state = "filuni"
-	worn_state = "filuni"
 	var/rolled = FALSE
 
 /obj/item/clothing/under/ph_us_war/filipino/filuni/verb/roll_sleeves()
@@ -1577,17 +1490,15 @@
 	else
 		if (rolled)
 			item_state = "filuni"
-			worn_state = "filuni"
 			item_state_slots["w_uniform"] = "filuni"
-			usr << "<span class = 'danger'>You roll down your uniform's sleeves.</span>"
+			to_chat(usr, "<span class = 'danger'>You roll down your uniform's sleeves.</span>")
 			rolled = FALSE
 			cold_protection = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 			update_clothing_icon()
 		else if (!rolled)
 			item_state = "filuni_rolled"
-			worn_state = "filuni_rolled"
 			item_state_slots["w_uniform"] = "filuni_rolled"
-			usr << "<span class = 'danger'>You roll up your uniform's sleeves.</span>"
+			to_chat(usr, "<span class = 'danger'>You roll up your uniform's sleeves.</span>")
 			rolled = TRUE
 			heat_protection = ARMS
 			cold_protection = UPPER_TORSO|LOWER_TORSO|LEGS
@@ -1598,7 +1509,6 @@
 	desc = "A standard philippine republic army uniform."
 	icon_state = "filuni_sniper"
 	item_state = "filuni_sniper"
-	worn_state = "filuni_sniper"
 	var/rolled = FALSE
 
 /obj/item/clothing/under/ph_us_war/filipino/tiradores/verb/roll_sleeves()
@@ -1609,17 +1519,15 @@
 	else
 		if (rolled)
 			item_state = "filuni_sniper"
-			worn_state = "filuni_sniper"
 			item_state_slots["w_uniform"] = "filuni_sniper"
-			usr << "<span class = 'danger'>You roll down your uniform's sleeves.</span>"
+			to_chat(usr, "<span class = 'danger'>You roll down your uniform's sleeves.</span>")
 			rolled = FALSE
 			cold_protection = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 			update_clothing_icon()
 		else if (!rolled)
 			item_state = "filuni_sniper_rolled"
-			worn_state = "filuni_sniper_rolled"
 			item_state_slots["w_uniform"] = "filuni_sniper_rolled"
-			usr << "<span class = 'danger'>You roll up your uniform's sleeves.</span>"
+			to_chat(usr, "<span class = 'danger'>You roll up your uniform's sleeves.</span>")
 			rolled = TRUE
 			heat_protection = ARMS
 			cold_protection = UPPER_TORSO|LOWER_TORSO|LEGS
@@ -1631,7 +1539,6 @@
 	desc = "A standard tropical US army uniform."
 	icon_state = "us_fp"
 	item_state = "us_fp"
-	worn_state = "us_fp"
 	var/rolled = FALSE
 
 /obj/item/clothing/under/ph_us_war/american/us_uni/verb/roll_sleeves()
@@ -1642,17 +1549,15 @@
 	else
 		if (rolled)
 			item_state = "us_fp"
-			worn_state = "us_fp"
 			item_state_slots["w_uniform"] = "us_fp"
-			usr << "<span class = 'danger'>You roll down your uniform's sleeves.</span>"
+			to_chat(usr, "<span class = 'danger'>You roll down your uniform's sleeves.</span>")
 			rolled = FALSE
 			cold_protection = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 			update_clothing_icon()
 		else if (!rolled)
 			item_state = "us_fp_rolled"
-			worn_state = "us_fp_rolled"
 			item_state_slots["w_uniform"] = "us_fp_rolled"
-			usr << "<span class = 'danger'>You roll up your uniform's sleeves.</span>"
+			to_chat(usr, "<span class = 'danger'>You roll up your uniform's sleeves.</span>")
 			rolled = TRUE
 			heat_protection = ARMS
 			cold_protection = UPPER_TORSO|LOWER_TORSO|LEGS
@@ -1663,7 +1568,6 @@
 	desc = "A standard tropical US army officer uniform."
 	icon_state = "us_fp_off"
 	item_state = "us_fp_off"
-	worn_state = "us_fp_off"
 	var/rolled = FALSE
 
 /obj/item/clothing/under/ph_us_war/american/us_off_uni/verb/roll_sleeves()
@@ -1674,17 +1578,15 @@
 	else
 		if (rolled)
 			item_state = "us_fp_off"
-			worn_state = "us_fp_off"
 			item_state_slots["w_uniform"] = "us_fp_off"
-			usr << "<span class = 'danger'>You roll down your uniform's sleeves.</span>"
+			to_chat(usr, "<span class = 'danger'>You roll down your uniform's sleeves.</span>")
 			rolled = FALSE
 			cold_protection = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 			update_clothing_icon()
 		else if (!rolled)
 			item_state = "us_fp_off_rolled"
-			worn_state = "us_fp_off_rolled"
 			item_state_slots["w_uniform"] = "us_fp_off_rolled"
-			usr << "<span class = 'danger'>You roll up your uniform's sleeves.</span>"
+			to_chat(usr, "<span class = 'danger'>You roll up your uniform's sleeves.</span>")
 			rolled = TRUE
 			heat_protection = ARMS
 			cold_protection = UPPER_TORSO|LOWER_TORSO|LEGS
@@ -1726,21 +1628,18 @@
 	desc = "A Uniform used by the spanish republican forces."
 	icon_state = "spanishrepublican"
 	item_state = "spanishrepublican"
-	worn_state = "spanishrepublican"
 
 /obj/item/clothing/under/spain/nationalist
 	name = "Spanish Nationalist Uniform"
 	desc = "A Uniform used by the spanish Nationalist forces."
 	icon_state = "spanishnationalist"
 	item_state = "spanishnationalist"
-	worn_state = "spanishnationalist"
 
 /obj/item/clothing/under/spain/brigadist
 	name = "Brigadists Uniform"
 	desc = "A Cheap Blue Uniform."
 	icon_state = "intbrigadist"
 	item_state = "intbrigadist"
-	worn_state = "intbrigadist"
 
 // Blugoslavia
 /obj/item/clothing/under/blugoslavia/standard
@@ -1748,28 +1647,24 @@
 	desc = "An easy to see uniform used by Blugoslavia."
 	icon_state = "baf_standard"
 	item_state = "baf_standard"
-	worn_state = "baf_standard"
 
 /obj/item/clothing/under/blugoslavia/standard/combat
 	name = "Blugoslavian Camo Uniform"
 	desc = "A Blugoslavian combat uniform, slightly camoed."
 	icon_state = "baf_standardc"
 	item_state = "baf_standardc"
-	worn_state = "baf_standardc"
 
 /obj/item/clothing/under/blugoslavia/standard/squadlead
 	name = "Blugoslavian Camo Uniform"
 	desc = "A Blugoslavian combat uniform, used by squad leaders."
 	icon_state = "baf_standardc"
 	item_state = "baf_standardc"
-	worn_state = "baf_standardc"
 
 /obj/item/clothing/under/blugoslavia/standard/command
 	name = "Blugoslavian Ceremonial Uniform"
 	desc = "A ceremonial uniform of Blugoslavia, used by officers and commanders"
 	icon_state = "baf_command"
 	item_state = "baf_command"
-	worn_state = "baf_command"
 
 // Redmenia
 /obj/item/clothing/under/redmenia/standard
@@ -1777,32 +1672,27 @@
 	desc = "An easy to see uniform used by Blugoslavia."
 	icon_state = "rdf_standard"
 	item_state = "rdf_standard"
-	worn_state = "rdf_standard"
 
 /obj/item/clothing/under/redmenia/standard/combat
 	name = "Redmenian Camo Uniform"
 	desc = "A Redmenian combat uniform, slightly camoed."
 	icon_state = "rdf_standardc"
 	item_state = "rdf_standardc"
-	worn_state = "rdf_standardc"
 
 /obj/item/clothing/under/redmenia/standard/squadlead
 	name = "Redmenian Camo Uniform"
 	desc = "A Redmenian combat uniform used by squad leaders."
 	icon_state = "rdf_standardc"
 	item_state = "rdf_standardc"
-	worn_state = "rdf_standardc"
 
 /obj/item/clothing/under/redmenia/standard/command
 	name = "Redmenian Ceremonial Uniform"
 	desc = "A ceremonial uniform of Redmenia, used by officers and commanders"
 	icon_state = "rdf_command"
 	item_state = "rdf_command"
-	worn_state = "rdf_command"
 
 /obj/item/clothing/under/redmenia/standard/modern
 	name = "Redmenian Camo Uniform"
 	desc = "A Redmenian combat uniform, slightly camoed."
 	icon_state = "rdf_modern"
 	item_state = "rdf_modern"
-	worn_state = "rdf_modern"

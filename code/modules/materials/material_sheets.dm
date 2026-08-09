@@ -10,7 +10,6 @@
 	can_stack = TRUE
 	var/default_type = DEFAULT_WALL_MATERIAL
 	var/material/material
-	var/perunit = SHEET_MATERIAL_AMOUNT
 	var/apply_colour //temp pending icon rewrite
 	icon = 'icons/obj/materials.dmi'
 
@@ -323,7 +322,7 @@
 	if (map.ID == MAP_GULAG13)
 		if (!istype(W)) return//I really don't understand why this check is needed
 		if (istype(W, /obj/item/weapon/key/soviet/guard))
-			user << "<span class='notice'>You make the clay into a mold of the key.</span>"
+			to_chat(user, "<span class='notice'>You make the clay into a mold of the key.</span>")
 			new/obj/item/weapon/clay/mold/key(user.loc)
 			qdel(src)
 	if (istype(W, type))
@@ -332,10 +331,10 @@
 		S.update_icon()
 		src.update_icon()
 		spawn(0) //give the stacks a chance to delete themselves if necessary
-		if (S && usr.using_object == S)
-			S.interact(usr)
-		if (src && usr.using_object == src)
-			interact(usr)
+			if (S && usr.using_object == S)
+				S.interact(usr)
+			if (src && usr.using_object == src)
+				interact(usr)
 
 /obj/item/stack/material/electronics
 	name = "electronic circuits"

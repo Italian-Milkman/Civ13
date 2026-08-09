@@ -41,9 +41,6 @@
 
 	// Stuff relating vocalizations
 	var/list/slogan_list = list()
-	var/shut_up = FALSE //Let spouting those godawful pitches!
-	var/vend_reply //Thank you for shopping!
-	var/last_reply = FALSE
 	var/last_slogan = FALSE //When did we last pitch?
 	var/slogan_delay = 6000 //How long until we can pitch again?
 
@@ -128,7 +125,7 @@
 
 		if (do_after(user, 20, src))
 			if (!src) return
-			user << "<span class='notice'>You [anchored? "un" : ""]secured \the [src]!</span>"
+			to_chat(user, "<span class='notice'>You [anchored? "un" : ""]secured \the [src]!</span>")
 			anchored = !anchored
 		return
 
@@ -143,7 +140,7 @@
 		if (istype(src, /obj/structure/vending/craftable))
 			var/obj/structure/vending/craftable/CTB = src
 			if (product_records.len >= CTB.max_products)
-				user << "<span class='notice'>\The [src] is full!</span>"
+				to_chat(user, "<span class='notice'>\The [src] is full!</span>")
 				return FALSE
 			else
 				var/datum/data/vending_product/product = new/datum/data/vending_product(src, W.type, W.name, _icon = W.icon, _icon_state = W.icon_state, M = W)
@@ -198,7 +195,7 @@
 
 	ui = GLOB.nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
 	if (!ui)
-		ui = new(user, src, ui_key, "vending_machine.tmpl", name, 440, 600)
+		ui = new(user, src, ui_key, "vending_machine.tmpl", name, 540, 600)
 		ui.set_initial_data(data)
 		ui.open()
 
@@ -259,7 +256,7 @@
 	if (!user.unEquip(W))
 		return
 
-	user << "<span class='notice'>You insert \the [W] in \the [src].</span>"
+	to_chat(user, "<span class='notice'>You insert \the [W] in \the [src].</span>")
 	R.amount++
 	qdel(W)
 

@@ -64,12 +64,12 @@ default behaviour is:
 			for (var/mob/living/M in range(tmob, TRUE))
 				if (tmob.pinned.len ||  ((M.pulling == tmob && ( tmob.restrained() && !( M.restrained() ) && M.stat == FALSE)) || locate(/obj/item/weapon/grab, tmob.grabbed_by.len)) )
 					if ( !(world.time % 5) )
-						src << "<span class='warning'>[tmob] is restrained, you cannot push past.</span>"
+						to_chat(src, "<span class='warning'>[tmob] is restrained, you cannot push past.</span>")
 					now_pushing = FALSE
 					return
 				if ( tmob.pulling == M && ( M.restrained() && !( tmob.restrained() ) && tmob.stat == FALSE) )
 					if ( !(world.time % 5) )
-						src << "<span class='warning'>[tmob] is restraining [M], you cannot push past.</span>"
+						to_chat(src, "<span class='warning'>[tmob] is restraining [M], you cannot push past.</span>")
 					now_pushing = FALSE
 					return
 
@@ -156,7 +156,7 @@ default behaviour is:
 			return TRUE
 
 /mob/living/proc/can_swap_with(var/mob/living/tmob)
-	if (map && (map.ID == MAP_FOOTBALL || map.ID == MAP_FOOTBALL_CMP))
+	if (map && istype(map, /obj/map_metadata/football))
 		return FALSE
 	if (ishuman(src))
 		var/mob/living/human/H = src
@@ -182,14 +182,20 @@ default behaviour is:
 	set name = "Succumb"
 	set desc = "Succumb to death."
 	set category = "IC"
-	if (getTotalDmg() > 60)
+
+	if (map.ID == MAP_WIZARD_BOY)
+		var/area/H_area = get_area(src)
+		if (H_area && istype(H_area, /area/caribbean/houses/nml_three))
+			to_chat(src, "<span class = 'notice'>You cannot succumb while in prison.</span>")
+			return
+	if (getTotalDmg() > 50)
 		if (WWinput(src, "Are you sure you want to succumb? You only live once.", "", "Cancel", list("Succumb", "Cancel")) == "Succumb")
 			adjustBrainLoss(300)
 			death()
-			src << "<span class = 'notice'>You have given up life and succumbed to death.</span>"
+			to_chat(src, "<span class = 'notice'>You have given up life and succumbed to death.</span>")
 			return
 	else
-		src << "<span class = 'notice'>You cannot succumb in this map unless you have very high damage!</span>"
+		to_chat(src, "<span class = 'notice'>You cannot succumb in this map unless you have very high damage!</span>")
 		return
 
 
@@ -243,11 +249,9 @@ default behaviour is:
 
 /mob/living/proc/adjustBruteLoss(var/amount)
 	if (status_flags & GODMODE)	return FALSE	//godmode
-	if (ishuman(src))
-		var/mob/living/human/H = src
-		if (H.takes_less_damage)
-			amount /= H.getStatCoeff("strength")
 	bruteloss = min(max(bruteloss + amount, FALSE),(maxHealth*2))
+	if (amount > 0)
+		check_arena_promotion()
 	return TRUE
 
 /mob/living/proc/getBurnLoss()
@@ -255,29 +259,20 @@ default behaviour is:
 
 /mob/living/proc/adjustBurnLoss(var/amount)
 	if (status_flags & GODMODE)	return FALSE	//godmode
-	if (ishuman(src))
-		var/mob/living/human/H = src
-		if (H.takes_less_damage)
-			amount /= H.getStatCoeff("strength")
 	burnloss = min(max(burnloss + amount, FALSE),(maxHealth*2))
+	if (amount > 0)
+		check_arena_promotion()
+	return TRUE
 
 /mob/living/proc/getOxyLoss()
 	return oxyloss
 
 /mob/living/proc/adjustOxyLoss(var/amount)
 	if (status_flags & GODMODE)	return FALSE	//godmode
-	if (ishuman(src))
-		var/mob/living/human/H = src
-		if (H.takes_less_damage)
-			amount /= H.getStatCoeff("strength")
 	oxyloss = min(max(oxyloss + amount, FALSE),(maxHealth*2))
 
 /mob/living/proc/setOxyLoss(var/amount)
 	if (status_flags & GODMODE)	return FALSE	//godmode
-	if (ishuman(src))
-		var/mob/living/human/H = src
-		if (H.takes_less_damage)
-			amount /= H.getStatCoeff("strength")
 	oxyloss = amount
 
 /mob/living/proc/getToxLoss()
@@ -285,18 +280,12 @@ default behaviour is:
 
 /mob/living/proc/adjustToxLoss(var/amount)
 	if (status_flags & GODMODE)	return FALSE	//godmode
-	if (ishuman(src))
-		var/mob/living/human/H = src
-		if (H.takes_less_damage)
-			amount /= H.getStatCoeff("strength")
 	toxloss = min(max(toxloss + amount, FALSE),(maxHealth*2))
-
+	if (amount > 0)
+		check_arena_promotion()
+	return TRUE
 /mob/living/proc/setToxLoss(var/amount)
 	if (status_flags & GODMODE)	return FALSE	//godmode
-	if (ishuman(src))
-		var/mob/living/human/H = src
-		if (H.takes_less_damage)
-			amount /= H.getStatCoeff("strength")
 	toxloss = amount
 
 /mob/living/proc/getCloneLoss()
@@ -304,10 +293,6 @@ default behaviour is:
 
 /mob/living/proc/adjustCloneLoss(var/amount)
 	if (status_flags & GODMODE)	return FALSE	//godmode
-	if (ishuman(src))
-		var/mob/living/human/H = src
-		if (H.takes_less_damage)
-			amount /= H.getStatCoeff("strength")
 	cloneloss = min(max(cloneloss + amount, FALSE),(maxHealth*2))
 
 /mob/living/proc/setCloneLoss(var/amount)
@@ -320,6 +305,9 @@ default behaviour is:
 /mob/living/proc/adjustBrainLoss(var/amount)
 	if (status_flags & GODMODE)	return FALSE	//godmode
 	brainloss = min(max(brainloss + amount, FALSE),(maxHealth*2))
+	if (amount > 0)
+		check_arena_promotion()
+	return TRUE
 
 /mob/living/proc/setBrainLoss(var/amount)
 	if (status_flags & GODMODE)	return FALSE	//godmode
@@ -345,6 +333,24 @@ default behaviour is:
 
 /mob/living/proc/setMaxHealth(var/newMaxHealth)
 	maxHealth = newMaxHealth
+
+/**
+ * Performance-optimized check for arena promotions based on damage thresholds.
+ */
+/mob/living/proc/check_arena_promotion()
+	if (!map || map.ID != MAP_WIZARD_BOY || !ishuman(src) || !lastattacker || lastattacker == src || !ishuman(lastattacker))
+		return
+	if (getTotalDmg() < 90)
+		return
+	var/mob/living/human/H = lastattacker
+	if (!H.client)
+		return
+	if (!istype(get_area(src), /area/caribbean/houses/nml_one))
+		return
+	var/obj/map_metadata/wizard_boy/WB = map
+	if (WB.check_level(H.client.ckey) == "4")
+		WB.change_level(H.client.ckey, "5")
+		to_chat(world, "<font size=3 class='wizard'><b>[H.real_name]</b> ([H.key]) has progressed to qualification level 5 (<b>C.H.A.D.</b>) by defeating <b>[real_name]</b> ([key]) in the Arena!</font>")
 
 // ++++ROCKDTBEN++++ MOB PROCS //END
 
@@ -376,7 +382,7 @@ default behaviour is:
 	return FALSE
 
 
-/mob/living/proc/can_inject()
+/mob/living/proc/can_inject(var/mob/user, var/error_msg, var/target_zone)
 	return TRUE
 
 /mob/living/proc/get_organ_target()
@@ -480,7 +486,6 @@ default behaviour is:
 	if (stat == DEAD)
 		dead_mob_list -= src
 		living_mob_list += src
-		tod = null
 		timeofdeath = FALSE
 
 	// restore us to conciousness
@@ -489,8 +494,6 @@ default behaviour is:
 	// make the icons look correct
 	regenerate_icons()
 
-	failed_last_breath = FALSE //So mobs that died of oxyloss don't revive and have perpetual out of breath.
-
 	return
 
 /mob/living/proc/UpdateDamageIcon()
@@ -498,14 +501,15 @@ default behaviour is:
 
 /mob/living/Move(a, b, flag)
 	if (buckled)
-		return
+		return FALSE
 	if (using_drone)
-		return
+		return FALSE
 
 	if (restrained())
 		stop_pulling()
 
 
+	var/moved = FALSE
 	var/t7 = TRUE
 	if (restrained())
 		for (var/mob/living/M in range(src, TRUE))
@@ -513,19 +517,17 @@ default behaviour is:
 				t7 = null
 	if ((t7 && (pulling && ((get_dist(src, pulling) <= 1 || pulling.loc == loc) && (client && client.moving)))))
 		var/turf/T = loc
-		. = ..()
+		moved = ..()
 
 		if (pulling && pulling.loc)
 			if (!( isturf(pulling.loc) ))
 				stop_pulling()
-				return
+				return FALSE
 
-		/////
-		if (pulling && pulling.anchored)
-			stop_pulling()
-			return
-
-		if (!restrained())
+			/////
+			if (pulling && pulling.anchored)
+				stop_pulling()
+				return FALSE
 			var/diag = get_dir(src, pulling)
 			if ((diag - 1) & diag)
 			else
@@ -573,7 +575,7 @@ default behaviour is:
 						step(pulling, get_dir(pulling.loc, T))
 	else
 		stop_pulling()
-		. = ..()
+		moved = ..()
 
 	if (s_active && !( s_active in contents ) && get_turf(s_active) != get_turf(src))	//check !( s_active in contents ) first so we hopefully don't have to call get_turf() so much.
 		s_active.close(src)
@@ -585,6 +587,7 @@ default behaviour is:
 			CT.glide_size = src.glide_size
 			CT.forceMove(src.loc)
 
+	return moved
 
 /mob/living/verb/resist()
 	set name = "Resist"
@@ -619,6 +622,13 @@ default behaviour is:
 
 /mob/living/proc/resist_grab()
 	var/resisting = FALSE
+	if (choked_by)
+		resisting++
+		if (prob(15))
+			visible_message("<span class='warning'>[src] has struggled and broken free from [choked_by]'s strangling vine!</span>", "<span class='warning'>You have successfully struggled and broken free from [choked_by]'s strangling vine!</span>")
+			choked_by.release_mob()
+		else
+			visible_message("<span class='warning'>[src] struggles desperately against [choked_by]'s strangling vine!</span>", "<span class='warning'>You struggle desperately but fail to break free from [choked_by]'s strangling vine!</span>")
 	for (var/obj/O in requests)
 		requests.Remove(O)
 		qdel(O)
@@ -699,9 +709,9 @@ default behaviour is:
 	qdel(possessor)
 /*
 	if (round_is_spooky(6)) // Six or more active cultists.
-		src << "<span class='notice'>You reach out with tendrils of ectoplasm and invade the mind of \the [src]...</span>"
-		src << "<b>You have assumed direct control of \the [src].</b>"
-		src << "<span class='notice'>Due to the spookiness of the round, you have taken control of the poor animal as an invading, possessing spirit - roleplay accordingly.</span>"
+		to_chat(src, "<span class='notice'>You reach out with tendrils of ectoplasm and invade the mind of \the [src]...</span>")
+		to_chat(src, "<b>You have assumed direct control of \the [src].</b>")
+		to_chat(src, "<span class='notice'>Due to the spookiness of the round, you have taken control of the poor animal as an invading, possessing spirit - roleplay accordingly.</span>")
 		universal_speak = TRUE
 		universal_understand = TRUE
 		//cultify() // Maybe another time.
@@ -792,17 +802,10 @@ default behaviour is:
 	pulling = AM
 	AM.pulledby = src
 
-	/*if (pullin)
-		pullin.icon_state = "pull1"*/
 	if (HUDneed.Find("pull"))
 		var/obj/screen/HUDthrow/HUD = HUDneed["pull"]
 		HUD.update_icon()
-/*
-	if (ishuman(AM))
-		var/mob/living/human/H = AM
-		if (H.pull_damage())
-			src << SPAN_WARNING("<b>Pulling \the [H] in their current condition would probably be a bad idea.</b>")
-*/
+
 	//Attempted fix for people flying away through space when cuffed and dragged.
 	if (ismob(AM))
 		var/mob/pulled = AM
@@ -830,16 +833,3 @@ default behaviour is:
 		return
 /mob/living/proc/slip(var/slipped_on,stun_duration=8)
 	return FALSE
-//Code to handle merging stacks when they are in mob's direct inventory.
-//Called when object enters the contents of a mob. Storage items not supported yet.
-//Not used because people don't like it. Might be useful for merging in containers.
-/* /mob/living/Entered(var/obj/item/stack/O)
- * 	..()
- * 	if(istype(O, /obj/item/stack))
- * 		if(O.amount != O.max_amount)
- * 			for(var/obj/item/stack/S in contents)
- * 				if(S.stacktype == O.stacktype && S.amount != S.max_amount)
- * 					if(O.amount == O.max_amount)
- * 						break
- * 					S.merge(O)
- */
